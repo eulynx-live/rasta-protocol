@@ -50,7 +50,7 @@ int event_system_sleep(uint64_t time_to_wait, fd_event* fd_events[], int len) {
  * resulting in a delay of the event
  * @param event the event to delay
  */
-void rescedule_event(timed_event * event) {
+void reschedule_event(timed_event * event) {
     event->__last_call = get_nanotime();
 }
 
@@ -137,7 +137,7 @@ void start_event_loop(timed_event* timed_events[], int timed_events_len, fd_even
  */
 void enable_timed_event(timed_event* event) {
     event->enabled = 1;
-    rescedule_event(event);
+    reschedule_event(event);
 }
 
 /**

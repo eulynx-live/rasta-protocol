@@ -173,7 +173,7 @@ void send_Heartbeat(redundancy_mux *mux, struct rasta_connection * connection, c
 
     connection->sn_t = connection->sn_t +1;
     if (rescedule_manually) {
-        rescedule_event(connection->send_heartbeat_event);
+        reschedule_event(connection->send_heartbeat_event);
     }
 }
 
@@ -214,7 +214,7 @@ void updateTI(long confirmed_timestamp, struct rasta_connection * con, struct Ra
     con->t_i = (uint32_t )(cfg.t_max - t_rtd);
 
     // update the timeout start time
-    rescedule_event(con->timeout_event);
+    reschedule_event(con->timeout_event);
 }
 
 void resetDiagnostic(struct rasta_connection * connection) {
@@ -586,7 +586,7 @@ void sr_retransmit_data(struct rasta_receive_handle *h, struct rasta_connection 
         connection->sn_t = connection->sn_t +1;
 
         // set last message ts
-        rescedule_event(connection->send_heartbeat_event);
+        reschedule_event(connection->send_heartbeat_event);
 
         // free allocated memory of current packet
         freeRastaByteArray(&packets[i]);
@@ -1398,7 +1398,7 @@ char data_send_event(void * carry_data) {
                 connection->sn_t = data.sequence_number + 1;
 
                 // set last message ts
-                rescedule_event(connection->send_heartbeat_event);
+                reschedule_event(connection->send_heartbeat_event);
 
                 connection->hb_stopped = 0;
 

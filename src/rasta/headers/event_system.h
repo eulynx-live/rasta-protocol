@@ -48,7 +48,7 @@ void start_event_loop(timed_event* timed_events[], int timed_events_len, fd_even
  * resulting in a delay of the event
  * @param event the event to delay
  */
-void rescedule_event(timed_event* event);
+void reschedule_event(timed_event* event);
 
 /**
  * enables a timed event, it will fire in event::interval nanoseconds
