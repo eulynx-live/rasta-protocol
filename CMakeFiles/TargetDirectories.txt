@@ -1,0 +1,14 @@
+/home/simon/Projects/rasta-protocol/CMakeFiles/install/strip.dir
+/home/simon/Projects/rasta-protocol/CMakeFiles/install/local.dir
+/home/simon/Projects/rasta-protocol/CMakeFiles/rasta.dir
+/home/simon/Projects/rasta-protocol/CMakeFiles/scip_example_local.dir
+/home/simon/Projects/rasta-protocol/CMakeFiles/scils_example_local.dir
+/home/simon/Projects/rasta-protocol/CMakeFiles/rasta_example_local.dir
+/home/simon/Projects/rasta-protocol/CMakeFiles/scip_example.dir
+/home/simon/Projects/rasta-protocol/CMakeFiles/event_system_example_local.dir
+/home/simon/Projects/rasta-protocol/CMakeFiles/rasta_example.dir
+/home/simon/Projects/rasta-protocol/CMakeFiles/scils_example.dir
+/home/simon/Projects/rasta-protocol/CMakeFiles/list_install_components.dir
+/home/simon/Projects/rasta-protocol/CMakeFiles/install.dir
+/home/simon/Projects/rasta-protocol/CMakeFiles/rebuild_cache.dir
+/home/simon/Projects/rasta-protocol/CMakeFiles/edit_cache.dir

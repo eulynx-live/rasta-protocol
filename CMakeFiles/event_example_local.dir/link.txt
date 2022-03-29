@@ -1,0 +1,1 @@
+/usr/bin/cc    CMakeFiles/event_example_local.dir/src/examples_localhost/c/event_test.c.o  -o bin/exe/examples/event_example_local  -Wl,-rpath,/home/simon/Projects/rasta-protocol/bin/lib bin/lib/librasta.so -lrt -lpthread 

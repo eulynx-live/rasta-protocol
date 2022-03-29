@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/simon/Projects/rasta-protocol/src/examples_localhost/c/event_test.c
+event_system.h
+-
+stdio.h
+-
+unistd.h
+-
+
+src/rasta/headers/event_system.h
+inttypes.h
+-
+time.h
+-
+unistd.h
+-
+

@@ -1,0 +1,1 @@
+/usr/bin/cc -g   CMakeFiles/scip_example_local.dir/src/examples_localhost/c/scip.c.o  -o bin/exe/examples/scip_example_local  -Wl,-rpath,/home/simon/Projects/rasta-protocol/bin/lib bin/lib/librasta.so -lrt 
