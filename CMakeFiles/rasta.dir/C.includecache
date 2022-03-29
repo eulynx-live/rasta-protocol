@@ -6,37 +6,15 @@
 
 #IncludeRegexTransform: 
 
-/home/simon/Projects/rasta-protocol/src/rasta/c/rasta_red_multiplexer.c
-rasta_red_multiplexer.h
--
-rastaredundancy_new.h
--
-string.h
--
-errno.h
--
-string.h
--
-unistd.h
--
-stdlib.h
--
-stdio.h
--
-syscall.h
--
-event_system.h
--
-rastahandle.h
-/home/simon/Projects/rasta-protocol/src/rasta/c/rastahandle.h
+/home/simon/Projects/rasta-protocol/src/rasta/c/event_system.c
 event_system.h
 /home/simon/Projects/rasta-protocol/src/rasta/c/event_system.h
-rmemory.h
-/home/simon/Projects/rasta-protocol/src/rasta/c/rmemory.h
-udp.h
-/home/simon/Projects/rasta-protocol/src/rasta/c/udp.h
-rastautil.h
-/home/simon/Projects/rasta-protocol/src/rasta/c/rastautil.h
+rasta_new.h
+/home/simon/Projects/rasta-protocol/src/rasta/c/rasta_new.h
+time.h
+-
+sys/select.h
+-
 
 src/rasta/headers/config.h
 dictionary.h
@@ -63,6 +41,12 @@ mqueue.h
 -
 fifo.h
 src/rasta/headers/fifo.h
+
+src/rasta/headers/rasta_new.h
+rastahandle.h
+src/rasta/headers/rastahandle.h
+event_system.h
+src/rasta/headers/event_system.h
 
 src/rasta/headers/rasta_red_multiplexer.h
 stdint.h
@@ -170,13 +154,5 @@ string.h
 
 src/rasta/headers/rastautil.h
 stdint.h
--
-
-src/rasta/headers/rmemory.h
-
-src/rasta/headers/udp.h
-stdint.h
--
-netinet/in.h
 -
 
