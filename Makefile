@@ -90,18 +90,6 @@ list_install_components/fast: list_install_components
 
 .PHONY : list_install_components/fast
 
-# Special rule for the target install
-install: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
-.PHONY : install
-
-# Special rule for the target install
-install/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
-.PHONY : install/fast
-
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -123,6 +111,29 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target test
+test:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running tests..."
+	/usr/bin/ctest --force-new-ctest-process $(ARGS)
+.PHONY : test
+
+# Special rule for the target test
+test/fast: test
+
+.PHONY : test/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -157,6 +168,370 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named NightlyMemCheck
+
+# Build rule for target.
+NightlyMemCheck: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyMemCheck
+.PHONY : NightlyMemCheck
+
+# fast build rule for target.
+NightlyMemCheck/fast:
+	$(MAKE) -f CMakeFiles/NightlyMemCheck.dir/build.make CMakeFiles/NightlyMemCheck.dir/build
+.PHONY : NightlyMemCheck/fast
+
+#=============================================================================
+# Target rules for targets named NightlyTest
+
+# Build rule for target.
+NightlyTest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyTest
+.PHONY : NightlyTest
+
+# fast build rule for target.
+NightlyTest/fast:
+	$(MAKE) -f CMakeFiles/NightlyTest.dir/build.make CMakeFiles/NightlyTest.dir/build
+.PHONY : NightlyTest/fast
+
+#=============================================================================
+# Target rules for targets named ContinuousConfigure
+
+# Build rule for target.
+ContinuousConfigure: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ContinuousConfigure
+.PHONY : ContinuousConfigure
+
+# fast build rule for target.
+ContinuousConfigure/fast:
+	$(MAKE) -f CMakeFiles/ContinuousConfigure.dir/build.make CMakeFiles/ContinuousConfigure.dir/build
+.PHONY : ContinuousConfigure/fast
+
+#=============================================================================
+# Target rules for targets named ContinuousBuild
+
+# Build rule for target.
+ContinuousBuild: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ContinuousBuild
+.PHONY : ContinuousBuild
+
+# fast build rule for target.
+ContinuousBuild/fast:
+	$(MAKE) -f CMakeFiles/ContinuousBuild.dir/build.make CMakeFiles/ContinuousBuild.dir/build
+.PHONY : ContinuousBuild/fast
+
+#=============================================================================
+# Target rules for targets named NightlyConfigure
+
+# Build rule for target.
+NightlyConfigure: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyConfigure
+.PHONY : NightlyConfigure
+
+# fast build rule for target.
+NightlyConfigure/fast:
+	$(MAKE) -f CMakeFiles/NightlyConfigure.dir/build.make CMakeFiles/NightlyConfigure.dir/build
+.PHONY : NightlyConfigure/fast
+
+#=============================================================================
+# Target rules for targets named NightlyMemoryCheck
+
+# Build rule for target.
+NightlyMemoryCheck: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyMemoryCheck
+.PHONY : NightlyMemoryCheck
+
+# fast build rule for target.
+NightlyMemoryCheck/fast:
+	$(MAKE) -f CMakeFiles/NightlyMemoryCheck.dir/build.make CMakeFiles/NightlyMemoryCheck.dir/build
+.PHONY : NightlyMemoryCheck/fast
+
+#=============================================================================
+# Target rules for targets named ExperimentalTest
+
+# Build rule for target.
+ExperimentalTest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalTest
+.PHONY : ExperimentalTest
+
+# fast build rule for target.
+ExperimentalTest/fast:
+	$(MAKE) -f CMakeFiles/ExperimentalTest.dir/build.make CMakeFiles/ExperimentalTest.dir/build
+.PHONY : ExperimentalTest/fast
+
+#=============================================================================
+# Target rules for targets named ContinuousUpdate
+
+# Build rule for target.
+ContinuousUpdate: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ContinuousUpdate
+.PHONY : ContinuousUpdate
+
+# fast build rule for target.
+ContinuousUpdate/fast:
+	$(MAKE) -f CMakeFiles/ContinuousUpdate.dir/build.make CMakeFiles/ContinuousUpdate.dir/build
+.PHONY : ContinuousUpdate/fast
+
+#=============================================================================
+# Target rules for targets named NightlyUpdate
+
+# Build rule for target.
+NightlyUpdate: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyUpdate
+.PHONY : NightlyUpdate
+
+# fast build rule for target.
+NightlyUpdate/fast:
+	$(MAKE) -f CMakeFiles/NightlyUpdate.dir/build.make CMakeFiles/NightlyUpdate.dir/build
+.PHONY : NightlyUpdate/fast
+
+#=============================================================================
+# Target rules for targets named ExperimentalMemCheck
+
+# Build rule for target.
+ExperimentalMemCheck: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalMemCheck
+.PHONY : ExperimentalMemCheck
+
+# fast build rule for target.
+ExperimentalMemCheck/fast:
+	$(MAKE) -f CMakeFiles/ExperimentalMemCheck.dir/build.make CMakeFiles/ExperimentalMemCheck.dir/build
+.PHONY : ExperimentalMemCheck/fast
+
+#=============================================================================
+# Target rules for targets named ExperimentalSubmit
+
+# Build rule for target.
+ExperimentalSubmit: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalSubmit
+.PHONY : ExperimentalSubmit
+
+# fast build rule for target.
+ExperimentalSubmit/fast:
+	$(MAKE) -f CMakeFiles/ExperimentalSubmit.dir/build.make CMakeFiles/ExperimentalSubmit.dir/build
+.PHONY : ExperimentalSubmit/fast
+
+#=============================================================================
+# Target rules for targets named Experimental
+
+# Build rule for target.
+Experimental: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Experimental
+.PHONY : Experimental
+
+# fast build rule for target.
+Experimental/fast:
+	$(MAKE) -f CMakeFiles/Experimental.dir/build.make CMakeFiles/Experimental.dir/build
+.PHONY : Experimental/fast
+
+#=============================================================================
+# Target rules for targets named ContinuousCoverage
+
+# Build rule for target.
+ContinuousCoverage: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ContinuousCoverage
+.PHONY : ContinuousCoverage
+
+# fast build rule for target.
+ContinuousCoverage/fast:
+	$(MAKE) -f CMakeFiles/ContinuousCoverage.dir/build.make CMakeFiles/ContinuousCoverage.dir/build
+.PHONY : ContinuousCoverage/fast
+
+#=============================================================================
+# Target rules for targets named ExperimentalConfigure
+
+# Build rule for target.
+ExperimentalConfigure: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalConfigure
+.PHONY : ExperimentalConfigure
+
+# fast build rule for target.
+ExperimentalConfigure/fast:
+	$(MAKE) -f CMakeFiles/ExperimentalConfigure.dir/build.make CMakeFiles/ExperimentalConfigure.dir/build
+.PHONY : ExperimentalConfigure/fast
+
+#=============================================================================
+# Target rules for targets named Continuous
+
+# Build rule for target.
+Continuous: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Continuous
+.PHONY : Continuous
+
+# fast build rule for target.
+Continuous/fast:
+	$(MAKE) -f CMakeFiles/Continuous.dir/build.make CMakeFiles/Continuous.dir/build
+.PHONY : Continuous/fast
+
+#=============================================================================
+# Target rules for targets named Nightly
+
+# Build rule for target.
+Nightly: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Nightly
+.PHONY : Nightly
+
+# fast build rule for target.
+Nightly/fast:
+	$(MAKE) -f CMakeFiles/Nightly.dir/build.make CMakeFiles/Nightly.dir/build
+.PHONY : Nightly/fast
+
+#=============================================================================
+# Target rules for targets named NightlySubmit
+
+# Build rule for target.
+NightlySubmit: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlySubmit
+.PHONY : NightlySubmit
+
+# fast build rule for target.
+NightlySubmit/fast:
+	$(MAKE) -f CMakeFiles/NightlySubmit.dir/build.make CMakeFiles/NightlySubmit.dir/build
+.PHONY : NightlySubmit/fast
+
+#=============================================================================
+# Target rules for targets named NightlyStart
+
+# Build rule for target.
+NightlyStart: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyStart
+.PHONY : NightlyStart
+
+# fast build rule for target.
+NightlyStart/fast:
+	$(MAKE) -f CMakeFiles/NightlyStart.dir/build.make CMakeFiles/NightlyStart.dir/build
+.PHONY : NightlyStart/fast
+
+#=============================================================================
+# Target rules for targets named ExperimentalCoverage
+
+# Build rule for target.
+ExperimentalCoverage: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalCoverage
+.PHONY : ExperimentalCoverage
+
+# fast build rule for target.
+ExperimentalCoverage/fast:
+	$(MAKE) -f CMakeFiles/ExperimentalCoverage.dir/build.make CMakeFiles/ExperimentalCoverage.dir/build
+.PHONY : ExperimentalCoverage/fast
+
+#=============================================================================
+# Target rules for targets named NightlyCoverage
+
+# Build rule for target.
+NightlyCoverage: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyCoverage
+.PHONY : NightlyCoverage
+
+# fast build rule for target.
+NightlyCoverage/fast:
+	$(MAKE) -f CMakeFiles/NightlyCoverage.dir/build.make CMakeFiles/NightlyCoverage.dir/build
+.PHONY : NightlyCoverage/fast
+
+#=============================================================================
+# Target rules for targets named ExperimentalStart
+
+# Build rule for target.
+ExperimentalStart: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalStart
+.PHONY : ExperimentalStart
+
+# fast build rule for target.
+ExperimentalStart/fast:
+	$(MAKE) -f CMakeFiles/ExperimentalStart.dir/build.make CMakeFiles/ExperimentalStart.dir/build
+.PHONY : ExperimentalStart/fast
+
+#=============================================================================
+# Target rules for targets named NightlyBuild
+
+# Build rule for target.
+NightlyBuild: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 NightlyBuild
+.PHONY : NightlyBuild
+
+# fast build rule for target.
+NightlyBuild/fast:
+	$(MAKE) -f CMakeFiles/NightlyBuild.dir/build.make CMakeFiles/NightlyBuild.dir/build
+.PHONY : NightlyBuild/fast
+
+#=============================================================================
+# Target rules for targets named ExperimentalBuild
+
+# Build rule for target.
+ExperimentalBuild: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalBuild
+.PHONY : ExperimentalBuild
+
+# fast build rule for target.
+ExperimentalBuild/fast:
+	$(MAKE) -f CMakeFiles/ExperimentalBuild.dir/build.make CMakeFiles/ExperimentalBuild.dir/build
+.PHONY : ExperimentalBuild/fast
+
+#=============================================================================
+# Target rules for targets named ExperimentalUpdate
+
+# Build rule for target.
+ExperimentalUpdate: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ExperimentalUpdate
+.PHONY : ExperimentalUpdate
+
+# fast build rule for target.
+ExperimentalUpdate/fast:
+	$(MAKE) -f CMakeFiles/ExperimentalUpdate.dir/build.make CMakeFiles/ExperimentalUpdate.dir/build
+.PHONY : ExperimentalUpdate/fast
+
+#=============================================================================
+# Target rules for targets named ContinuousStart
+
+# Build rule for target.
+ContinuousStart: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ContinuousStart
+.PHONY : ContinuousStart
+
+# fast build rule for target.
+ContinuousStart/fast:
+	$(MAKE) -f CMakeFiles/ContinuousStart.dir/build.make CMakeFiles/ContinuousStart.dir/build
+.PHONY : ContinuousStart/fast
+
+#=============================================================================
+# Target rules for targets named ContinuousMemCheck
+
+# Build rule for target.
+ContinuousMemCheck: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ContinuousMemCheck
+.PHONY : ContinuousMemCheck
+
+# fast build rule for target.
+ContinuousMemCheck/fast:
+	$(MAKE) -f CMakeFiles/ContinuousMemCheck.dir/build.make CMakeFiles/ContinuousMemCheck.dir/build
+.PHONY : ContinuousMemCheck/fast
+
+#=============================================================================
+# Target rules for targets named ContinuousTest
+
+# Build rule for target.
+ContinuousTest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ContinuousTest
+.PHONY : ContinuousTest
+
+# fast build rule for target.
+ContinuousTest/fast:
+	$(MAKE) -f CMakeFiles/ContinuousTest.dir/build.make CMakeFiles/ContinuousTest.dir/build
+.PHONY : ContinuousTest/fast
+
+#=============================================================================
+# Target rules for targets named ContinuousSubmit
+
+# Build rule for target.
+ContinuousSubmit: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 ContinuousSubmit
+.PHONY : ContinuousSubmit
+
+# fast build rule for target.
+ContinuousSubmit/fast:
+	$(MAKE) -f CMakeFiles/ContinuousSubmit.dir/build.make CMakeFiles/ContinuousSubmit.dir/build
+.PHONY : ContinuousSubmit/fast
+
+#=============================================================================
 # Target rules for targets named rasta
 
 # Build rule for target.
@@ -166,60 +541,34 @@ rasta: cmake_check_build_system
 
 # fast build rule for target.
 rasta/fast:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/build
+	$(MAKE) -f src/CMakeFiles/rasta.dir/build.make src/CMakeFiles/rasta.dir/build
 .PHONY : rasta/fast
 
 #=============================================================================
-# Target rules for targets named scip_example_local
+# Target rules for targets named sciTest
 
 # Build rule for target.
-scip_example_local: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 scip_example_local
-.PHONY : scip_example_local
+sciTest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 sciTest
+.PHONY : sciTest
 
 # fast build rule for target.
-scip_example_local/fast:
-	$(MAKE) -f CMakeFiles/scip_example_local.dir/build.make CMakeFiles/scip_example_local.dir/build
-.PHONY : scip_example_local/fast
+sciTest/fast:
+	$(MAKE) -f test/CMakeFiles/sciTest.dir/build.make test/CMakeFiles/sciTest.dir/build
+.PHONY : sciTest/fast
 
 #=============================================================================
-# Target rules for targets named scils_example_local
+# Target rules for targets named rastaTest
 
 # Build rule for target.
-scils_example_local: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 scils_example_local
-.PHONY : scils_example_local
+rastaTest: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 rastaTest
+.PHONY : rastaTest
 
 # fast build rule for target.
-scils_example_local/fast:
-	$(MAKE) -f CMakeFiles/scils_example_local.dir/build.make CMakeFiles/scils_example_local.dir/build
-.PHONY : scils_example_local/fast
-
-#=============================================================================
-# Target rules for targets named rasta_example_local
-
-# Build rule for target.
-rasta_example_local: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 rasta_example_local
-.PHONY : rasta_example_local
-
-# fast build rule for target.
-rasta_example_local/fast:
-	$(MAKE) -f CMakeFiles/rasta_example_local.dir/build.make CMakeFiles/rasta_example_local.dir/build
-.PHONY : rasta_example_local/fast
-
-#=============================================================================
-# Target rules for targets named scip_example
-
-# Build rule for target.
-scip_example: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 scip_example
-.PHONY : scip_example
-
-# fast build rule for target.
-scip_example/fast:
-	$(MAKE) -f CMakeFiles/scip_example.dir/build.make CMakeFiles/scip_example.dir/build
-.PHONY : scip_example/fast
+rastaTest/fast:
+	$(MAKE) -f test/CMakeFiles/rastaTest.dir/build.make test/CMakeFiles/rastaTest.dir/build
+.PHONY : rastaTest/fast
 
 #=============================================================================
 # Target rules for targets named event_system_example_local
@@ -231,21 +580,47 @@ event_system_example_local: cmake_check_build_system
 
 # fast build rule for target.
 event_system_example_local/fast:
-	$(MAKE) -f CMakeFiles/event_system_example_local.dir/build.make CMakeFiles/event_system_example_local.dir/build
+	$(MAKE) -f examples/CMakeFiles/event_system_example_local.dir/build.make examples/CMakeFiles/event_system_example_local.dir/build
 .PHONY : event_system_example_local/fast
 
 #=============================================================================
-# Target rules for targets named rasta_example
+# Target rules for targets named rasta_example_local
 
 # Build rule for target.
-rasta_example: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 rasta_example
-.PHONY : rasta_example
+rasta_example_local: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 rasta_example_local
+.PHONY : rasta_example_local
 
 # fast build rule for target.
-rasta_example/fast:
-	$(MAKE) -f CMakeFiles/rasta_example.dir/build.make CMakeFiles/rasta_example.dir/build
-.PHONY : rasta_example/fast
+rasta_example_local/fast:
+	$(MAKE) -f examples/CMakeFiles/rasta_example_local.dir/build.make examples/CMakeFiles/rasta_example_local.dir/build
+.PHONY : rasta_example_local/fast
+
+#=============================================================================
+# Target rules for targets named scils_example_local
+
+# Build rule for target.
+scils_example_local: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 scils_example_local
+.PHONY : scils_example_local
+
+# fast build rule for target.
+scils_example_local/fast:
+	$(MAKE) -f examples/CMakeFiles/scils_example_local.dir/build.make examples/CMakeFiles/scils_example_local.dir/build
+.PHONY : scils_example_local/fast
+
+#=============================================================================
+# Target rules for targets named scip_example_local
+
+# Build rule for target.
+scip_example_local: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 scip_example_local
+.PHONY : scip_example_local
+
+# fast build rule for target.
+scip_example_local/fast:
+	$(MAKE) -f examples/CMakeFiles/scip_example_local.dir/build.make examples/CMakeFiles/scip_example_local.dir/build
+.PHONY : scip_example_local/fast
 
 #=============================================================================
 # Target rules for targets named scils_example
@@ -257,953 +632,34 @@ scils_example: cmake_check_build_system
 
 # fast build rule for target.
 scils_example/fast:
-	$(MAKE) -f CMakeFiles/scils_example.dir/build.make CMakeFiles/scils_example.dir/build
+	$(MAKE) -f examples/scils_example/CMakeFiles/scils_example.dir/build.make examples/scils_example/CMakeFiles/scils_example.dir/build
 .PHONY : scils_example/fast
 
-src/examples_localhost/c/event_test.o: src/examples_localhost/c/event_test.c.o
-
-.PHONY : src/examples_localhost/c/event_test.o
-
-# target to build an object file
-src/examples_localhost/c/event_test.c.o:
-	$(MAKE) -f CMakeFiles/event_system_example_local.dir/build.make CMakeFiles/event_system_example_local.dir/src/examples_localhost/c/event_test.c.o
-.PHONY : src/examples_localhost/c/event_test.c.o
-
-src/examples_localhost/c/event_test.i: src/examples_localhost/c/event_test.c.i
-
-.PHONY : src/examples_localhost/c/event_test.i
-
-# target to preprocess a source file
-src/examples_localhost/c/event_test.c.i:
-	$(MAKE) -f CMakeFiles/event_system_example_local.dir/build.make CMakeFiles/event_system_example_local.dir/src/examples_localhost/c/event_test.c.i
-.PHONY : src/examples_localhost/c/event_test.c.i
-
-src/examples_localhost/c/event_test.s: src/examples_localhost/c/event_test.c.s
-
-.PHONY : src/examples_localhost/c/event_test.s
-
-# target to generate assembly for a file
-src/examples_localhost/c/event_test.c.s:
-	$(MAKE) -f CMakeFiles/event_system_example_local.dir/build.make CMakeFiles/event_system_example_local.dir/src/examples_localhost/c/event_test.c.s
-.PHONY : src/examples_localhost/c/event_test.c.s
-
-src/examples_localhost/c/rasta.o: src/examples_localhost/c/rasta.c.o
-
-.PHONY : src/examples_localhost/c/rasta.o
-
-# target to build an object file
-src/examples_localhost/c/rasta.c.o:
-	$(MAKE) -f CMakeFiles/rasta_example_local.dir/build.make CMakeFiles/rasta_example_local.dir/src/examples_localhost/c/rasta.c.o
-.PHONY : src/examples_localhost/c/rasta.c.o
-
-src/examples_localhost/c/rasta.i: src/examples_localhost/c/rasta.c.i
-
-.PHONY : src/examples_localhost/c/rasta.i
-
-# target to preprocess a source file
-src/examples_localhost/c/rasta.c.i:
-	$(MAKE) -f CMakeFiles/rasta_example_local.dir/build.make CMakeFiles/rasta_example_local.dir/src/examples_localhost/c/rasta.c.i
-.PHONY : src/examples_localhost/c/rasta.c.i
-
-src/examples_localhost/c/rasta.s: src/examples_localhost/c/rasta.c.s
-
-.PHONY : src/examples_localhost/c/rasta.s
-
-# target to generate assembly for a file
-src/examples_localhost/c/rasta.c.s:
-	$(MAKE) -f CMakeFiles/rasta_example_local.dir/build.make CMakeFiles/rasta_example_local.dir/src/examples_localhost/c/rasta.c.s
-.PHONY : src/examples_localhost/c/rasta.c.s
-
-src/examples_localhost/c/scils.o: src/examples_localhost/c/scils.c.o
-
-.PHONY : src/examples_localhost/c/scils.o
-
-# target to build an object file
-src/examples_localhost/c/scils.c.o:
-	$(MAKE) -f CMakeFiles/scils_example_local.dir/build.make CMakeFiles/scils_example_local.dir/src/examples_localhost/c/scils.c.o
-.PHONY : src/examples_localhost/c/scils.c.o
-
-src/examples_localhost/c/scils.i: src/examples_localhost/c/scils.c.i
-
-.PHONY : src/examples_localhost/c/scils.i
-
-# target to preprocess a source file
-src/examples_localhost/c/scils.c.i:
-	$(MAKE) -f CMakeFiles/scils_example_local.dir/build.make CMakeFiles/scils_example_local.dir/src/examples_localhost/c/scils.c.i
-.PHONY : src/examples_localhost/c/scils.c.i
-
-src/examples_localhost/c/scils.s: src/examples_localhost/c/scils.c.s
-
-.PHONY : src/examples_localhost/c/scils.s
-
-# target to generate assembly for a file
-src/examples_localhost/c/scils.c.s:
-	$(MAKE) -f CMakeFiles/scils_example_local.dir/build.make CMakeFiles/scils_example_local.dir/src/examples_localhost/c/scils.c.s
-.PHONY : src/examples_localhost/c/scils.c.s
-
-src/examples_localhost/c/scip.o: src/examples_localhost/c/scip.c.o
-
-.PHONY : src/examples_localhost/c/scip.o
-
-# target to build an object file
-src/examples_localhost/c/scip.c.o:
-	$(MAKE) -f CMakeFiles/scip_example_local.dir/build.make CMakeFiles/scip_example_local.dir/src/examples_localhost/c/scip.c.o
-.PHONY : src/examples_localhost/c/scip.c.o
-
-src/examples_localhost/c/scip.i: src/examples_localhost/c/scip.c.i
-
-.PHONY : src/examples_localhost/c/scip.i
-
-# target to preprocess a source file
-src/examples_localhost/c/scip.c.i:
-	$(MAKE) -f CMakeFiles/scip_example_local.dir/build.make CMakeFiles/scip_example_local.dir/src/examples_localhost/c/scip.c.i
-.PHONY : src/examples_localhost/c/scip.c.i
-
-src/examples_localhost/c/scip.s: src/examples_localhost/c/scip.c.s
-
-.PHONY : src/examples_localhost/c/scip.s
-
-# target to generate assembly for a file
-src/examples_localhost/c/scip.c.s:
-	$(MAKE) -f CMakeFiles/scip_example_local.dir/build.make CMakeFiles/scip_example_local.dir/src/examples_localhost/c/scip.c.s
-.PHONY : src/examples_localhost/c/scip.c.s
-
-src/rasta/c/config.o: src/rasta/c/config.c.o
-
-.PHONY : src/rasta/c/config.o
-
-# target to build an object file
-src/rasta/c/config.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/config.c.o
-.PHONY : src/rasta/c/config.c.o
-
-src/rasta/c/config.i: src/rasta/c/config.c.i
-
-.PHONY : src/rasta/c/config.i
-
-# target to preprocess a source file
-src/rasta/c/config.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/config.c.i
-.PHONY : src/rasta/c/config.c.i
-
-src/rasta/c/config.s: src/rasta/c/config.c.s
-
-.PHONY : src/rasta/c/config.s
-
-# target to generate assembly for a file
-src/rasta/c/config.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/config.c.s
-.PHONY : src/rasta/c/config.c.s
-
-src/rasta/c/dictionary.o: src/rasta/c/dictionary.c.o
-
-.PHONY : src/rasta/c/dictionary.o
-
-# target to build an object file
-src/rasta/c/dictionary.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/dictionary.c.o
-.PHONY : src/rasta/c/dictionary.c.o
-
-src/rasta/c/dictionary.i: src/rasta/c/dictionary.c.i
-
-.PHONY : src/rasta/c/dictionary.i
-
-# target to preprocess a source file
-src/rasta/c/dictionary.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/dictionary.c.i
-.PHONY : src/rasta/c/dictionary.c.i
-
-src/rasta/c/dictionary.s: src/rasta/c/dictionary.c.s
-
-.PHONY : src/rasta/c/dictionary.s
-
-# target to generate assembly for a file
-src/rasta/c/dictionary.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/dictionary.c.s
-.PHONY : src/rasta/c/dictionary.c.s
-
-src/rasta/c/event_system.o: src/rasta/c/event_system.c.o
-
-.PHONY : src/rasta/c/event_system.o
-
-# target to build an object file
-src/rasta/c/event_system.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/event_system.c.o
-.PHONY : src/rasta/c/event_system.c.o
-
-src/rasta/c/event_system.i: src/rasta/c/event_system.c.i
-
-.PHONY : src/rasta/c/event_system.i
-
-# target to preprocess a source file
-src/rasta/c/event_system.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/event_system.c.i
-.PHONY : src/rasta/c/event_system.c.i
-
-src/rasta/c/event_system.s: src/rasta/c/event_system.c.s
-
-.PHONY : src/rasta/c/event_system.s
-
-# target to generate assembly for a file
-src/rasta/c/event_system.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/event_system.c.s
-.PHONY : src/rasta/c/event_system.c.s
-
-src/rasta/c/fifo.o: src/rasta/c/fifo.c.o
-
-.PHONY : src/rasta/c/fifo.o
-
-# target to build an object file
-src/rasta/c/fifo.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/fifo.c.o
-.PHONY : src/rasta/c/fifo.c.o
-
-src/rasta/c/fifo.i: src/rasta/c/fifo.c.i
-
-.PHONY : src/rasta/c/fifo.i
-
-# target to preprocess a source file
-src/rasta/c/fifo.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/fifo.c.i
-.PHONY : src/rasta/c/fifo.c.i
-
-src/rasta/c/fifo.s: src/rasta/c/fifo.c.s
-
-.PHONY : src/rasta/c/fifo.s
-
-# target to generate assembly for a file
-src/rasta/c/fifo.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/fifo.c.s
-.PHONY : src/rasta/c/fifo.c.s
-
-src/rasta/c/logging.o: src/rasta/c/logging.c.o
-
-.PHONY : src/rasta/c/logging.o
-
-# target to build an object file
-src/rasta/c/logging.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/logging.c.o
-.PHONY : src/rasta/c/logging.c.o
-
-src/rasta/c/logging.i: src/rasta/c/logging.c.i
-
-.PHONY : src/rasta/c/logging.i
-
-# target to preprocess a source file
-src/rasta/c/logging.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/logging.c.i
-.PHONY : src/rasta/c/logging.c.i
-
-src/rasta/c/logging.s: src/rasta/c/logging.c.s
-
-.PHONY : src/rasta/c/logging.s
-
-# target to generate assembly for a file
-src/rasta/c/logging.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/logging.c.s
-.PHONY : src/rasta/c/logging.c.s
-
-src/rasta/c/rasta_new.o: src/rasta/c/rasta_new.c.o
-
-.PHONY : src/rasta/c/rasta_new.o
-
-# target to build an object file
-src/rasta/c/rasta_new.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rasta_new.c.o
-.PHONY : src/rasta/c/rasta_new.c.o
-
-src/rasta/c/rasta_new.i: src/rasta/c/rasta_new.c.i
-
-.PHONY : src/rasta/c/rasta_new.i
-
-# target to preprocess a source file
-src/rasta/c/rasta_new.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rasta_new.c.i
-.PHONY : src/rasta/c/rasta_new.c.i
-
-src/rasta/c/rasta_new.s: src/rasta/c/rasta_new.c.s
-
-.PHONY : src/rasta/c/rasta_new.s
-
-# target to generate assembly for a file
-src/rasta/c/rasta_new.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rasta_new.c.s
-.PHONY : src/rasta/c/rasta_new.c.s
-
-src/rasta/c/rasta_red_multiplexer.o: src/rasta/c/rasta_red_multiplexer.c.o
-
-.PHONY : src/rasta/c/rasta_red_multiplexer.o
-
-# target to build an object file
-src/rasta/c/rasta_red_multiplexer.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rasta_red_multiplexer.c.o
-.PHONY : src/rasta/c/rasta_red_multiplexer.c.o
-
-src/rasta/c/rasta_red_multiplexer.i: src/rasta/c/rasta_red_multiplexer.c.i
-
-.PHONY : src/rasta/c/rasta_red_multiplexer.i
-
-# target to preprocess a source file
-src/rasta/c/rasta_red_multiplexer.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rasta_red_multiplexer.c.i
-.PHONY : src/rasta/c/rasta_red_multiplexer.c.i
-
-src/rasta/c/rasta_red_multiplexer.s: src/rasta/c/rasta_red_multiplexer.c.s
-
-.PHONY : src/rasta/c/rasta_red_multiplexer.s
-
-# target to generate assembly for a file
-src/rasta/c/rasta_red_multiplexer.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rasta_red_multiplexer.c.s
-.PHONY : src/rasta/c/rasta_red_multiplexer.c.s
-
-src/rasta/c/rastablake2.o: src/rasta/c/rastablake2.c.o
-
-.PHONY : src/rasta/c/rastablake2.o
-
-# target to build an object file
-src/rasta/c/rastablake2.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastablake2.c.o
-.PHONY : src/rasta/c/rastablake2.c.o
-
-src/rasta/c/rastablake2.i: src/rasta/c/rastablake2.c.i
-
-.PHONY : src/rasta/c/rastablake2.i
-
-# target to preprocess a source file
-src/rasta/c/rastablake2.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastablake2.c.i
-.PHONY : src/rasta/c/rastablake2.c.i
-
-src/rasta/c/rastablake2.s: src/rasta/c/rastablake2.c.s
-
-.PHONY : src/rasta/c/rastablake2.s
-
-# target to generate assembly for a file
-src/rasta/c/rastablake2.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastablake2.c.s
-.PHONY : src/rasta/c/rastablake2.c.s
-
-src/rasta/c/rastacrc.o: src/rasta/c/rastacrc.c.o
-
-.PHONY : src/rasta/c/rastacrc.o
-
-# target to build an object file
-src/rasta/c/rastacrc.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastacrc.c.o
-.PHONY : src/rasta/c/rastacrc.c.o
-
-src/rasta/c/rastacrc.i: src/rasta/c/rastacrc.c.i
-
-.PHONY : src/rasta/c/rastacrc.i
-
-# target to preprocess a source file
-src/rasta/c/rastacrc.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastacrc.c.i
-.PHONY : src/rasta/c/rastacrc.c.i
-
-src/rasta/c/rastacrc.s: src/rasta/c/rastacrc.c.s
-
-.PHONY : src/rasta/c/rastacrc.s
-
-# target to generate assembly for a file
-src/rasta/c/rastacrc.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastacrc.c.s
-.PHONY : src/rasta/c/rastacrc.c.s
-
-src/rasta/c/rastadeferqueue.o: src/rasta/c/rastadeferqueue.c.o
-
-.PHONY : src/rasta/c/rastadeferqueue.o
-
-# target to build an object file
-src/rasta/c/rastadeferqueue.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastadeferqueue.c.o
-.PHONY : src/rasta/c/rastadeferqueue.c.o
-
-src/rasta/c/rastadeferqueue.i: src/rasta/c/rastadeferqueue.c.i
-
-.PHONY : src/rasta/c/rastadeferqueue.i
-
-# target to preprocess a source file
-src/rasta/c/rastadeferqueue.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastadeferqueue.c.i
-.PHONY : src/rasta/c/rastadeferqueue.c.i
-
-src/rasta/c/rastadeferqueue.s: src/rasta/c/rastadeferqueue.c.s
-
-.PHONY : src/rasta/c/rastadeferqueue.s
-
-# target to generate assembly for a file
-src/rasta/c/rastadeferqueue.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastadeferqueue.c.s
-.PHONY : src/rasta/c/rastadeferqueue.c.s
-
-src/rasta/c/rastafactory.o: src/rasta/c/rastafactory.c.o
-
-.PHONY : src/rasta/c/rastafactory.o
-
-# target to build an object file
-src/rasta/c/rastafactory.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastafactory.c.o
-.PHONY : src/rasta/c/rastafactory.c.o
-
-src/rasta/c/rastafactory.i: src/rasta/c/rastafactory.c.i
-
-.PHONY : src/rasta/c/rastafactory.i
-
-# target to preprocess a source file
-src/rasta/c/rastafactory.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastafactory.c.i
-.PHONY : src/rasta/c/rastafactory.c.i
-
-src/rasta/c/rastafactory.s: src/rasta/c/rastafactory.c.s
-
-.PHONY : src/rasta/c/rastafactory.s
-
-# target to generate assembly for a file
-src/rasta/c/rastafactory.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastafactory.c.s
-.PHONY : src/rasta/c/rastafactory.c.s
-
-src/rasta/c/rastahandle.o: src/rasta/c/rastahandle.c.o
-
-.PHONY : src/rasta/c/rastahandle.o
-
-# target to build an object file
-src/rasta/c/rastahandle.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastahandle.c.o
-.PHONY : src/rasta/c/rastahandle.c.o
-
-src/rasta/c/rastahandle.i: src/rasta/c/rastahandle.c.i
-
-.PHONY : src/rasta/c/rastahandle.i
-
-# target to preprocess a source file
-src/rasta/c/rastahandle.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastahandle.c.i
-.PHONY : src/rasta/c/rastahandle.c.i
-
-src/rasta/c/rastahandle.s: src/rasta/c/rastahandle.c.s
-
-.PHONY : src/rasta/c/rastahandle.s
-
-# target to generate assembly for a file
-src/rasta/c/rastahandle.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastahandle.c.s
-.PHONY : src/rasta/c/rastahandle.c.s
-
-src/rasta/c/rastahashing.o: src/rasta/c/rastahashing.c.o
-
-.PHONY : src/rasta/c/rastahashing.o
-
-# target to build an object file
-src/rasta/c/rastahashing.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastahashing.c.o
-.PHONY : src/rasta/c/rastahashing.c.o
-
-src/rasta/c/rastahashing.i: src/rasta/c/rastahashing.c.i
-
-.PHONY : src/rasta/c/rastahashing.i
-
-# target to preprocess a source file
-src/rasta/c/rastahashing.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastahashing.c.i
-.PHONY : src/rasta/c/rastahashing.c.i
-
-src/rasta/c/rastahashing.s: src/rasta/c/rastahashing.c.s
-
-.PHONY : src/rasta/c/rastahashing.s
-
-# target to generate assembly for a file
-src/rasta/c/rastahashing.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastahashing.c.s
-.PHONY : src/rasta/c/rastahashing.c.s
-
-src/rasta/c/rastalist.o: src/rasta/c/rastalist.c.o
-
-.PHONY : src/rasta/c/rastalist.o
-
-# target to build an object file
-src/rasta/c/rastalist.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastalist.c.o
-.PHONY : src/rasta/c/rastalist.c.o
-
-src/rasta/c/rastalist.i: src/rasta/c/rastalist.c.i
-
-.PHONY : src/rasta/c/rastalist.i
-
-# target to preprocess a source file
-src/rasta/c/rastalist.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastalist.c.i
-.PHONY : src/rasta/c/rastalist.c.i
-
-src/rasta/c/rastalist.s: src/rasta/c/rastalist.c.s
-
-.PHONY : src/rasta/c/rastalist.s
-
-# target to generate assembly for a file
-src/rasta/c/rastalist.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastalist.c.s
-.PHONY : src/rasta/c/rastalist.c.s
-
-src/rasta/c/rastamd4.o: src/rasta/c/rastamd4.c.o
-
-.PHONY : src/rasta/c/rastamd4.o
-
-# target to build an object file
-src/rasta/c/rastamd4.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastamd4.c.o
-.PHONY : src/rasta/c/rastamd4.c.o
-
-src/rasta/c/rastamd4.i: src/rasta/c/rastamd4.c.i
-
-.PHONY : src/rasta/c/rastamd4.i
-
-# target to preprocess a source file
-src/rasta/c/rastamd4.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastamd4.c.i
-.PHONY : src/rasta/c/rastamd4.c.i
-
-src/rasta/c/rastamd4.s: src/rasta/c/rastamd4.c.s
-
-.PHONY : src/rasta/c/rastamd4.s
-
-# target to generate assembly for a file
-src/rasta/c/rastamd4.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastamd4.c.s
-.PHONY : src/rasta/c/rastamd4.c.s
-
-src/rasta/c/rastamodule.o: src/rasta/c/rastamodule.c.o
-
-.PHONY : src/rasta/c/rastamodule.o
-
-# target to build an object file
-src/rasta/c/rastamodule.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastamodule.c.o
-.PHONY : src/rasta/c/rastamodule.c.o
-
-src/rasta/c/rastamodule.i: src/rasta/c/rastamodule.c.i
-
-.PHONY : src/rasta/c/rastamodule.i
-
-# target to preprocess a source file
-src/rasta/c/rastamodule.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastamodule.c.i
-.PHONY : src/rasta/c/rastamodule.c.i
-
-src/rasta/c/rastamodule.s: src/rasta/c/rastamodule.c.s
-
-.PHONY : src/rasta/c/rastamodule.s
-
-# target to generate assembly for a file
-src/rasta/c/rastamodule.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastamodule.c.s
-.PHONY : src/rasta/c/rastamodule.c.s
-
-src/rasta/c/rastaredundancy_new.o: src/rasta/c/rastaredundancy_new.c.o
-
-.PHONY : src/rasta/c/rastaredundancy_new.o
-
-# target to build an object file
-src/rasta/c/rastaredundancy_new.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastaredundancy_new.c.o
-.PHONY : src/rasta/c/rastaredundancy_new.c.o
-
-src/rasta/c/rastaredundancy_new.i: src/rasta/c/rastaredundancy_new.c.i
-
-.PHONY : src/rasta/c/rastaredundancy_new.i
-
-# target to preprocess a source file
-src/rasta/c/rastaredundancy_new.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastaredundancy_new.c.i
-.PHONY : src/rasta/c/rastaredundancy_new.c.i
-
-src/rasta/c/rastaredundancy_new.s: src/rasta/c/rastaredundancy_new.c.s
-
-.PHONY : src/rasta/c/rastaredundancy_new.s
-
-# target to generate assembly for a file
-src/rasta/c/rastaredundancy_new.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastaredundancy_new.c.s
-.PHONY : src/rasta/c/rastaredundancy_new.c.s
-
-src/rasta/c/rastasiphash24.o: src/rasta/c/rastasiphash24.c.o
-
-.PHONY : src/rasta/c/rastasiphash24.o
-
-# target to build an object file
-src/rasta/c/rastasiphash24.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastasiphash24.c.o
-.PHONY : src/rasta/c/rastasiphash24.c.o
-
-src/rasta/c/rastasiphash24.i: src/rasta/c/rastasiphash24.c.i
-
-.PHONY : src/rasta/c/rastasiphash24.i
-
-# target to preprocess a source file
-src/rasta/c/rastasiphash24.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastasiphash24.c.i
-.PHONY : src/rasta/c/rastasiphash24.c.i
-
-src/rasta/c/rastasiphash24.s: src/rasta/c/rastasiphash24.c.s
-
-.PHONY : src/rasta/c/rastasiphash24.s
-
-# target to generate assembly for a file
-src/rasta/c/rastasiphash24.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastasiphash24.c.s
-.PHONY : src/rasta/c/rastasiphash24.c.s
-
-src/rasta/c/rastautil.o: src/rasta/c/rastautil.c.o
-
-.PHONY : src/rasta/c/rastautil.o
-
-# target to build an object file
-src/rasta/c/rastautil.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastautil.c.o
-.PHONY : src/rasta/c/rastautil.c.o
-
-src/rasta/c/rastautil.i: src/rasta/c/rastautil.c.i
-
-.PHONY : src/rasta/c/rastautil.i
-
-# target to preprocess a source file
-src/rasta/c/rastautil.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastautil.c.i
-.PHONY : src/rasta/c/rastautil.c.i
-
-src/rasta/c/rastautil.s: src/rasta/c/rastautil.c.s
-
-.PHONY : src/rasta/c/rastautil.s
-
-# target to generate assembly for a file
-src/rasta/c/rastautil.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rastautil.c.s
-.PHONY : src/rasta/c/rastautil.c.s
-
-src/rasta/c/rmemory.o: src/rasta/c/rmemory.c.o
-
-.PHONY : src/rasta/c/rmemory.o
-
-# target to build an object file
-src/rasta/c/rmemory.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rmemory.c.o
-.PHONY : src/rasta/c/rmemory.c.o
-
-src/rasta/c/rmemory.i: src/rasta/c/rmemory.c.i
-
-.PHONY : src/rasta/c/rmemory.i
-
-# target to preprocess a source file
-src/rasta/c/rmemory.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rmemory.c.i
-.PHONY : src/rasta/c/rmemory.c.i
-
-src/rasta/c/rmemory.s: src/rasta/c/rmemory.c.s
-
-.PHONY : src/rasta/c/rmemory.s
-
-# target to generate assembly for a file
-src/rasta/c/rmemory.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/rmemory.c.s
-.PHONY : src/rasta/c/rmemory.c.s
-
-src/rasta/c/udp.o: src/rasta/c/udp.c.o
-
-.PHONY : src/rasta/c/udp.o
-
-# target to build an object file
-src/rasta/c/udp.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/udp.c.o
-.PHONY : src/rasta/c/udp.c.o
-
-src/rasta/c/udp.i: src/rasta/c/udp.c.i
-
-.PHONY : src/rasta/c/udp.i
-
-# target to preprocess a source file
-src/rasta/c/udp.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/udp.c.i
-.PHONY : src/rasta/c/udp.c.i
-
-src/rasta/c/udp.s: src/rasta/c/udp.c.s
-
-.PHONY : src/rasta/c/udp.s
-
-# target to generate assembly for a file
-src/rasta/c/udp.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/rasta/c/udp.c.s
-.PHONY : src/rasta/c/udp.c.s
-
-src/rasta_example_new/c/main.o: src/rasta_example_new/c/main.c.o
-
-.PHONY : src/rasta_example_new/c/main.o
-
-# target to build an object file
-src/rasta_example_new/c/main.c.o:
-	$(MAKE) -f CMakeFiles/rasta_example.dir/build.make CMakeFiles/rasta_example.dir/src/rasta_example_new/c/main.c.o
-.PHONY : src/rasta_example_new/c/main.c.o
-
-src/rasta_example_new/c/main.i: src/rasta_example_new/c/main.c.i
-
-.PHONY : src/rasta_example_new/c/main.i
-
-# target to preprocess a source file
-src/rasta_example_new/c/main.c.i:
-	$(MAKE) -f CMakeFiles/rasta_example.dir/build.make CMakeFiles/rasta_example.dir/src/rasta_example_new/c/main.c.i
-.PHONY : src/rasta_example_new/c/main.c.i
-
-src/rasta_example_new/c/main.s: src/rasta_example_new/c/main.c.s
-
-.PHONY : src/rasta_example_new/c/main.s
-
-# target to generate assembly for a file
-src/rasta_example_new/c/main.c.s:
-	$(MAKE) -f CMakeFiles/rasta_example.dir/build.make CMakeFiles/rasta_example.dir/src/rasta_example_new/c/main.c.s
-.PHONY : src/rasta_example_new/c/main.c.s
-
-src/sci/c/hashmap.o: src/sci/c/hashmap.c.o
-
-.PHONY : src/sci/c/hashmap.o
-
-# target to build an object file
-src/sci/c/hashmap.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/hashmap.c.o
-.PHONY : src/sci/c/hashmap.c.o
-
-src/sci/c/hashmap.i: src/sci/c/hashmap.c.i
-
-.PHONY : src/sci/c/hashmap.i
-
-# target to preprocess a source file
-src/sci/c/hashmap.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/hashmap.c.i
-.PHONY : src/sci/c/hashmap.c.i
-
-src/sci/c/hashmap.s: src/sci/c/hashmap.c.s
-
-.PHONY : src/sci/c/hashmap.s
-
-# target to generate assembly for a file
-src/sci/c/hashmap.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/hashmap.c.s
-.PHONY : src/sci/c/hashmap.c.s
-
-src/sci/c/sci.o: src/sci/c/sci.c.o
-
-.PHONY : src/sci/c/sci.o
-
-# target to build an object file
-src/sci/c/sci.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/sci.c.o
-.PHONY : src/sci/c/sci.c.o
-
-src/sci/c/sci.i: src/sci/c/sci.c.i
-
-.PHONY : src/sci/c/sci.i
-
-# target to preprocess a source file
-src/sci/c/sci.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/sci.c.i
-.PHONY : src/sci/c/sci.c.i
-
-src/sci/c/sci.s: src/sci/c/sci.c.s
-
-.PHONY : src/sci/c/sci.s
-
-# target to generate assembly for a file
-src/sci/c/sci.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/sci.c.s
-.PHONY : src/sci/c/sci.c.s
-
-src/sci/c/sci_telegram_factory.o: src/sci/c/sci_telegram_factory.c.o
-
-.PHONY : src/sci/c/sci_telegram_factory.o
-
-# target to build an object file
-src/sci/c/sci_telegram_factory.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/sci_telegram_factory.c.o
-.PHONY : src/sci/c/sci_telegram_factory.c.o
-
-src/sci/c/sci_telegram_factory.i: src/sci/c/sci_telegram_factory.c.i
-
-.PHONY : src/sci/c/sci_telegram_factory.i
-
-# target to preprocess a source file
-src/sci/c/sci_telegram_factory.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/sci_telegram_factory.c.i
-.PHONY : src/sci/c/sci_telegram_factory.c.i
-
-src/sci/c/sci_telegram_factory.s: src/sci/c/sci_telegram_factory.c.s
-
-.PHONY : src/sci/c/sci_telegram_factory.s
-
-# target to generate assembly for a file
-src/sci/c/sci_telegram_factory.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/sci_telegram_factory.c.s
-.PHONY : src/sci/c/sci_telegram_factory.c.s
-
-src/sci/c/scils.o: src/sci/c/scils.c.o
-
-.PHONY : src/sci/c/scils.o
-
-# target to build an object file
-src/sci/c/scils.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/scils.c.o
-.PHONY : src/sci/c/scils.c.o
-
-src/sci/c/scils.i: src/sci/c/scils.c.i
-
-.PHONY : src/sci/c/scils.i
-
-# target to preprocess a source file
-src/sci/c/scils.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/scils.c.i
-.PHONY : src/sci/c/scils.c.i
-
-src/sci/c/scils.s: src/sci/c/scils.c.s
-
-.PHONY : src/sci/c/scils.s
-
-# target to generate assembly for a file
-src/sci/c/scils.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/scils.c.s
-.PHONY : src/sci/c/scils.c.s
-
-src/sci/c/scils_telegram_factory.o: src/sci/c/scils_telegram_factory.c.o
-
-.PHONY : src/sci/c/scils_telegram_factory.o
-
-# target to build an object file
-src/sci/c/scils_telegram_factory.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/scils_telegram_factory.c.o
-.PHONY : src/sci/c/scils_telegram_factory.c.o
-
-src/sci/c/scils_telegram_factory.i: src/sci/c/scils_telegram_factory.c.i
-
-.PHONY : src/sci/c/scils_telegram_factory.i
-
-# target to preprocess a source file
-src/sci/c/scils_telegram_factory.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/scils_telegram_factory.c.i
-.PHONY : src/sci/c/scils_telegram_factory.c.i
-
-src/sci/c/scils_telegram_factory.s: src/sci/c/scils_telegram_factory.c.s
-
-.PHONY : src/sci/c/scils_telegram_factory.s
-
-# target to generate assembly for a file
-src/sci/c/scils_telegram_factory.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/scils_telegram_factory.c.s
-.PHONY : src/sci/c/scils_telegram_factory.c.s
-
-src/sci/c/scip.o: src/sci/c/scip.c.o
-
-.PHONY : src/sci/c/scip.o
-
-# target to build an object file
-src/sci/c/scip.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/scip.c.o
-.PHONY : src/sci/c/scip.c.o
-
-src/sci/c/scip.i: src/sci/c/scip.c.i
-
-.PHONY : src/sci/c/scip.i
-
-# target to preprocess a source file
-src/sci/c/scip.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/scip.c.i
-.PHONY : src/sci/c/scip.c.i
-
-src/sci/c/scip.s: src/sci/c/scip.c.s
-
-.PHONY : src/sci/c/scip.s
-
-# target to generate assembly for a file
-src/sci/c/scip.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/scip.c.s
-.PHONY : src/sci/c/scip.c.s
-
-src/sci/c/scip_telegram_factory.o: src/sci/c/scip_telegram_factory.c.o
-
-.PHONY : src/sci/c/scip_telegram_factory.o
-
-# target to build an object file
-src/sci/c/scip_telegram_factory.c.o:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/scip_telegram_factory.c.o
-.PHONY : src/sci/c/scip_telegram_factory.c.o
-
-src/sci/c/scip_telegram_factory.i: src/sci/c/scip_telegram_factory.c.i
-
-.PHONY : src/sci/c/scip_telegram_factory.i
-
-# target to preprocess a source file
-src/sci/c/scip_telegram_factory.c.i:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/scip_telegram_factory.c.i
-.PHONY : src/sci/c/scip_telegram_factory.c.i
-
-src/sci/c/scip_telegram_factory.s: src/sci/c/scip_telegram_factory.c.s
-
-.PHONY : src/sci/c/scip_telegram_factory.s
-
-# target to generate assembly for a file
-src/sci/c/scip_telegram_factory.c.s:
-	$(MAKE) -f CMakeFiles/rasta.dir/build.make CMakeFiles/rasta.dir/src/sci/c/scip_telegram_factory.c.s
-.PHONY : src/sci/c/scip_telegram_factory.c.s
-
-src/scils_example/c/main.o: src/scils_example/c/main.c.o
-
-.PHONY : src/scils_example/c/main.o
-
-# target to build an object file
-src/scils_example/c/main.c.o:
-	$(MAKE) -f CMakeFiles/scils_example.dir/build.make CMakeFiles/scils_example.dir/src/scils_example/c/main.c.o
-.PHONY : src/scils_example/c/main.c.o
-
-src/scils_example/c/main.i: src/scils_example/c/main.c.i
-
-.PHONY : src/scils_example/c/main.i
-
-# target to preprocess a source file
-src/scils_example/c/main.c.i:
-	$(MAKE) -f CMakeFiles/scils_example.dir/build.make CMakeFiles/scils_example.dir/src/scils_example/c/main.c.i
-.PHONY : src/scils_example/c/main.c.i
-
-src/scils_example/c/main.s: src/scils_example/c/main.c.s
-
-.PHONY : src/scils_example/c/main.s
-
-# target to generate assembly for a file
-src/scils_example/c/main.c.s:
-	$(MAKE) -f CMakeFiles/scils_example.dir/build.make CMakeFiles/scils_example.dir/src/scils_example/c/main.c.s
-.PHONY : src/scils_example/c/main.c.s
-
-src/scip_example/c/main.o: src/scip_example/c/main.c.o
-
-.PHONY : src/scip_example/c/main.o
-
-# target to build an object file
-src/scip_example/c/main.c.o:
-	$(MAKE) -f CMakeFiles/scip_example.dir/build.make CMakeFiles/scip_example.dir/src/scip_example/c/main.c.o
-.PHONY : src/scip_example/c/main.c.o
-
-src/scip_example/c/main.i: src/scip_example/c/main.c.i
-
-.PHONY : src/scip_example/c/main.i
-
-# target to preprocess a source file
-src/scip_example/c/main.c.i:
-	$(MAKE) -f CMakeFiles/scip_example.dir/build.make CMakeFiles/scip_example.dir/src/scip_example/c/main.c.i
-.PHONY : src/scip_example/c/main.c.i
-
-src/scip_example/c/main.s: src/scip_example/c/main.c.s
-
-.PHONY : src/scip_example/c/main.s
-
-# target to generate assembly for a file
-src/scip_example/c/main.c.s:
-	$(MAKE) -f CMakeFiles/scip_example.dir/build.make CMakeFiles/scip_example.dir/src/scip_example/c/main.c.s
-.PHONY : src/scip_example/c/main.c.s
+#=============================================================================
+# Target rules for targets named scip_example
+
+# Build rule for target.
+scip_example: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 scip_example
+.PHONY : scip_example
+
+# fast build rule for target.
+scip_example/fast:
+	$(MAKE) -f examples/scip_example/CMakeFiles/scip_example.dir/build.make examples/scip_example/CMakeFiles/scip_example.dir/build
+.PHONY : scip_example/fast
+
+#=============================================================================
+# Target rules for targets named rasta_example
+
+# Build rule for target.
+rasta_example: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 rasta_example
+.PHONY : rasta_example
+
+# fast build rule for target.
+rasta_example/fast:
+	$(MAKE) -f examples/rasta_example_new/CMakeFiles/rasta_example.dir/build.make examples/rasta_example_new/CMakeFiles/rasta_example.dir/build
+.PHONY : rasta_example/fast
 
 # Help Target
 help:
@@ -1213,123 +669,49 @@ help:
 	@echo "... depend"
 	@echo "... install/strip"
 	@echo "... install/local"
-	@echo "... rasta"
-	@echo "... scip_example_local"
-	@echo "... scils_example_local"
-	@echo "... rasta_example_local"
-	@echo "... scip_example"
-	@echo "... event_system_example_local"
-	@echo "... rasta_example"
-	@echo "... scils_example"
 	@echo "... list_install_components"
-	@echo "... install"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... src/examples_localhost/c/event_test.o"
-	@echo "... src/examples_localhost/c/event_test.i"
-	@echo "... src/examples_localhost/c/event_test.s"
-	@echo "... src/examples_localhost/c/rasta.o"
-	@echo "... src/examples_localhost/c/rasta.i"
-	@echo "... src/examples_localhost/c/rasta.s"
-	@echo "... src/examples_localhost/c/scils.o"
-	@echo "... src/examples_localhost/c/scils.i"
-	@echo "... src/examples_localhost/c/scils.s"
-	@echo "... src/examples_localhost/c/scip.o"
-	@echo "... src/examples_localhost/c/scip.i"
-	@echo "... src/examples_localhost/c/scip.s"
-	@echo "... src/rasta/c/config.o"
-	@echo "... src/rasta/c/config.i"
-	@echo "... src/rasta/c/config.s"
-	@echo "... src/rasta/c/dictionary.o"
-	@echo "... src/rasta/c/dictionary.i"
-	@echo "... src/rasta/c/dictionary.s"
-	@echo "... src/rasta/c/event_system.o"
-	@echo "... src/rasta/c/event_system.i"
-	@echo "... src/rasta/c/event_system.s"
-	@echo "... src/rasta/c/fifo.o"
-	@echo "... src/rasta/c/fifo.i"
-	@echo "... src/rasta/c/fifo.s"
-	@echo "... src/rasta/c/logging.o"
-	@echo "... src/rasta/c/logging.i"
-	@echo "... src/rasta/c/logging.s"
-	@echo "... src/rasta/c/rasta_new.o"
-	@echo "... src/rasta/c/rasta_new.i"
-	@echo "... src/rasta/c/rasta_new.s"
-	@echo "... src/rasta/c/rasta_red_multiplexer.o"
-	@echo "... src/rasta/c/rasta_red_multiplexer.i"
-	@echo "... src/rasta/c/rasta_red_multiplexer.s"
-	@echo "... src/rasta/c/rastablake2.o"
-	@echo "... src/rasta/c/rastablake2.i"
-	@echo "... src/rasta/c/rastablake2.s"
-	@echo "... src/rasta/c/rastacrc.o"
-	@echo "... src/rasta/c/rastacrc.i"
-	@echo "... src/rasta/c/rastacrc.s"
-	@echo "... src/rasta/c/rastadeferqueue.o"
-	@echo "... src/rasta/c/rastadeferqueue.i"
-	@echo "... src/rasta/c/rastadeferqueue.s"
-	@echo "... src/rasta/c/rastafactory.o"
-	@echo "... src/rasta/c/rastafactory.i"
-	@echo "... src/rasta/c/rastafactory.s"
-	@echo "... src/rasta/c/rastahandle.o"
-	@echo "... src/rasta/c/rastahandle.i"
-	@echo "... src/rasta/c/rastahandle.s"
-	@echo "... src/rasta/c/rastahashing.o"
-	@echo "... src/rasta/c/rastahashing.i"
-	@echo "... src/rasta/c/rastahashing.s"
-	@echo "... src/rasta/c/rastalist.o"
-	@echo "... src/rasta/c/rastalist.i"
-	@echo "... src/rasta/c/rastalist.s"
-	@echo "... src/rasta/c/rastamd4.o"
-	@echo "... src/rasta/c/rastamd4.i"
-	@echo "... src/rasta/c/rastamd4.s"
-	@echo "... src/rasta/c/rastamodule.o"
-	@echo "... src/rasta/c/rastamodule.i"
-	@echo "... src/rasta/c/rastamodule.s"
-	@echo "... src/rasta/c/rastaredundancy_new.o"
-	@echo "... src/rasta/c/rastaredundancy_new.i"
-	@echo "... src/rasta/c/rastaredundancy_new.s"
-	@echo "... src/rasta/c/rastasiphash24.o"
-	@echo "... src/rasta/c/rastasiphash24.i"
-	@echo "... src/rasta/c/rastasiphash24.s"
-	@echo "... src/rasta/c/rastautil.o"
-	@echo "... src/rasta/c/rastautil.i"
-	@echo "... src/rasta/c/rastautil.s"
-	@echo "... src/rasta/c/rmemory.o"
-	@echo "... src/rasta/c/rmemory.i"
-	@echo "... src/rasta/c/rmemory.s"
-	@echo "... src/rasta/c/udp.o"
-	@echo "... src/rasta/c/udp.i"
-	@echo "... src/rasta/c/udp.s"
-	@echo "... src/rasta_example_new/c/main.o"
-	@echo "... src/rasta_example_new/c/main.i"
-	@echo "... src/rasta_example_new/c/main.s"
-	@echo "... src/sci/c/hashmap.o"
-	@echo "... src/sci/c/hashmap.i"
-	@echo "... src/sci/c/hashmap.s"
-	@echo "... src/sci/c/sci.o"
-	@echo "... src/sci/c/sci.i"
-	@echo "... src/sci/c/sci.s"
-	@echo "... src/sci/c/sci_telegram_factory.o"
-	@echo "... src/sci/c/sci_telegram_factory.i"
-	@echo "... src/sci/c/sci_telegram_factory.s"
-	@echo "... src/sci/c/scils.o"
-	@echo "... src/sci/c/scils.i"
-	@echo "... src/sci/c/scils.s"
-	@echo "... src/sci/c/scils_telegram_factory.o"
-	@echo "... src/sci/c/scils_telegram_factory.i"
-	@echo "... src/sci/c/scils_telegram_factory.s"
-	@echo "... src/sci/c/scip.o"
-	@echo "... src/sci/c/scip.i"
-	@echo "... src/sci/c/scip.s"
-	@echo "... src/sci/c/scip_telegram_factory.o"
-	@echo "... src/sci/c/scip_telegram_factory.i"
-	@echo "... src/sci/c/scip_telegram_factory.s"
-	@echo "... src/scils_example/c/main.o"
-	@echo "... src/scils_example/c/main.i"
-	@echo "... src/scils_example/c/main.s"
-	@echo "... src/scip_example/c/main.o"
-	@echo "... src/scip_example/c/main.i"
-	@echo "... src/scip_example/c/main.s"
+	@echo "... NightlyMemCheck"
+	@echo "... NightlyTest"
+	@echo "... test"
+	@echo "... ContinuousConfigure"
+	@echo "... ContinuousBuild"
+	@echo "... NightlyConfigure"
+	@echo "... NightlyMemoryCheck"
+	@echo "... ExperimentalTest"
+	@echo "... ContinuousUpdate"
+	@echo "... NightlyUpdate"
+	@echo "... ExperimentalMemCheck"
+	@echo "... ExperimentalSubmit"
+	@echo "... Experimental"
+	@echo "... ContinuousCoverage"
+	@echo "... ExperimentalConfigure"
+	@echo "... Continuous"
+	@echo "... Nightly"
+	@echo "... NightlySubmit"
+	@echo "... install"
+	@echo "... NightlyStart"
+	@echo "... ExperimentalCoverage"
+	@echo "... NightlyCoverage"
+	@echo "... ExperimentalStart"
+	@echo "... NightlyBuild"
+	@echo "... ExperimentalBuild"
+	@echo "... ExperimentalUpdate"
+	@echo "... ContinuousStart"
+	@echo "... ContinuousMemCheck"
+	@echo "... ContinuousTest"
+	@echo "... ContinuousSubmit"
+	@echo "... rasta"
+	@echo "... sciTest"
+	@echo "... rastaTest"
+	@echo "... event_system_example_local"
+	@echo "... rasta_example_local"
+	@echo "... scils_example_local"
+	@echo "... scip_example_local"
+	@echo "... scils_example"
+	@echo "... scip_example"
+	@echo "... rasta_example"
 .PHONY : help
 
 

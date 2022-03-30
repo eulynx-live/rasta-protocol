@@ -14,11 +14,20 @@
 # EXTERNAL cache entries
 ########################
 
+//Generate documentation
+BUILD_DOCUMENTATION:BOOL=OFF
+
 //Build the RaSTA/SCI examples the run on localhost
 BUILD_LOCAL_EXAMPLES:BOOL=ON
 
 //Build the RaSTA/SCI examples that communicate in a network
 BUILD_REMOTE_EXAMPLES:BOOL=ON
+
+//Build the testing tree.
+BUILD_TESTING:BOOL=ON
+
+//Path to a program.
+BZRCOMMAND:FILEPATH=BZRCOMMAND-NOTFOUND
 
 //Path to a program.
 CMAKE_ADDR2LINE:FILEPATH=/usr/bin/addr2line
@@ -167,7 +176,7 @@ CMAKE_OBJCOPY:FILEPATH=/usr/bin/objcopy
 CMAKE_OBJDUMP:FILEPATH=/usr/bin/objdump
 
 //Value Computed by CMake
-CMAKE_PROJECT_DESCRIPTION:STATIC=
+CMAKE_PROJECT_DESCRIPTION:STATIC=A C implementation of the RaSTA protocol stack
 
 //Value Computed by CMake
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
@@ -237,17 +246,78 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 // Studio IDE projects all commands are done without /nologo.
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
+//Path to the coverage program that CTest uses for performing coverage
+// inspection
+COVERAGE_COMMAND:FILEPATH=/usr/bin/gcov
+
+//Extra command line flags to pass to the coverage tool
+COVERAGE_EXTRA_FLAGS:STRING=-l
+
+//How many times to retry timed-out CTest submissions.
+CTEST_SUBMIT_RETRY_COUNT:STRING=3
+
+//How long to wait between timed-out CTest submissions.
+CTEST_SUBMIT_RETRY_DELAY:STRING=5
+
+//Path to a program.
+CVSCOMMAND:FILEPATH=CVSCOMMAND-NOTFOUND
+
+//Options passed to the cvs update command.
+CVS_UPDATE_OPTIONS:STRING=-d -A -P
+
+//Maximum time allowed before CTest will kill the test.
+DART_TESTING_TIMEOUT:STRING=1500
+
+//Provide command to generate code coverage report
+ENABLE_CODE_COVERAGE:BOOL=OFF
+
+//Run cppcheck along with the compiler
+ENABLE_STATIC_ANALYSIS:BOOL=OFF
+
 //Use IPs from environment variables in RaSTA/SCI examples
 EXAMPLE_IP_OVERRIDE:BOOL=OFF
+
+//Path to a program.
+GITCOMMAND:FILEPATH=/usr/bin/git
+
+//Path to a program.
+HGCOMMAND:FILEPATH=HGCOMMAND-NOTFOUND
+
+//Command to build the project
+MAKECOMMAND:STRING=/usr/bin/cmake --build . --config "${CTEST_CONFIGURATION_TYPE}"
+
+//Path to the memory checking command, used for memory error detection.
+MEMORYCHECK_COMMAND:FILEPATH=/usr/bin/valgrind
+
+//File that contains suppressions for the memory checker
+MEMORYCHECK_SUPPRESSIONS_FILE:FILEPATH=
+
+//Path to a program.
+P4COMMAND:FILEPATH=P4COMMAND-NOTFOUND
+
+//pkg-config executable
+PKG_CONFIG_EXECUTABLE:FILEPATH=/usr/bin/pkg-config
+
+//Name of the computer/site where compile is being run
+SITE:STRING=teno-aspire-a715-41g
+
+//Path to the SLURM sbatch executable
+SLURM_SBATCH_COMMAND:FILEPATH=SLURM_SBATCH_COMMAND-NOTFOUND
+
+//Path to the SLURM srun executable
+SLURM_SRUN_COMMAND:FILEPATH=SLURM_SRUN_COMMAND-NOTFOUND
+
+//Path to a program.
+SVNCOMMAND:FILEPATH=SVNCOMMAND-NOTFOUND
 
 //Use OpenSSL MD4 implementation
 USE_OPENSSL:BOOL=false
 
+//Path to a library.
+pkgcfg_lib_CUnit_cunit:FILEPATH=/usr/lib/x86_64-linux-gnu/libcunit.so
+
 //Value Computed by CMake
 rasta_BINARY_DIR:STATIC=/home/simon/Projects/rasta-protocol
-
-//Dependencies for the target
-rasta_LIB_DEPENDS:STATIC=general;rt;
 
 //Value Computed by CMake
 rasta_SOURCE_DIR:STATIC=/home/simon/Projects/rasta-protocol
@@ -257,6 +327,8 @@ rasta_SOURCE_DIR:STATIC=/home/simon/Projects/rasta-protocol
 # INTERNAL cache entries
 ########################
 
+//ADVANCED property for variable: BZRCOMMAND
+BZRCOMMAND-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_ADDR2LINE
 CMAKE_ADDR2LINE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_AR
@@ -275,6 +347,8 @@ CMAKE_COLOR_MAKEFILE-ADVANCED:INTERNAL=1
 CMAKE_COMMAND:INTERNAL=/usr/bin/cmake
 //Path to cpack program executable.
 CMAKE_CPACK_COMMAND:INTERNAL=/usr/bin/cpack
+//ADVANCED property for variable: CMAKE_CTEST_COMMAND
+CMAKE_CTEST_COMMAND-ADVANCED:INTERNAL=1
 //Path to ctest program executable.
 CMAKE_CTEST_COMMAND:INTERNAL=/usr/bin/ctest
 //ADVANCED property for variable: CMAKE_C_COMPILER
@@ -373,7 +447,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=7
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
@@ -416,6 +490,84 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: COVERAGE_COMMAND
+COVERAGE_COMMAND-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: COVERAGE_EXTRA_FLAGS
+COVERAGE_EXTRA_FLAGS-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CTEST_SUBMIT_RETRY_COUNT
+CTEST_SUBMIT_RETRY_COUNT-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CTEST_SUBMIT_RETRY_DELAY
+CTEST_SUBMIT_RETRY_DELAY-ADVANCED:INTERNAL=1
+CUnit_CFLAGS:INTERNAL=
+CUnit_CFLAGS_I:INTERNAL=
+CUnit_CFLAGS_OTHER:INTERNAL=
+CUnit_FOUND:INTERNAL=1
+CUnit_INCLUDEDIR:INTERNAL=/usr/include
+CUnit_INCLUDE_DIRS:INTERNAL=
+CUnit_LDFLAGS:INTERNAL=-lcunit
+CUnit_LDFLAGS_OTHER:INTERNAL=
+CUnit_LIBDIR:INTERNAL=/usr/lib/x86_64-linux-gnu
+CUnit_LIBRARIES:INTERNAL=cunit
+CUnit_LIBRARY_DIRS:INTERNAL=
+CUnit_LIBS:INTERNAL=
+CUnit_LIBS_L:INTERNAL=
+CUnit_LIBS_OTHER:INTERNAL=
+CUnit_LIBS_PATHS:INTERNAL=
+CUnit_MODULE_NAME:INTERNAL=cunit
+CUnit_PREFIX:INTERNAL=/usr
+CUnit_STATIC_CFLAGS:INTERNAL=
+CUnit_STATIC_CFLAGS_I:INTERNAL=
+CUnit_STATIC_CFLAGS_OTHER:INTERNAL=
+CUnit_STATIC_INCLUDE_DIRS:INTERNAL=
+CUnit_STATIC_LDFLAGS:INTERNAL=-lcunit
+CUnit_STATIC_LDFLAGS_OTHER:INTERNAL=
+CUnit_STATIC_LIBDIR:INTERNAL=
+CUnit_STATIC_LIBRARIES:INTERNAL=cunit
+CUnit_STATIC_LIBRARY_DIRS:INTERNAL=
+CUnit_STATIC_LIBS:INTERNAL=
+CUnit_STATIC_LIBS_L:INTERNAL=
+CUnit_STATIC_LIBS_OTHER:INTERNAL=
+CUnit_STATIC_LIBS_PATHS:INTERNAL=
+CUnit_VERSION:INTERNAL=2.1-3
+CUnit_cunit_INCLUDEDIR:INTERNAL=
+CUnit_cunit_LIBDIR:INTERNAL=
+CUnit_cunit_PREFIX:INTERNAL=
+CUnit_cunit_VERSION:INTERNAL=
+//ADVANCED property for variable: CVSCOMMAND
+CVSCOMMAND-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: CVS_UPDATE_OPTIONS
+CVS_UPDATE_OPTIONS-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: DART_TESTING_TIMEOUT
+DART_TESTING_TIMEOUT-ADVANCED:INTERNAL=1
+//Details about finding PkgConfig
+FIND_PACKAGE_MESSAGE_DETAILS_PkgConfig:INTERNAL=[/usr/bin/pkg-config][v0.29.1()]
+//ADVANCED property for variable: GITCOMMAND
+GITCOMMAND-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: HGCOMMAND
+HGCOMMAND-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: MAKECOMMAND
+MAKECOMMAND-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: MEMORYCHECK_COMMAND
+MEMORYCHECK_COMMAND-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: MEMORYCHECK_SUPPRESSIONS_FILE
+MEMORYCHECK_SUPPRESSIONS_FILE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: P4COMMAND
+P4COMMAND-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: PKG_CONFIG_EXECUTABLE
+PKG_CONFIG_EXECUTABLE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: SITE
+SITE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: SLURM_SBATCH_COMMAND
+SLURM_SBATCH_COMMAND-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: SLURM_SRUN_COMMAND
+SLURM_SRUN_COMMAND-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: SVNCOMMAND
+SVNCOMMAND-ADVANCED:INTERNAL=1
 //CMAKE_INSTALL_PREFIX during last run
 _GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=/usr/local
+__pkg_config_arguments_CUnit:INTERNAL=IMPORTED_TARGET;cunit
+__pkg_config_checked_CUnit:INTERNAL=1
+//ADVANCED property for variable: pkgcfg_lib_CUnit_cunit
+pkgcfg_lib_CUnit_cunit-ADVANCED:INTERNAL=1
+prefix_result:INTERNAL=/usr/lib/x86_64-linux-gnu
 

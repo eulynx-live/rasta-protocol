@@ -12,6 +12,7 @@ build
 ubuntu-xenial*
 \.idea/
 cmake-build-debug/
+CMakeFiles/
 
 ccHTML
 app.info

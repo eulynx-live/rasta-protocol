@@ -180,7 +180,7 @@ struct connect_event_data {
     fd_event * schwarzenegger;
 };
 
-int connect_on_stdin(void * carry_data) {
+char connect_on_stdin(void * carry_data) {
     printf("try to connect\n");
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
@@ -193,7 +193,7 @@ int connect_on_stdin(void * carry_data) {
     return 0;
 }
 
-int terminator(void * h) {
+char terminator(void * h) {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
     sr_cleanup(h);

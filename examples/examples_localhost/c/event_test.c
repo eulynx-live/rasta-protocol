@@ -14,7 +14,7 @@ uint64_t test_get_nanotime() {
     return t.tv_sec * 1000000000 + t.tv_nsec;
 }
 
-int send_heartbeat_event(void * carry_data) {
+char send_heartbeat_event(void* carry_data) {
     (void)carry_data;
     uint64_t n_time = test_get_nanotime();
     printf("time since last call: %8lu us - expected:%8lu us\n", (n_time - last_time) / 1000, heartbeat_interval / 1000);
@@ -22,13 +22,13 @@ int send_heartbeat_event(void * carry_data) {
     return 0;
 }
 
-int disconnect_event(void* carry_data) {
+char disconnect_event(void* carry_data) {
     (void)carry_data;
     printf("disconnecting due to inactivity\n");
     return 1;
 }
 
-int event_read(void * carry_data) {
+char event_read(void * carry_data) {
     char buffer[128];
     ssize_t len = read(STDIN_FILENO, buffer, 127);
     if (buffer[0] != '\n') {
@@ -42,15 +42,9 @@ int event_read(void * carry_data) {
 int main() {
     last_time = test_get_nanotime();
     timed_event t_events[2];
-<<<<<<< HEAD:src/examples_localhost/c/event_test.c
-    t_events[0].meta_information.callback = send_heardbeat_event;
-    t_events[0].interval = heardbeat_interval;
-    t_events[0].meta_information.carry_data = NULL;
-=======
-    t_events[0].callback = send_heartbeat_event;
+    t_events[0].meta_information.callback = send_heartbeat_event;
     t_events[0].interval = heartbeat_interval;
-    t_events[0].carry_data = NULL;
->>>>>>> 183a3c53b2f3a29f08e32d70ca3d450e8889cc4a:examples/examples_localhost/c/event_test.c
+    t_events[0].meta_information.carry_data = NULL;
 
     t_events[1].meta_information.callback = disconnect_event;
     t_events[1].interval = disconnect_interval;
@@ -59,7 +53,6 @@ int main() {
     fd_event f_events[1];
     f_events[0].meta_information.callback = event_read;
     f_events[0].fd = STDIN_FILENO;
-<<<<<<< HEAD:src/examples_localhost/c/event_test.c
     f_events[0].meta_information.carry_data = t_events + 1;
 
     struct event_container container;
@@ -70,8 +63,3 @@ int main() {
 
     start_event_loop(&container);
 }
-=======
-    f_events[0].carry_data = t_events + 1;
-    start_event_loop(t_events, 2, f_events, 1);
-}
->>>>>>> 183a3c53b2f3a29f08e32d70ca3d450e8889cc4a:examples/examples_localhost/c/event_test.c
