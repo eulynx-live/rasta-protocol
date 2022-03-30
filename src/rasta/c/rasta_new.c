@@ -172,11 +172,7 @@ void send_Heartbeat(redundancy_mux *mux, struct rasta_connection * connection, c
     redundancy_mux_send(mux, hb);
 
     connection->sn_t = connection->sn_t +1;
-<<<<<<< HEAD
-    if (rescedule_manually) {
-=======
     if (reschedule_manually) {
->>>>>>> 183a3c53b2f3a29f08e32d70ca3d450e8889cc4a
         reschedule_event(connection->send_heartbeat_event);
     }
 }
@@ -780,13 +776,8 @@ struct rasta_connection * handle_conresp(struct rasta_receive_handle *h, int con
                 register_connection(con_id, connection);
 
                 // start sending heartbeats
-<<<<<<< HEAD
                 add_timed_event(&h->handle->events, connection->send_heartbeat_event);
                 
-=======
-                enable_timed_event(connection->send_heartbeat_event);
-
->>>>>>> 183a3c53b2f3a29f08e32d70ca3d450e8889cc4a
                 connection->hb_locked = 0;
 
                 // save the N_SENDMAX of remote
@@ -1275,15 +1266,9 @@ int on_readable_event(void * handle) {
     return 0;
 }
 
-<<<<<<< HEAD
 char event_connection_expired(void * carry_data) {
     struct timed_event_data* data = carry_data;
     struct rasta_heartbeat_handle* h = (struct rasta_heartbeat_handle*) data->handle;
-=======
-int event_connection_expired(void * carry_data) {
-    struct timed_event_data * data = carry_data;
-    struct rasta_heartbeat_handle *h = (struct rasta_heartbeat_handle*) data->handle;
->>>>>>> 183a3c53b2f3a29f08e32d70ca3d450e8889cc4a
     logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA HEARTBEAT", "T_i timer expired - send DisconnectionRequest");
 
     //because its multithreaded, count can get wrong
@@ -1714,7 +1699,6 @@ void sr_begin(struct rasta_handle * h, fd_event * extern_fd_events, int len) {
         channel_event_data[i].h = h;
     }
 
-<<<<<<< HEAD
     for (int i = 0; i < len; i++) {
         add_fd_event(&h->events, &(extern_fd_events[i]));
     }
@@ -1723,15 +1707,4 @@ void sr_begin(struct rasta_handle * h, fd_event * extern_fd_events, int len) {
     }
 
     start_event_loop(&h->events);
-=======
-    fd_event fd_event_ptr_arr[len + channel_event_data_len];
-    for (int i = 0; i < len; i++) {
-        memcpy(&fd_event_ptr_arr[i], &extern_fd_events[i], sizeof(fd_event));
-    }
-    for (int i = 0; i < channel_event_data_len; i++) {
-        memcpy(&fd_event_ptr_arr[len + i], &channel_events[i], sizeof(fd_event));
-    }
-
-    start_event_loop(t_events, CONNECTION_EVENTS + OTHER_EVENTS, fd_event_ptr_arr, len + channel_event_data_len);
->>>>>>> 183a3c53b2f3a29f08e32d70ca3d450e8889cc4a
 }

@@ -154,21 +154,8 @@ void fire_on_handshake_complete(struct rasta_notification_result result){
     on_handshake_complete_call(&result);
 }
 
-<<<<<<< HEAD
 void * on_heartbeat_timeout_call(struct rasta_notification_result * result){
     (*result->handle->notifications.on_heartbeat_timeout)(result);
-
-    // notification handler completed, decrease amount of running threads
-    result->handle->running_notifications = result->handle->running_notifications -1;
-=======
-void on_heartbeat_timeout_call(struct rasta_notification_result * container){
-    struct rasta_notification_result * result = (struct rasta_notification_result * )container;
-
-    (*result->handle->notifications.on_heartbeat_timeout)(result);
-
-    //free container
-    rfree(container);
->>>>>>> 183a3c53b2f3a29f08e32d70ca3d450e8889cc4a
 }
 
 void fire_on_heartbeat_timeout(struct rasta_notification_result result){
@@ -178,15 +165,6 @@ void fire_on_heartbeat_timeout(struct rasta_notification_result result){
         return;
     }
 
-<<<<<<< HEAD
-    // a thread will be started, increase amount of running notification threads
-    result.handle->running_notifications = result.handle->running_notifications + 1;
-
-=======
-    //create container
-    struct rasta_notification_result* container = rmalloc(sizeof(struct rasta_notification_result));
-    *container = result;
->>>>>>> 183a3c53b2f3a29f08e32d70ca3d450e8889cc4a
     on_heartbeat_timeout_call(&result);
 }
 
