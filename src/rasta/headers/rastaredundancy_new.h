@@ -81,7 +81,7 @@ typedef struct {
      * data used for transport channel diagnostics as in 6.6.3.2
      */
     rasta_redundancy_diagnostics_data diagnostics_data;
-}rasta_transport_channel;
+} rasta_transport_channel;
 
 
 /**
@@ -126,13 +126,13 @@ typedef struct {
     /**
      * the FIFO where the messages for the upper layer are stored
      */
-    fifo_t * fifo_recv;
+    fifo_t* fifo_recv;
 
     /**
      * the transport channels of the partner (client) when running in server mode.
      * these are dynamically added when a message from the corresponding channel is received.
      */
-    rasta_transport_channel * connected_channels;
+    rasta_transport_channel* connected_channels;
 
     /**
      * the amount of discovered partner transport channels
