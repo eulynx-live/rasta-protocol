@@ -1152,7 +1152,7 @@ void handle_retrdata(struct rasta_receive_handle *h, struct rasta_connection *co
  * threads
  */
 
-int on_readable_event(void * handle) {
+char on_readable_event(void * handle) {
     struct rasta_receive_handle *h = (struct rasta_receive_handle*) handle;
 
     // wait for incoming packets
@@ -1299,7 +1299,7 @@ char event_connection_expired(void * carry_data) {
     return 0;
 }
 
-int heartbeat_send_event(void * carry_data) {
+char heartbeat_send_event(void * carry_data) {
     struct timed_event_data * data = carry_data;
     struct rasta_heartbeat_handle *h = (struct rasta_heartbeat_handle*) data->handle;
 
@@ -1324,7 +1324,7 @@ int heartbeat_send_event(void * carry_data) {
 }
 
 // TODO: split up this mess of a function
-int data_send_event(void * carry_data) {
+char data_send_event(void * carry_data) {
     struct rasta_sending_handle * h = carry_data;
     unsigned int con_count = rastalist_count(h->connections);
 

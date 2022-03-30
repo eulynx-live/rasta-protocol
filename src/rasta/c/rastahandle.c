@@ -154,7 +154,7 @@ void fire_on_handshake_complete(struct rasta_notification_result result){
     on_handshake_complete_call(&result);
 }
 
-void * on_heartbeat_timeout_call(struct rasta_notification_result * result){
+void on_heartbeat_timeout_call(struct rasta_notification_result * result){
     (*result->handle->notifications.on_heartbeat_timeout)(result);
 }
 
