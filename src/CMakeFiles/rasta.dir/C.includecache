@@ -6,13 +6,29 @@
 
 #IncludeRegexTransform: 
 
-/home/simon/Projects/rasta-protocol/src/rasta/c/rastahandle.c
+/home/simon/Projects/rasta-protocol/src/rasta/c/rasta_new.c
 stdlib.h
 -
-rastahandle.h
-/home/simon/Projects/rasta-protocol/src/rasta/c/rastahandle.h
+unistd.h
+-
 rmemory.h
-/home/simon/Projects/rasta-protocol/src/rasta/c/rmemory.h
+-
+stdio.h
+-
+rastaredundancy_new.h
+-
+rasta_new.h
+/home/simon/Projects/rasta-protocol/src/rasta/c/rasta_new.h
+time.h
+-
+errno.h
+-
+syscall.h
+-
+rasta_new.h
+-
+event_system.h
+-
 
 src/rasta/headers/config.h
 dictionary.h
@@ -39,6 +55,12 @@ mqueue.h
 -
 fifo.h
 src/rasta/headers/fifo.h
+
+src/rasta/headers/rasta_new.h
+rastahandle.h
+src/rasta/headers/rastahandle.h
+event_system.h
+src/rasta/headers/event_system.h
 
 src/rasta/headers/rasta_red_multiplexer.h
 stdint.h
