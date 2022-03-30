@@ -20,6 +20,20 @@ extern "C" {  // only need to export C interface if
 #include "config.h"
 #include "rasta_red_multiplexer.h"
 
+/**
+ * struct that is returned in all notifications
+ */
+struct rasta_notification_result {
+    /**
+     * copy of the calling rasta connection (this should always be used first)
+     */
+    struct rasta_connection connection;
+
+    /**
+     * handle, don't touch
+     */
+    struct rasta_handle *handle;
+};
 
 /**
  * pointer to a function that will be called when application messages are ready for processing
@@ -99,22 +113,6 @@ struct rasta_notification_ptr{
      * called when the T_i timer of an entity expired
      */
     on_heartbeat_timeout_ptr on_heartbeat_timeout;
-};
-
-
-/**
- * struct that is returned in all notifications
- */
-struct rasta_notification_result {
-    /**
-     * copy of the calling rasta connection (this should always be used first)
-     */
-    struct rasta_connection connection;
-
-    /**
-     * handle, don't touch
-     */
-    struct rasta_handle *handle;
 };
 
 struct rasta_disconnect_notification_result {
@@ -244,11 +242,6 @@ struct rasta_handle {
     struct rasta_notification_ptr notifications;
 
     /**
-     *
-     */
-    int running_notifications;
-
-    /**
     * the logger which is used to log protocol activities
     */
     struct logger_t logger;
@@ -325,7 +318,7 @@ void fire_on_handshake_complete(struct rasta_notification_result result);
  * fires the onHeartbeatTimeout event set in the rasta handle
  * @param result
  */
-void fire_on_hearbeat_timeout(struct rasta_notification_result result);
+void fire_on_heartbeat_timeout(struct rasta_notification_result result);
 
 /**
  * initializes the rasta handle

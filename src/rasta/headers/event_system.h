@@ -1,8 +1,8 @@
 #ifndef EVENT_LOOP_H
 #define EVENT_LOOP_H
-#include<inttypes.h>
-#include<time.h>
-#include<unistd.h>
+#include <inttypes.h>
+#include <time.h>
+#include <unistd.h>
 
 #ifdef __cplusplus
 extern "C" {  // only need to export C interface if
@@ -10,7 +10,7 @@ extern "C" {  // only need to export C interface if
 #endif
 
 // event callback pointer, return 0 to keep the loop running, everything else stops the loop
-typedef char (*event_ptr)();
+typedef int (*event_ptr)(void* h);
 
 struct event_shared_information {
     event_ptr callback;
@@ -57,10 +57,14 @@ void init_event_container(event_container* container);
  * @param events a pointer to the event "container",
  * which contains two linked lists filled with events
  */
+<<<<<<< HEAD
 void start_event_loop(event_container* events);
+=======
+void start_event_loop(timed_event* timed_events, int timed_events_len, fd_event* fd_events, int fd_events_len);
+>>>>>>> 183a3c53b2f3a29f08e32d70ca3d450e8889cc4a
 
 /**
- * rescedules the event to the current time + the event interval
+ * reschedules the event to the current time + the event interval
  * resulting in a delay of the event
  * @param event the event to delay
  */

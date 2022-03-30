@@ -1,7 +1,7 @@
-#include"event_system.h"
-#include"rasta_new.h"
-#include<time.h>
-#include<sys/select.h>
+#include "event_system.h"
+#include "rasta_new.h"
+#include <time.h>
+#include <sys/select.h>
 
 uint64_t get_nanotime() {
     struct timespec t;
@@ -48,7 +48,7 @@ int event_system_sleep(uint64_t time_to_wait, event_container* events) {
 }
 
 /**
- * rescedules the event to the current time + the event interval
+ * reschedules the event to the current time + the event interval
  * resulting in a delay of the event
  * @param event the event to delay
  */
@@ -120,7 +120,7 @@ void start_event_loop(event_container* events) {
             }
             else if (result >= 0) {
                 // the sleep didn't time out, but a fd event occured
-                // recalculate next timed event in case one got resceduled
+                // recalculate next timed event in case one got rescheduled
                 continue;
             }
         }
