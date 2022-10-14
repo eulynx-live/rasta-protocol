@@ -3,13 +3,48 @@
 #include <time.h>
 #include <sys/select.h>
 
-uint64_t get_nanotime() {
-    struct timespec t;
-    clock_gettime(CLOCK_MONOTONIC, &t);
+typedef uint_fast64_t evtime_t;
+
+/**
+ * convert an integer (at least 64 bit) to timespec format
+ * This function does NOT invert timeval_to_evtime()
+ * 
+ * @param t input time as integer
+ * @return the value of t as timeval struct
+ */
+static inline struct timeval evtime_to_timeval(evtime_t t) {
+    return (struct timeval) {
+        t / 1000000000,
+        t % 1000000000
+    };
+}
+
+/**
+ * convert timespec to evtime_t,
+ * inlined because it is a unnecessary call
+ * This function does NOT invert evtime_to_timeval()
+ * 
+ * @param t input time as timespec struct
+ * @return the value of t as a (at least) 64 bit integer
+ */
+static inline evtime_t timeval_to_evtime(struct timespec t) {
     return t.tv_sec * 1000000000 + t.tv_nsec;
 }
 
-int get_max_nfds(struct fd_event_linked_list_s* fd_events) {
+/**
+ * return the current time
+ * CLOCK_MONOTONIC is implemented on every POSIX system
+ * and will never have backward jumps.
+ * 
+ * @return evtime_t 
+ */
+evtime_t get_nanotime() {
+    struct timespec t;
+    clock_gettime(CLOCK_MONOTONIC, &t);
+    return timeval_to_evtime(t);
+}
+
+static inline int get_max_nfds(struct fd_event_linked_list_s* fd_events) {
     int nfds = 0;
     // find highest fd and set nfds to 1 higher
     for (fd_event* current = fd_events->first; current; current = current->next) {
@@ -17,6 +52,42 @@ int get_max_nfds(struct fd_event_linked_list_s* fd_events) {
     }
     nfds++;
     return nfds;
+}
+
+static void prepare_fd_sets(fd_set* on_readable,
+                            fd_set* on_writable,
+                            fd_set* on_exception,
+                            struct fd_event_linked_list_s* fd_events) {
+    FD_ZERO(on_readable);
+    FD_ZERO(on_writable);
+    FD_ZERO(on_exception);
+    for (fd_event* current = fd_events->first; current; current = current->next) {
+        if (current->enabled) {
+            if (current->options & EV_READABLE)
+                FD_SET(current->fd, on_readable);
+            if (current->options & EV_WRITABLE)
+                FD_SET(current->fd, on_writable);
+            if (current->options & EV_EXCEPTIONAL)
+                FD_SET(current->fd, on_exception);
+        }
+    }
+}
+
+static int handle_fd_events(fd_set* on_readable,
+                            fd_set* on_writable,
+                            fd_set* on_exception,
+                            struct fd_event_linked_list_s* fd_events) {
+    for (fd_event* current = fd_events->first; current; current = current->next) {
+        if (current->enabled && FD_ISSET(current->fd, on_readable)) {
+            if (current->callback(current->carry_data)) return -1;
+        }
+        if (current->enabled && FD_ISSET(current->fd, on_writable)) {
+            if (current->callback(current->carry_data)) return -1;
+        }
+        if (current->enabled && FD_ISSET(current->fd, on_exception)) {
+            if (current->callback(current->carry_data)) return -1;
+        }
+    }
 }
 
 /**
@@ -27,9 +98,7 @@ int get_max_nfds(struct fd_event_linked_list_s* fd_events) {
  * @return the amount of fd events that got called or -1 to terminate the event loop
  */
 int event_system_sleep(uint64_t time_to_wait, struct fd_event_linked_list_s* fd_events) {
-    struct timeval tv;
-    tv.tv_sec = time_to_wait / 1000000000;
-    tv.tv_usec = (time_to_wait / 1000) % 1000000;
+    struct timeval tv = evtime_to_timeval(time_to_wait);
     int nfds = get_max_nfds(fd_events);
     if (nfds >= FD_SETSIZE) {
         // too high file desriptors, can be fixed by using poll instead but should not be an issue
@@ -38,37 +107,13 @@ int event_system_sleep(uint64_t time_to_wait, struct fd_event_linked_list_s* fd_
     // zero and set the fd to watch
     fd_set on_readable;
     fd_set on_writable;
-    fd_set on_exceptional;
-    FD_ZERO(&on_readable);
-    FD_ZERO(&on_writable);
-    FD_ZERO(&on_exceptional);
-    for (fd_event* current = fd_events->first; current; current = current->next) {
-        if (current->enabled) {
-            if (current->options & EV_READABLE)
-                FD_SET(current->fd, &on_readable);
-            if (current->options & EV_WRITABLE)
-                FD_SET(current->fd, &on_writable);
-            if (current->options & EV_EXCEPTIONAL)
-                FD_SET(current->fd, &on_exceptional);
-        }
-    }
-    // wait
-    int result = select(nfds, &on_readable, &on_writable, &on_exceptional, &tv);
-    if (result == -1) {
-        // syscall error or error on select()
-        return -1;
-    }
-    for (fd_event* current = fd_events->first; current; current = current->next) {
-        if (current->enabled && FD_ISSET(current->fd, &on_readable)) {
-            if (current->callback(current->carry_data)) return -1;
-        }
-        if (current->enabled && FD_ISSET(current->fd, &on_writable)) {
-            if (current->callback(current->carry_data)) return -1;
-        }
-        if (current->enabled && FD_ISSET(current->fd, &on_exceptional)) {
-            if (current->callback(current->carry_data)) return -1;
-        }
-    }
+    fd_set on_exception;
+    prepare_fd_sets(&on_readable, &on_writable, &on_exception, fd_events);
+    // call select and wait
+    int result = select(nfds, &on_readable, &on_writable, &on_exception, &tv);
+    // syscall error or error on select()
+    if (result == -1) return -1;
+    handle_fd_events(&on_readable, &on_writable, &on_exception, fd_events);
     return result;
 }
 
@@ -89,26 +134,25 @@ void reschedule_event(timed_event * event) {
  * @param cur_time the current time
  * @return uint64_t the time to wait
  */
-uint64_t calc_next_timed_event(struct timed_event_linked_list_s* timed_events, timed_event** next_timed_event, uint64_t cur_time) {
+uint64_t calc_next_timed_event(struct timed_event_linked_list_s* timed_events,
+                               timed_event** next_timed_event,
+                               uint64_t cur_time) {
     uint64_t time_to_wait = UINT64_MAX;
     for (timed_event* current = timed_events->first; current; current = current->next) {
-        if (current->enabled) {
-            uint64_t continue_at = current->last_call + current->interval;
-            if (continue_at <= cur_time) {
-                if (next_timed_event) {
-                    *next_timed_event = current;
-                }
-                return 0;
+        if (!current->enabled) continue;
+        uint64_t continue_at = current->last_call + current->interval;
+        if (continue_at <= cur_time) {
+            if (next_timed_event) {
+                *next_timed_event = current;
             }
-            else {
-                uint64_t new_time_to_wait = continue_at - cur_time;
-                if (new_time_to_wait < time_to_wait) {
-                    if (next_timed_event) {
-                        *next_timed_event = current;
-                    }
-                    time_to_wait = new_time_to_wait;
-                }
+            return 0;
+        }
+        uint64_t new_time_to_wait = continue_at - cur_time;
+        if (new_time_to_wait < time_to_wait) {
+            if (next_timed_event) {
+                *next_timed_event = current;
             }
+            time_to_wait = new_time_to_wait;
         }
     }
     return time_to_wait;
