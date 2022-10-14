@@ -88,6 +88,7 @@ static int handle_fd_events(fd_set* on_readable,
             if (current->callback(current->carry_data)) return -1;
         }
     }
+    return 0;
 }
 
 /**
@@ -113,7 +114,7 @@ int event_system_sleep(uint64_t time_to_wait, struct fd_event_linked_list_s* fd_
     int result = select(nfds, &on_readable, &on_writable, &on_exception, &tv);
     // syscall error or error on select()
     if (result == -1) return -1;
-    handle_fd_events(&on_readable, &on_writable, &on_exception, fd_events);
+    if (handle_fd_events(&on_readable, &on_writable, &on_exception, fd_events)) return -1;
     return result;
 }
 
