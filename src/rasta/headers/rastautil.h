@@ -46,7 +46,7 @@ void hostLongToLe(uint32_t v, unsigned char* result);
  * @param v pointer to uint32_t in LE byte order
  * @return the ulong
  */
-uint32_t leLongToHost(const unsigned char *v);
+uint32_t leLongToHost(const unsigned char v[4]);
 
 #ifdef __cplusplus
 }

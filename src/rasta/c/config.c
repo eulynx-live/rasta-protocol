@@ -908,7 +908,7 @@ struct RastaConfig config_load(const char filename[256]) {
         }
 
         //parse key
-        char key[256];
+        char key[MAX_DICTIONARY_STRING_LENGTH_BYTES];
         parser_parseIdentifier(&p,key);
 
         //skip empty start
@@ -925,8 +925,6 @@ struct RastaConfig config_load(const char filename[256]) {
         parser_skipBlanc(&p);
 
         parser_parseValue(&p,key);
-
-
 
         n++;
     }
