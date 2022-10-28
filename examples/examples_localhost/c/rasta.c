@@ -196,12 +196,11 @@ static bool test_success = false;
 int terminator(void* h) {
     struct rasta_handle *handle = (struct rasta_handle*) h;
     printf("terminating\n");
-    // server checks for success and tears down, client relies on server
-    if(handle->last_con->role == RASTA_ROLE_SERVER) {
-
-        if (!handle->last_con) {
+    if (!handle->last_con) {
             printf("Test failure - no last connection!\n");
-        } else if (handle->last_con->current_state != RASTA_CONNECTION_UP) {
+    } else if (handle->last_con->role == RASTA_ROLE_SERVER) {
+        // server checks for success and tears down, client relies on server
+        if (handle->last_con->current_state != RASTA_CONNECTION_UP) {
             printf("Test failure - last connection state was not UP: %u\n", handle->last_con->current_state);
         } else {
             test_success = true;
