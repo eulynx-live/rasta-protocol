@@ -1,10 +1,10 @@
 #ifndef RASTA_RASTAHASHING_H
 #define RASTA_RASTAHASHING_H
 
-#include <rastautil.h>
-#include <rastamd4.h>
-#include <rastablake2.h>
-#include <rastasiphash24.h>
+#include "rastautil.h"
+#include "rastamd4.h"
+#include "rastablake2.h"
+#include "rastasiphash24.h"
 
 
 /**
