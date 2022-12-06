@@ -7,10 +7,10 @@ extern "C" {  // only need to export C interface if
 #endif
 
 #include <stdint.h>
-#include <event_system.h>
+#include "event_system.h"
 #include "rastamodule.h"
 #include "rastaredundancy_new.h"
-#include <udp.h>
+#include "udp.h"
 
 /**
  * define struct as type here to allow usage in notification pointers

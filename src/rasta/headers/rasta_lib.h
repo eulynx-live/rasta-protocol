@@ -6,8 +6,8 @@ extern "C" {  // only need to export C interface if
               // used by C++ source code
 #endif
 
-#include<rasta_new.h>
-#include<rastahandle.h>
+#include "rasta_new.h"
+#include "rastahandle.h"
 
 // The header, which the user will include later.
 

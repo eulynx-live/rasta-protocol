@@ -10,8 +10,8 @@ extern "C" {  // only need to export C interface if
               // used by C++ source code
 #endif
 
-#include <mqueue.h>
-#include <rastahashing.h>
+#include "mqueue.h"
+#include "rastahashing.h"
 //TODO: check
 //#include <stdint.h>
 #include "rastafactory.h"

@@ -6,7 +6,7 @@ extern "C" {  // only need to export C interface if
               // used by C++ source code
 #endif
 
-#include <sci.h>
+#include "sci.h"
 
 /**
  * Message type of a SCI version request

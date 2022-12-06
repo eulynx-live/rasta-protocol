@@ -13,7 +13,7 @@ extern "C" {  // only need to export C interface if
 #include "rastautil.h"
 #include "rastacrc.h"
 #include <stdint.h>
-#include <rastahashing.h>
+#include "rastahashing.h"
 
 #define RASTA_CHECKSUM_VALID 1
 #define RASTA_CHECKSUM_INVALID 0

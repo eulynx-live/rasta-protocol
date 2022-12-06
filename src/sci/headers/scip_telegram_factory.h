@@ -6,8 +6,8 @@ extern "C" {  // only need to export C interface if
               // used by C++ source code
 #endif
 
-#include <sci.h>
-#include <sci_telegram_factory.h>
+#include "sci.h"
+#include "sci_telegram_factory.h"
 
 /**
  * Message type of a SCI-P change location command

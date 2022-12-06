@@ -11,7 +11,7 @@ extern "C" {  // only need to export C interface if
 #endif
 
 #include "key_exchange.h"
-#include <logging.h>
+#include "logging.h"
 #include "rastamodule.h"
 #include "rastahashing.h"
 #include <stdint.h>
