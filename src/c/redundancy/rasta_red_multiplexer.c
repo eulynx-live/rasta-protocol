@@ -758,6 +758,8 @@ void redundancy_mux_connect(redundancy_mux *mux, unsigned int channel, char *hos
                     (uint16_t)mux->config.redundancy.connections.data[channel].port,
                     mux->config.redundancy.connections.data[channel].ip);
     tcp_connect(&mux->transport_states[channel], host, port);
+    logger_log(&mux->logger, LOG_LEVEL_INFO, "RaSTA RedMux connect", "connection established, sleeping for 5 seconds");
+    sleep(5);
 }
 #endif
 
