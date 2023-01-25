@@ -142,7 +142,7 @@ int rasta_accept(rasta_lib_configuration_t rc, struct RastaChannel *channel, str
 
     add_fd_event(&rc->rasta_lib_event_system, &fd_event, EV_READABLE);
     if (rc->h.config.general.rasta_id < channel->remote_id) {
-        rasta_lib_start(rc, 2000, false);
+        rasta_lib_start(rc, 20000, false);
     } else {
         // Wait for channel establishment indefinitely (server)
         rasta_lib_start(rc, 0, true);
