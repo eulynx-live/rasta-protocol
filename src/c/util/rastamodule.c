@@ -232,9 +232,7 @@ struct RastaByteArray rastaRedundancyPacketToBytes(struct RastaRedundancyPacket 
     struct RastaByteArray internal_packet_bytes = rastaModuleToBytes(packet.data, hashing_context);
 
     // pack data into result
-    for (unsigned int i = 0; i < internal_packet_len; ++i) {
-        result.bytes[8 + i] = internal_packet_bytes.bytes[i];
-    }
+    rmemcpy(result.bytes+8, internal_packet_bytes.bytes, internal_packet_len);
 
     // initialize a byte array containing all data except checksum
     // this is needed, as otherwise the 0s/unset bytes in the result byte array will be used in calculating the checksum
@@ -243,18 +241,14 @@ struct RastaByteArray rastaRedundancyPacketToBytes(struct RastaRedundancyPacket 
     allocateRastaByteArray(&temp_wo_checksum, len_wo_checksum);
 
     // copy data
-    for (unsigned int j = 0; j < len_wo_checksum; ++j) {
-        temp_wo_checksum.bytes[j] = result.bytes[j];
-    }
+    rmemcpy(temp_wo_checksum.bytes, result.bytes, len_wo_checksum);
 
     // generate checksum
     unsigned long checksum = crc_calculate(&packet.checksum_type, temp_wo_checksum);
 
     // pack checksum
     hostLongToLe(checksum, checksum_storage);
-    for (int k = 0; k < (packet.checksum_type.width / 8); ++k) {
-        result.bytes[8 + internal_packet_len + k] = checksum_storage[k];
-    }
+    rmemcpy(result.bytes + 8 + internal_packet_len, checksum_storage, (packet.checksum_type.width / 8));
 
     // free the temporary checksum data
     freeRastaByteArray(&temp_wo_checksum);
@@ -284,9 +278,7 @@ struct RastaRedundancyPacket bytesToRastaRedundancyPacket(struct RastaByteArray 
     allocateRastaByteArray(&internal_packet_bytes, data_len);
 
     // copy internal data bytes
-    for (unsigned int i = 0; i < data_len; ++i) {
-        internal_packet_bytes.bytes[i] = data.bytes[8 + i];
-    }
+    rmemcpy(internal_packet_bytes.bytes, data.bytes + 8, data_len);
 
     // convert to rasta packet
     packet.data = bytesToRastaPacket(internal_packet_bytes, hashing_context);
@@ -300,9 +292,7 @@ struct RastaRedundancyPacket bytesToRastaRedundancyPacket(struct RastaByteArray 
     allocateRastaByteArray(&data_wo_checksum, data_wo_checksum_len);
 
     // copy data
-    for (unsigned int j = 0; j < data_wo_checksum_len; ++j) {
-        data_wo_checksum.bytes[j] = data.bytes[j];
-    }
+    rmemcpy(data_wo_checksum.bytes, data.bytes, data_wo_checksum_len);
 
     // calculate the actual checksum
     unsigned long calculated_checksum = crc_calculate(&checksum_type, data_wo_checksum);
