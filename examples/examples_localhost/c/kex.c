@@ -131,7 +131,7 @@ void onConnectionStateChange(struct rasta_notification_result *result) {
 }
 
 void onHandshakeCompleted(struct rasta_notification_result *result) {
-    printf("Handshake complete, tls_state is now UP (with ID 0x%X)\n", result->connection.remote_id);
+    printf("Handshake complete, state is now UP (with ID 0x%X)\n", result->connection.remote_id);
 }
 
 void onTimeout(struct rasta_notification_result *result) {

@@ -72,32 +72,29 @@ void sr_add_app_messages_to_buffer(struct rasta_receive_handle *h, struct rasta_
  */
 void sr_remove_confirmed_messages(struct rasta_receive_handle *h, struct rasta_connection *con) {
     // remove confirmed messages from retransmission fifo
-    logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA remove confirmed", "confirming messages with SN_PDU <= %lu", (long unsigned int)con->cs_r);
+    logger_log(h->logger, LOG_LEVEL_INFO, "RaSTA remove confirmed", "confirming messages with SN_PDU <= %lu", (long unsigned int)con->cs_r);
 
     struct RastaByteArray *elem;
-    while ((elem = fifo_pop(con->fifo_retransmission)) != NULL) {
+    while ((elem = fifo_peek(con->fifo_retransmission)) != NULL) {
         struct RastaPacket packet = bytesToRastaPacket(*elem, h->hashing_context);
-        logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA remove confirmed", "removing packet with sn = %lu",
-                   (long unsigned int)packet.sequence_number);
 
         // message is confirmed when CS_R - SN_PDU >= 0
         // equivalent to SN_PDU <= CS_R
-        if (packet.sequence_number == con->cs_r) {
+        if (packet.sequence_number <= con->cs_r) {
             // this packet has the last same sequence number as the confirmed sn, i.e. the next packet in the queue's
             // SN_PDU will be bigger than CS_R (because of FIFO property of mqueue)
             // that means we removed all confirmed messages and have to leave the loop to stop removing packets
-            logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA remove confirmed", "last confirmed packet removed");
+            logger_log(h->logger, LOG_LEVEL_INFO, "RaSTA remove confirmed", "removing packet with sn = %lu",
+                   (long unsigned int)packet.sequence_number);
 
+            // remove it from fifo
+            elem = fifo_pop(con->fifo_retransmission);
             freeRastaByteArray(elem);
             freeRastaByteArray(&packet.data);
             rfree(elem);
-
+        } else {
             break;
         }
-
-        freeRastaByteArray(elem);
-        freeRastaByteArray(&packet.data);
-        rfree(elem);
     }
 }
 

@@ -14,6 +14,17 @@ fifo_t *fifo_init(unsigned int max_size) {
     return fifo;
 }
 
+void *fifo_peek(fifo_t *fifo) {
+    void *res = NULL;
+
+    if (fifo->size > 0 && fifo->head != NULL) {
+        struct fifo_element *element = fifo->head;
+        res = element->data;
+    }
+
+    return res;
+}
+
 void *fifo_pop(fifo_t *fifo) {
     void *res = NULL;
 

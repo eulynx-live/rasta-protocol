@@ -22,7 +22,7 @@ extern "C" { // only need to export C interface if
 
 
 /**
- * representation of the tls_state of a redundancy channel as defined in 6.6.4.1
+ * representation of the state of a redundancy channel as defined in 6.6.4.1
  */
 typedef enum {
     /**
@@ -46,7 +46,7 @@ typedef struct {
     unsigned long associated_id;
 
     /**
-     * current tls_state of the redundancy channel
+     * current state of the redundancy channel
      */
     rasta_redundancy_state current_state;
 
@@ -145,7 +145,7 @@ void red_f_receiveData(rasta_redundancy_channel *channel, struct RastaRedundancy
 void red_f_deferTmo(rasta_redundancy_channel *channel);
 
 /**
- * blocks until the tls_state is closed and all notification threads terminate
+ * blocks until the state is closed and all notification threads terminate
  * @param channel the channel that is used
  */
 void rasta_red_wait_for_close(rasta_redundancy_channel *channel);

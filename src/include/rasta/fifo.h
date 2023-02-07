@@ -56,6 +56,13 @@ fifo_t *fifo_init(unsigned int max_size);
 void fifo_destroy(fifo_t *fifo);
 
 /**
+ * Retrieves the first (oldest) element from the FIFO.
+ * @param fifo the FIFO to use
+ * @return the data of the first element or NULL if the FIFO is empty
+ */
+void *fifo_peek(fifo_t *fifo);
+
+/**
  * Retrieves the first (oldest) element from the FIFO and removes it from the FIFO.
  * @param fifo the FIFO to use
  * @return the data of the first element or NULL if the FIFO is empty

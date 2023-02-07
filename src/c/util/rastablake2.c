@@ -129,7 +129,7 @@ int rasta_blake2b_init(rasta_blake2b_ctx *ctx, size_t outlen,
     if (outlen == 0 || outlen > 64 || keylen > 64)
         return -1; // illegal parameters
 
-    for (i = 0; i < 8; i++) // tls_state, "param block"
+    for (i = 0; i < 8; i++) // state, "param block"
         ctx->h[i] = blake2b_iv[i];
     ctx->h[0] ^= 0x01010000 ^ (keylen << 8) ^ outlen;
 

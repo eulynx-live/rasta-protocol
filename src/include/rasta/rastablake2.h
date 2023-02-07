@@ -21,10 +21,10 @@ int rasta_blake2b_selftest();
  * https://tools.ietf.org/html/rfc7693#page-16
  */
 
-// tls_state context
+// state context
 typedef struct {
     uint8_t b[128]; // input buffer
-    uint64_t h[8];  // chained tls_state
+    uint64_t h[8];  // chained state
     uint64_t t[2];  // total number of bytes
     size_t c;       // pointer for b[]
     size_t outlen;  // digest size

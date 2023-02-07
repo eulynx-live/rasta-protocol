@@ -10,7 +10,6 @@
 #include "rastacrc_test.h"
 #include "rastadeferqueue_test.h"
 #include "rastafactory_test.h"
-#include "rastalist_test.h"
 #include "rastamd4_test.h"
 #include "rastamodule_test.h"
 #include "safety_retransmission_test.h"

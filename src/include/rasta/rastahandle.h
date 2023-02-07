@@ -21,7 +21,7 @@ typedef enum {
 } rasta_role;
 
 /**
- * representation of the connection tls_state in the SR layer
+ * representation of the connection state in the SR layer
  */
 typedef enum {
     /**
@@ -294,7 +294,7 @@ struct rasta_notification_result {
 typedef void (*on_receive_ptr)(struct rasta_notification_result *result);
 
 /**
- * pointer to a function that will be called when connection tls_state has changed
+ * pointer to a function that will be called when connection state has changed
  * first parameter is the connection that fired the event
  */
 typedef void (*on_connection_state_change_ptr)(struct rasta_notification_result *result);
@@ -316,7 +316,7 @@ typedef void (*on_diagnostic_notification_ptr)(struct rasta_notification_result 
 typedef void (*on_disconnection_request_received_ptr)(struct rasta_notification_result *result, unsigned short reason, unsigned short detail);
 
 /**
- * pointer to a function that will be called when an entity successfully completed the handshake and is now in tls_state UP.
+ * pointer to a function that will be called when an entity successfully completed the handshake and is now in state UP.
  * first parameter is the connection that fired the event
  */
 typedef void (*on_handshake_complete_ptr)(struct rasta_notification_result *);
@@ -337,7 +337,7 @@ struct rasta_notification_ptr {
     on_receive_ptr on_receive;
 
     /**
-     * called when connection tls_state has changed
+     * called when connection state has changed
      */
     on_connection_state_change_ptr on_connection_state_change;
 
@@ -357,7 +357,7 @@ struct rasta_notification_ptr {
     on_diagnostics_available_red_ptr on_redundancy_diagnostic_notification;
 
     /**
-     * called when an entity successfully completed the handshake and is now in tls_state UP
+     * called when an entity successfully completed the handshake and is now in state UP
      */
     on_handshake_complete_ptr on_handshake_complete;
 
