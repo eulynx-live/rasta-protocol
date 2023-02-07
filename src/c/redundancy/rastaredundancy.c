@@ -193,7 +193,7 @@ void red_f_receiveData(rasta_redundancy_channel *channel, struct RastaRedundancy
         } else {
             // check if queue is full
             if (deferqueue_isfull(&channel->defer_q)) {
-                logger_log(&channel->logger, LOG_LEVEL_DEBUG, "RaSTA Red receive", "channel %d: deferq full", channel_id);
+                logger_log(&channel->logger, LOG_LEVEL_INFO, "RaSTA Red receive", "channel %d: deferq full", channel_id);
 
                 // full -> discard message
                 return;

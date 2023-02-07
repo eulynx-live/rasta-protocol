@@ -5,7 +5,6 @@ if(PKG_CONFIG_FOUND)
 endif(PKG_CONFIG_FOUND)
 
 add_executable(rasta_test
-    ../examples/common/c/logging.c
     ../examples/common/c/configfile.c
     ../examples/common/c/dictionary.c
     rasta_test/headers/blake2_test.h
@@ -15,7 +14,6 @@ add_executable(rasta_test
     rasta_test/headers/rastacrc_test.h
     rasta_test/headers/rastadeferqueue_test.h
     rasta_test/headers/rastafactory_test.h
-    rasta_test/headers/rastalist_test.h
     rasta_test/headers/rastamd4_test.h
     rasta_test/headers/rastamodule_test.h
     rasta_test/headers/register_tests.h
@@ -29,7 +27,6 @@ add_executable(rasta_test
     rasta_test/c/rastacrc_test.c
     rasta_test/c/rastadeferqueue_test.c
     rasta_test/c/rastafactory_test.c
-    rasta_test/c/rastalist_test.c
     rasta_test/c/rastamd4_test.c
     rasta_test/c/rastamodule_test.c
     rasta_test/c/register_tests.c

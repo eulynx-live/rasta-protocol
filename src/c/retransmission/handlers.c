@@ -70,6 +70,7 @@ void handle_data(struct rasta_receive_handle *h, struct rasta_connection *connec
                 connection->cs_t = receivedPacket.sequence_number;
                 connection->ts_r = receivedPacket.timestamp;
             } else {
+                logger_log(h->logger, LOG_LEVEL_INFO, "RaSTA HANDLE: Data", "retransmission failed, disconnect and close");
                 // retransmission failed, disconnect and close
                 sr_close_connection(connection, h->handle, h->mux, h->info, RASTA_DISC_REASON_PROTOCOLERROR, 0);
             }

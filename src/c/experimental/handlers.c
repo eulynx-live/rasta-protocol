@@ -1,4 +1,7 @@
 #include "handlers.h"
+
+#include <stdlib.h>
+
 #include "../retransmission/safety_retransmission.h"
 #include "../retransmission/protocol.h"
 

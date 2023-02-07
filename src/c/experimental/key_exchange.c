@@ -1,6 +1,3 @@
-#include <endian.h>
-#include <sys/mman.h>
-
 #include <rasta/logging.h>
 #include <rasta/rastahandle.h>
 

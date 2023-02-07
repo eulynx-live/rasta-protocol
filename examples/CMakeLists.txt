@@ -4,7 +4,6 @@ if(PKG_CONFIG_FOUND)
 endif(PKG_CONFIG_FOUND)
 
 set(EXAMPLES_COMMON_SRC
-    common/c/logging.c
     common/c/configfile.c
     common/c/dictionary.c)
 

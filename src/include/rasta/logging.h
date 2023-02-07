@@ -13,7 +13,6 @@ extern "C" { // only need to export C interface if
 #endif
 
 #include "fifo.h"
-#include <mqueue.h>
 #include <stdio.h>
 
 #define LOG_FORMAT "[%s][%s][%s] %s\n"

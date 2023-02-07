@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <syscall.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -539,7 +538,7 @@ struct rasta_connection *handle_conreq(struct rasta_receive_handle *h, struct ra
             return connection;
         }
     } else {
-        logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: ConnectionRequest", "Connection is in invalid tls_state (%d) send DisconnectionRequest", connection->current_state);
+        logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: ConnectionRequest", "Connection is in invalid state (%d) send DisconnectionRequest", connection->current_state);
         sr_close_connection(connection, h->handle, h->mux, h->info, RASTA_DISC_REASON_UNEXPECTEDTYPE, 0);
     }
     return connection;
@@ -581,7 +580,7 @@ struct rasta_connection *handle_conresp(struct rasta_receive_handle *h, struct r
 
                 // printf("RECEIVED CS_PDU=%lu (Type=%d)\n", receivedPacket.sequence_number, receivedPacket.type);
 
-                // update tls_state, ready to send data
+                // update state, ready to send data
                 con->current_state = RASTA_CONNECTION_UP;
 
                 // send hb
@@ -627,7 +626,7 @@ struct rasta_connection *handle_conresp(struct rasta_receive_handle *h, struct r
         }
     } else if (con->current_state == RASTA_CONNECTION_RETRREQ || con->current_state == RASTA_CONNECTION_RETRRUN || con->current_state == RASTA_CONNECTION_UP) {
         sr_close_connection(con, h->handle, h->mux, h->info, RASTA_DISC_REASON_UNEXPECTEDTYPE, 0);
-        logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: ConnectionResponse", "Received ConnectionResponse in wrong tls_state - semd DisconnectionRequest");
+        logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: ConnectionResponse", "Received ConnectionResponse in wrong state - semd DisconnectionRequest");
         return con;
     }
     return con;

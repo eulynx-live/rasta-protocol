@@ -1,8 +1,10 @@
-#include <endian.h>
 #include <stdlib.h>
 #include <time.h>
 
 #include <rasta/rastautil.h>
+
+#define htole32(X) (X)
+#define le32toh(X) (X)
 
 uint32_t current_ts() {
     long ms;

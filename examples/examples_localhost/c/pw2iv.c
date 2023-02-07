@@ -2,12 +2,13 @@
 // Created by erica on 02.08.22.
 //
 
-#include <endian.h>
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define htole32(X) (X)
 
 static void usage(const char *name) {
     fprintf(stderr, "Usage: %s <password>\n", name);

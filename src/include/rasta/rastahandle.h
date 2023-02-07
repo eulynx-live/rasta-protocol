@@ -10,7 +10,6 @@ extern "C" { // only need to export C interface if
 #include "rasta_red_multiplexer.h"
 #include "rastafactory.h"
 #include "rastahashing.h"
-#include <mqueue.h>
 
 #ifdef ENABLE_OPAQUE
 #include <opaque.h>

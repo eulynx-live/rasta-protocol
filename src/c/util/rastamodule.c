@@ -1,7 +1,8 @@
-#include <endian.h>
-
 #include <rasta/rastamodule.h>
 #include <rasta/rmemory.h>
+
+#define htole16(X) (X)
+#define le16toh(X) (X)
 
 rasta_error_type rastamodule_lasterror = RASTA_ERRORS_NONE;
 

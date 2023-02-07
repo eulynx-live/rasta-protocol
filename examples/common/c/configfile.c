@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include <ifaddrs.h>
 #include <inttypes.h>
-#include <linux/wireless.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -296,33 +295,6 @@ void parser_parseValue(struct LineParser *p, const char key[MAX_DICTIONARY_STRIN
 }
 
 /**
- * Checks if a given NIC is a wireless interface
- * @param ifname  the name of the NIC
- * @param protocol  the protocol
- * @return {@code true} if the NIC is a wireless interface, {@code false} otherwise
- */
-int isWirelessNic(const char *ifname, char *protocol) {
-    int sock = -1;
-    struct iwreq pwrq;
-    memset(&pwrq, 0, sizeof(pwrq));
-    strncpy(pwrq.ifr_name, ifname, IFNAMSIZ - 1);
-
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
-        perror("socket");
-        return 0;
-    }
-
-    if (ioctl(sock, SIOCGIWNAME, &pwrq) != -1) {
-        if (protocol) strncpy(protocol, pwrq.u.name, IFNAMSIZ);
-        close(sock);
-        return 1;
-    }
-
-    close(sock);
-    return 0;
-}
-
-/**
  * Gets the IP address of a wired NIC that matches the given index.
  * If only one wired NIC exists, the function will returns this NIC's IP without considering the index.
  * If multiple wired NIC's exists, the function will return the IP of the NIC with index index.
@@ -332,46 +304,44 @@ int isWirelessNic(const char *ifname, char *protocol) {
  * @return the IP address of a wired NIC that matches the given index
  */
 char *getIpByNic(int index) {
+    (void)index;
     char *ip = rmalloc(16);
-    struct ifaddrs *ifaddr, *ifa;
+    struct ifaddrs *ifaddr; //, *ifa;
 
     if (getifaddrs(&ifaddr) == -1) {
         perror("getifaddrs failed");
         return NULL;
     }
 
-    int eth_nics_count = 0;
+    // int eth_nics_count = 0;
     char *nic_ip = NULL;
-    for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
-        char protocol[IFNAMSIZ] = {0};
+    // for (ifa = ifaddr; ifa != NULL; ifa = ifa->ifa_next) {
+    //     char protocol[IFNAMSIZ] = {0};
 
-        if (ifa->ifa_addr == NULL ||
-            ifa->ifa_addr->sa_family != AF_PACKET) continue;
+    //     if (ifa->ifa_addr == NULL ||
+    //         ifa->ifa_addr->sa_family != AF_PACKET) continue;
 
-        if (!isWirelessNic(ifa->ifa_name, protocol)) {
+    //     // check if it's loop interface and skip in that case
+    //     if (ifa->ifa_flags & IFF_LOOPBACK) {
+    //         continue;
+    //     }
 
-            // check if it's loop interface and skip in that case
-            if (ifa->ifa_flags & IFF_LOOPBACK) {
-                continue;
-            }
+    //     eth_nics_count++;
+    //     int fd;
+    //     struct ifreq ifr;
 
-            eth_nics_count++;
-            int fd;
-            struct ifreq ifr;
+    //     fd = socket(AF_INET, SOCK_DGRAM, 0);
+    //     ifr.ifr_addr.sa_family = AF_INET;
+    //     strncpy(ifr.ifr_name, ifa->ifa_name, IFNAMSIZ - 1);
+    //     ioctl(fd, SIOCGIFADDR, &ifr);
+    //     close(fd);
+    //     nic_ip = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
 
-            fd = socket(AF_INET, SOCK_DGRAM, 0);
-            ifr.ifr_addr.sa_family = AF_INET;
-            strncpy(ifr.ifr_name, ifa->ifa_name, IFNAMSIZ - 1);
-            ioctl(fd, SIOCGIFADDR, &ifr);
-            close(fd);
-            nic_ip = inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
-
-            if (eth_nics_count == index + 1) {
-                rmemcpy(ip, nic_ip, 16);
-                break;
-            }
-        }
-    }
+    //     if (eth_nics_count == index + 1) {
+    //         rmemcpy(ip, nic_ip, 16);
+    //         break;
+    //     }
+    // }
 
     // no ip found, return last eth nic address
     if (nic_ip != NULL) {

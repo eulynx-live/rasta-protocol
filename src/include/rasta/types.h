@@ -1,10 +1,11 @@
 #pragma once
 
 #include <rasta/config.h>
+
+#ifdef ENABLE_TLS
 #include <wolfssl/options.h>
 #include <wolfssl/ssl.h>
 
-#ifdef ENABLE_TLS
 enum rasta_tls_connection_state {
     RASTA_TLS_CONNECTION_READY,
     RASTA_TLS_CONNECTION_ESTABLISHED,
@@ -19,7 +20,7 @@ struct rasta_transport_state {
 #ifdef ENABLE_TLS
     WOLFSSL_CTX *ctx;
     WOLFSSL *ssl;
-    enum rasta_tls_connection_state tls_state;
+    enum rasta_tls_connection_state state;
 #endif
 };
 
@@ -31,6 +32,6 @@ struct rasta_connected_transport_channel_state {
     WOLFSSL_CTX *ctx;
     int file_descriptor;
     WOLFSSL *ssl;
-    enum rasta_tls_connection_state tls_state;
+    enum rasta_tls_connection_state state;
 };
 #endif
