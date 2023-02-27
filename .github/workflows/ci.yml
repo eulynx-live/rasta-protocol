@@ -89,7 +89,7 @@ jobs:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/rasta-bridge-udp
 
     - name: Build and push Docker image
-      if: github.ref == 'refs/heads/main'
+      if: github.ref == 'refs/heads/docker'
       uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
       with:
         file: Dockerfile
