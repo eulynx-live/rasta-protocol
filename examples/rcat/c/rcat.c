@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
             .config = &config,
             .rasta_id = ID_S,
             .transport_sockets = toServer,
-            .transport_sockets_count = sizeof(toServer)
+            .transport_sockets_count = sizeof(toServer) / sizeof(toServer[0])
         };
 
         rasta_lib_init_configuration(rc, &config, &logger, &connection, 1);
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]) {
             .config = &config,
             .rasta_id = ID_R,
             .transport_sockets = toServer,
-            .transport_sockets_count = sizeof(toServer)
+            .transport_sockets_count = sizeof(toServer) / sizeof(toServer[0])
         };
 
         rasta_lib_init_configuration(rc, &config, &logger, &connection, 1);
