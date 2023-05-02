@@ -144,7 +144,7 @@ void udp_bind(rasta_transport_socket *transport_state, uint16_t port) {
     handle_tls_mode(transport_state);
 }
 
-void udp_bind_device(rasta_transport_socket *transport_state, uint16_t port, char *ip) {
+void udp_bind_device(rasta_transport_socket *transport_state, const char *ip, uint16_t port) {
     struct sockaddr_in local;
 
     // set struct to 0s
