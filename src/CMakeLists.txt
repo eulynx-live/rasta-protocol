@@ -29,6 +29,7 @@ set(headers
     include/rasta/rastadeferqueue.h
     include/rasta/rastafactory.h
     include/rasta/rastahandle.h
+    include/rasta/temp.h
     include/rasta/rasta_lib.h
     include/rasta/rastamd4.h
     include/rasta/rastamodule.h

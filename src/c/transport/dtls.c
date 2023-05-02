@@ -291,8 +291,7 @@ void send_callback(redundancy_mux *mux, struct RastaByteArray data_to_send, rast
     udp_send(channel, data_to_send.bytes, data_to_send.length, channel->remote_ip_address, channel->remote_port);
 }
 
-ssize_t receive_callback(redundancy_mux *mux, struct receive_event_data *data, unsigned char *buffer, struct sockaddr_in *sender) {
-    UNUSED(mux);
+ssize_t receive_callback(struct receive_event_data *data, unsigned char *buffer, struct sockaddr_in *sender) {
     return udp_receive(data->socket, buffer, MAX_DEFER_QUEUE_MSG_SIZE, sender);
 }
 

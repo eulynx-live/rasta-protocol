@@ -177,43 +177,5 @@ void rasta_handle_init(struct rasta_handle *h, rasta_config_info *config, struct
     h->notifications.on_diagnostic_notification = NULL;
     h->notifications.on_disconnection_request_received = NULL;
     h->notifications.on_redundancy_diagnostic_notification = NULL;
-
-    // init hashing context
-    // h->hashing_context.hash_length = h->config.sending.md4_type;
-    // h->hashing_context.algorithm = h->config.sending.sr_hash_algorithm;
-
-    // if (h->hashing_context.algorithm == RASTA_ALGO_MD4) {
-    //     // use MD4 IV as key
-    //     rasta_md4_set_key(&h->hashing_context, h->config.sending.md4_a, h->config.sending.md4_b,
-    //                       h->config.sending.md4_c, h->config.sending.md4_d);
-    // } else {
-    //     // use the sr_hash_key
-    //     allocateRastaByteArray(&h->hashing_context.key, sizeof(unsigned int));
-
-    //     // convert unsigned in to byte array
-    //     h->hashing_context.key.bytes[0] = (h->config.sending.sr_hash_key >> 24) & 0xFF;
-    //     h->hashing_context.key.bytes[1] = (h->config.sending.sr_hash_key >> 16) & 0xFF;
-    //     h->hashing_context.key.bytes[2] = (h->config.sending.sr_hash_key >> 8) & 0xFF;
-    //     h->hashing_context.key.bytes[3] = (h->config.sending.sr_hash_key) & 0xFF;
-    // }
-
-    // h->receive_handle = rmalloc(sizeof(rasta_receive_handle));
-    // h->send_handle = rmalloc(sizeof(rasta_sending_handle));
-
-    // receive
-    // h->receive_handle->config = h->config.sending;
-    // h->receive_handle->info = h->config.general;
-    // h->receive_handle->handle = h;
-    // h->receive_handle->logger = &h->logger;
-    // h->receive_handle->mux = &h->mux;
-    // h->receive_handle->hashing_context = &h->mux.sr_hashing_context;
-
-    // send
-    // h->send_handle->config = h->config.sending;
-    // h->send_handle->info = h->config.general;
-    // h->send_handle->handle = h;
-    // h->send_handle->logger = &h->logger;
-    // h->send_handle->mux = &h->mux;
-    // h->send_handle->hashing_context = &h->mux.sr_hashing_context;
 }
 

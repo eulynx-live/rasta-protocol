@@ -55,11 +55,8 @@ void udp_bind(rasta_transport_socket *transport_state, uint16_t port) {
     handle_tls_mode(transport_state);
 }
 
-void udp_bind_device(rasta_transport_socket *transport_state, uint16_t port, char *ip) {
-    struct sockaddr_in local;
-
-    // set struct to 0s
-    rmemset((char *)&local, 0, sizeof(local));
+void udp_bind_device(rasta_transport_socket *transport_state, const char *ip, uint16_t port) {
+    struct sockaddr_in local = {0};
 
     local.sin_family = AF_INET;
     local.sin_port = htons(port);
@@ -71,6 +68,7 @@ void udp_bind_device(rasta_transport_socket *transport_state, uint16_t port, cha
         handle_port_unavailable(port);
         abort();
     }
+
     handle_tls_mode(transport_state);
 }
 
@@ -147,30 +145,26 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
     socket->id = id;
     udp_init(socket, tls_config);
 
-    memset(&socket->accept_event, 0, sizeof(fd_event));
+    memset(&socket->receive_event, 0, sizeof(fd_event));
 
-    socket->accept_event.callback = channel_accept_event;
-    socket->accept_event.carry_data = &socket->accept_event_data;
-    socket->accept_event.fd = socket->file_descriptor;
+    socket->receive_event.callback = channel_receive_event;
+    socket->receive_event.carry_data = &socket->receive_event_data;
+    socket->receive_event.fd = socket->file_descriptor;
 
-    socket->accept_event_data.event = &socket->accept_event;
-    socket->accept_event_data.socket = socket;
-    socket->accept_event_data.h = h;
+    socket->receive_event_data.connection = NULL;
+    socket->receive_event_data.socket = socket;
+    // Iff channel == NULL the receive event operates in 'accept mode'
+    socket->receive_event_data.channel = NULL;
 
-    add_fd_event(h->ev_sys, &socket->accept_event, EV_READABLE);
+    add_fd_event(h->ev_sys, &socket->receive_event, EV_READABLE);
 }
 
 int transport_connect(rasta_connection *h, rasta_transport_socket *socket, rasta_transport_channel *channel) {
     UNUSED(h);
-    UNUSED(socket);
-    UNUSED(channel);
 
-    // channel->id = socket->id;
-    // channel->remote_port = port;
-    // channel->send_callback = send_callback;
-    // strncpy(channel->remote_ip_address, host, INET_ADDRSTRLEN-1);
-    // channel->tls_mode = socket->tls_mode;
-    // channel->file_descriptor = socket->file_descriptor;
+    channel->id = socket->id;
+    channel->tls_mode = socket->tls_mode;
+    channel->file_descriptor = socket->file_descriptor;
 
     // We can regard UDP channels as 'always connected' (no re-dial possible)
     channel->connected = true;
@@ -187,30 +181,20 @@ void send_callback(redundancy_mux *mux, struct RastaByteArray data_to_send, rast
     udp_send(channel, data_to_send.bytes, data_to_send.length, channel->remote_ip_address, channel->remote_port);
 }
 
-ssize_t receive_callback(redundancy_mux *mux, struct receive_event_data *data, unsigned char *buffer, struct sockaddr_in *sender) {
-    UNUSED(mux);
+ssize_t receive_callback(struct receive_event_data *data, unsigned char *buffer, struct sockaddr_in *sender) {
     return udp_receive(data->socket, buffer, MAX_DEFER_QUEUE_MSG_SIZE, sender);
 }
 
 void transport_listen(struct rasta_handle *h, rasta_transport_socket *socket) {
     UNUSED(h);
     UNUSED(socket);
+
+    enable_fd_event(&socket->receive_event);
 }
 
 void transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port) {
-    UNUSED(ip);
-    udp_bind(socket, port);
-
-    memset(&socket->receive_event, 0, sizeof(fd_event));
-    socket->receive_event.enabled = 1;
-    socket->receive_event.carry_data = &socket->receive_event_data;
-    socket->receive_event.callback = channel_receive_event;
-    socket->receive_event.fd = socket->file_descriptor;
-
-    memset(&socket->receive_event_data, 0, sizeof(socket->receive_event_data));
-    socket->receive_event_data.socket = socket;
-
-    add_fd_event(h->ev_sys, &socket->receive_event, EV_READABLE);
+    UNUSED(h);
+    udp_bind_device(socket, ip, port);
 }
 
 int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr) {
@@ -247,10 +231,19 @@ int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr) {
 // }
 
 void transport_init(struct rasta_handle *h, rasta_transport_channel* channel, unsigned id, const char *host, uint16_t port, const rasta_config_tls *tls_config) {
-    UNUSED(h);
     channel->id = id;
     channel->remote_port = port;
     strncpy(channel->remote_ip_address, host, INET_ADDRSTRLEN-1);
     channel->send_callback = send_callback;
     channel->tls_config = tls_config;
+
+    memset(&channel->receive_event, 0, sizeof(fd_event));
+    channel->receive_event.carry_data = &channel->receive_event_data;
+    channel->receive_event.callback = channel_receive_event;
+
+    memset(&channel->receive_event_data, 0, sizeof(channel->receive_event_data));
+    channel->receive_event_data.channel = channel;
+    channel->receive_event_data.connection = NULL;
+
+    add_fd_event(h->ev_sys, &channel->receive_event, EV_READABLE);
 }

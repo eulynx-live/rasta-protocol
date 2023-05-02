@@ -61,12 +61,11 @@ int channel_receive_event(void *carry_data) {
     unsigned char buffer[MAX_DEFER_QUEUE_MSG_SIZE] = {0};
     struct sockaddr_in sender = {0};
 
-    ssize_t len = receive_callback(data->connection->redundancy_channel->mux, data, buffer, &sender);
+    ssize_t len = receive_callback(data, buffer, &sender);
 
     char str[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &sender.sin_addr, str, INET_ADDRSTRLEN);
 
-    // Resolve channel by using sender ip and port
     rasta_transport_channel *transport_channel = data->channel;
 
     if (transport_channel == NULL) {

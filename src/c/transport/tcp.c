@@ -158,8 +158,7 @@ void send_callback(redundancy_mux *mux, struct RastaByteArray data_to_send, rast
     do_send(channel, data_to_send.bytes, data_to_send.length);
 }
 
-ssize_t receive_callback(redundancy_mux *mux, struct receive_event_data *data, unsigned char *buffer, struct sockaddr_in *sender) {
-    UNUSED(mux);
+ssize_t receive_callback(struct receive_event_data *data, unsigned char *buffer, struct sockaddr_in *sender) {
     // TODO: exchange MAX_DEFER_QUEUE_MSG_SIZE by something depending on send_max (i.e. the receive buffer size)
     // search for connected_recv_buffer_size
     // TODO: Manage possible remaining data in the receive buffer on next call to rasta_recv
