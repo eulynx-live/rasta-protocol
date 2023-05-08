@@ -51,6 +51,7 @@ set(sources
     c/transport/diagnostics.h
     c/transport/events.c
     c/transport/events.h
+    c/transport/transport.c
     c/retransmission/handlers.c
     c/retransmission/safety_retransmission.h
     c/retransmission/messages.c

@@ -106,3 +106,7 @@ int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr);
 int transport_connect(rasta_connection *h, rasta_transport_socket *socket, rasta_transport_channel *channel);
 int transport_redial(rasta_transport_channel* channel);
 void transport_close(rasta_transport_channel *channel);
+
+
+// Protected methods
+void transport_init_base(struct rasta_handle *h, rasta_transport_channel* channel, unsigned id, const char *host, uint16_t port, const rasta_config_tls *tls_config);
