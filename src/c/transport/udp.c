@@ -151,9 +151,10 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
     socket->receive_event.carry_data = &socket->receive_event_data;
     socket->receive_event.fd = socket->file_descriptor;
 
+    socket->receive_event_data.h = h;
     socket->receive_event_data.connection = NULL;
     socket->receive_event_data.socket = socket;
-    // Iff channel == NULL the receive event operates in 'accept mode'
+    // Iff channel == NULL the receive event operates in 'UDP/DTLS mode'
     socket->receive_event_data.channel = NULL;
 
     add_fd_event(h->ev_sys, &socket->receive_event, EV_READABLE);
@@ -161,6 +162,8 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
 
 int transport_connect(rasta_connection *h, rasta_transport_socket *socket, rasta_transport_channel *channel) {
     UNUSED(h);
+
+    enable_fd_event(&socket->receive_event);
 
     channel->id = socket->id;
     channel->tls_mode = socket->tls_mode;
@@ -242,6 +245,7 @@ void transport_init(struct rasta_handle *h, rasta_transport_channel* channel, un
     channel->receive_event.callback = channel_receive_event;
 
     memset(&channel->receive_event_data, 0, sizeof(channel->receive_event_data));
+    channel->receive_event_data.h = h;
     channel->receive_event_data.channel = channel;
     channel->receive_event_data.connection = NULL;
 

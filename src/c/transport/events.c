@@ -57,6 +57,7 @@ int channel_accept_event(void *carry_data) {
 
 int channel_receive_event(void *carry_data) {
     struct receive_event_data *data = carry_data;
+    rasta_connection * connection = data->connection;
 
     unsigned char buffer[MAX_DEFER_QUEUE_MSG_SIZE] = {0};
     struct sockaddr_in sender = {0};
@@ -69,20 +70,45 @@ int channel_receive_event(void *carry_data) {
     rasta_transport_channel *transport_channel = data->channel;
 
     if (transport_channel == NULL) {
+        // We will only enter this branch for UDP and DTLS
+
+        // Find the suitable transport channel in the mux
+        rasta_transport_channel * channel = NULL;
+        for (unsigned i = 0; i < data->h->mux.redundancy_channels_count; i++) {
+            for (unsigned j = 0; j < data->h->mux.redundancy_channels[i].transport_channel_count; j++) {
+                rasta_transport_channel *current_channel = &data->h->mux.redundancy_channels[i].transport_channels[j];
+                if (strncmp(current_channel->remote_ip_address, str, INET_ADDRSTRLEN) == 0
+                    && current_channel->remote_port == ntohs(sender.sin_port)) {
+                    channel = current_channel;
+                    connection = &data->h->rasta_connections[i];
+                    break;
+                }
+            }
+        }
+
+        if (channel == NULL) {
+            // Ignore and continue
+            logger_log(data->connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive", "Discarding packet from unknown sender");
+            return 0;
+        }
+
+        transport_channel = channel;
+
         // For UDP and DTLS, this seems to be a new peer
-        transport_channel = rmalloc(sizeof(rasta_transport_channel));
-        memset(transport_channel, 0, sizeof(rasta_transport_channel));
-        transport_channel->id = data->socket->id;
-        transport_channel->remote_port = ntohs(sender.sin_port);
-        transport_channel->send_callback = send_callback;
-        memcpy(transport_channel->remote_ip_address, str, INET_ADDRSTRLEN);
-        transport_channel->tls_mode = data->socket->tls_mode;
+//         transport_channel = rmalloc(sizeof(rasta_transport_channel));
+//         memset(transport_channel, 0, sizeof(rasta_transport_channel));
+//         transport_channel->id = data->socket->id;
+//         transport_channel->remote_port = ntohs(sender.sin_port);
+//         transport_channel->send_callback = send_callback;
+//         memcpy(transport_channel->remote_ip_address, str, INET_ADDRSTRLEN);
+//         transport_channel->tls_mode = data->socket->tls_mode;
         transport_channel->file_descriptor = data->socket->file_descriptor;
-#ifdef ENABLE_TLS
-        transport_channel->tls_state = RASTA_TLS_CONNECTION_READY;
-        transport_channel->ctx = data->socket->ctx;
-        transport_channel->ssl = data->socket->ssl;
-#endif
+// #ifdef ENABLE_TLS
+//         transport_channel->tls_state = RASTA_TLS_CONNECTION_READY;
+//         transport_channel->ctx = data->socket->ctx;
+//         transport_channel->ssl = data->socket->ssl;
+// #endif
+
         // We can regard UDP channels as 'always connected' (no re-dial possible)
         transport_channel->connected = true;
 
@@ -90,10 +116,9 @@ int channel_receive_event(void *carry_data) {
         // Maybe in redmux update connected channels?
     }
 
-    run_channel_diagnostics(data->connection->redundancy_channel, transport_channel->id);
+    run_channel_diagnostics(connection->redundancy_channel, transport_channel->id);
 
-
-    logger_log(data->connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive", "Channel %d calling receive", transport_channel->id);
+    logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive", "Channel %d calling receive", transport_channel->id);
 
     if (len <= 0) {
         // Connection is broken
@@ -114,21 +139,21 @@ int channel_receive_event(void *carry_data) {
     }
 
     if (len <= 0) {
-        if (data->connection != NULL) {
-            return handle_closed_transport(data->connection, data->connection->redundancy_channel);
+        if (connection != NULL) {
+            return handle_closed_transport(connection, connection->redundancy_channel);
         }
         // Ignore and continue
         return 0;
     }
 
-    int result = receive_packet(data->connection->redundancy_channel->mux, transport_channel, buffer, len);
+    int result = receive_packet(connection->redundancy_channel->mux, transport_channel, buffer, len);
 
     if (result) {
         // Deliver messages to the upper layer
-        return red_f_deliverDeferQueue(data->connection, data->connection->redundancy_channel);
+        return red_f_deliverDeferQueue(connection, connection->redundancy_channel);
     }
 
-    logger_log(data->connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive thread", "Channel %d receive done",
+    logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive thread", "Channel %d receive done",
                transport_channel->id);
     return !!result;
 }

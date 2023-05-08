@@ -20,6 +20,7 @@ struct accept_event_data {
 };
 
 struct receive_event_data {
+    struct rasta_handle *h;
     rasta_connection *connection;
     rasta_transport_socket *socket;
     rasta_transport_channel *channel;
