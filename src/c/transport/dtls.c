@@ -324,10 +324,5 @@ int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr) {
 }
 
 void transport_init(struct rasta_handle *h, rasta_transport_channel* channel, unsigned id, const char *host, uint16_t port, const rasta_config_tls *tls_config) {
-    UNUSED(h);
-    channel->id = id;
-    channel->remote_port = port;
-    strncpy(channel->remote_ip_address, host, INET_ADDRSTRLEN-1);
-    channel->send_callback = send_callback;
-    channel->tls_config = tls_config;
+    transport_init_base(h, channel, id, host, port, tls_config);
 }
