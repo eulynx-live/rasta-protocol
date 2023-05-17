@@ -12,6 +12,7 @@ void transport_init_base(struct rasta_handle *h, rasta_transport_channel* channe
     channel->receive_event.callback = channel_receive_event;
 
     memset(&channel->receive_event_data, 0, sizeof(channel->receive_event_data));
+    channel->receive_event_data.h = h;
     channel->receive_event_data.channel = channel;
     channel->receive_event_data.connection = NULL;
 

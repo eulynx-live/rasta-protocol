@@ -73,26 +73,23 @@ int channel_receive_event(void *carry_data) {
         // We will only enter this branch for UDP and DTLS
 
         // Find the suitable transport channel in the mux
-        rasta_transport_channel * channel = NULL;
         for (unsigned i = 0; i < data->h->mux.redundancy_channels_count; i++) {
             for (unsigned j = 0; j < data->h->mux.redundancy_channels[i].transport_channel_count; j++) {
                 rasta_transport_channel *current_channel = &data->h->mux.redundancy_channels[i].transport_channels[j];
                 if (strncmp(current_channel->remote_ip_address, str, INET_ADDRSTRLEN) == 0
                     && current_channel->remote_port == ntohs(sender.sin_port)) {
-                    channel = current_channel;
+                    transport_channel = current_channel;
                     connection = &data->h->rasta_connections[i];
                     break;
                 }
             }
         }
 
-        if (channel == NULL) {
+        if (transport_channel == NULL) {
             // Ignore and continue
             logger_log(data->connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive", "Discarding packet from unknown sender");
             return 0;
         }
-
-        transport_channel = channel;
 
         // For UDP and DTLS, this seems to be a new peer
 //         transport_channel = rmalloc(sizeof(rasta_transport_channel));
