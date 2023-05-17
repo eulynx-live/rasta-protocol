@@ -96,21 +96,7 @@ void tcp_close(rasta_transport_channel *transport_state) {
 void transport_listen(struct rasta_handle *h, rasta_transport_socket *socket) {
     UNUSED(h);
     tcp_listen(socket);
-
-    // Register accept event
-
-    memset(&socket->accept_event, 0, sizeof(fd_event));
-    socket->accept_event.carry_data = &socket->accept_event_data;
-
-    socket->accept_event.callback = channel_accept_event;
-    socket->accept_event.fd = socket->file_descriptor;
-    socket->accept_event.enabled = 1;
-
-    socket->accept_event_data.socket = socket;
-    socket->accept_event_data.event = &socket->accept_event;
-    socket->accept_event_data.h = h;
-
-    add_fd_event(h->ev_sys, &socket->accept_event, EV_READABLE);
+    enable_fd_event(&socket->accept_event);
 }
 
 int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr) {
@@ -170,6 +156,7 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
     socket->id = id;
     tcp_init(socket, tls_config);
 
+    // register accept event
     memset(&socket->accept_event, 0, sizeof(fd_event));
 
     socket->accept_event.callback = channel_accept_event;

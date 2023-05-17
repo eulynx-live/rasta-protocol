@@ -87,7 +87,7 @@ int channel_receive_event(void *carry_data) {
 
         if (transport_channel == NULL) {
             // Ignore and continue
-            logger_log(data->connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive", "Discarding packet from unknown sender");
+            logger_log(data->connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive", "Discarding packet from unknown peer %s:%u", str, ntohs(sender.sin_port));
             return 0;
         }
 
