@@ -91,26 +91,10 @@ int channel_receive_event(void *carry_data) {
             return 0;
         }
 
-        // For UDP and DTLS, this seems to be a new peer
-//         transport_channel = rmalloc(sizeof(rasta_transport_channel));
-//         memset(transport_channel, 0, sizeof(rasta_transport_channel));
-//         transport_channel->id = data->socket->id;
-//         transport_channel->remote_port = ntohs(sender.sin_port);
-//         transport_channel->send_callback = send_callback;
-//         memcpy(transport_channel->remote_ip_address, str, INET_ADDRSTRLEN);
-//         transport_channel->tls_mode = data->socket->tls_mode;
         transport_channel->file_descriptor = data->socket->file_descriptor;
-// #ifdef ENABLE_TLS
-//         transport_channel->tls_state = RASTA_TLS_CONNECTION_READY;
-//         transport_channel->ctx = data->socket->ctx;
-//         transport_channel->ssl = data->socket->ssl;
-// #endif
 
         // We can regard UDP channels as 'always connected' (no re-dial possible)
         transport_channel->connected = true;
-
-        // TODO: Somewhere, this channel should be freed.
-        // Maybe in redmux update connected channels?
     }
 
     run_channel_diagnostics(connection->redundancy_channel, transport_channel->id);

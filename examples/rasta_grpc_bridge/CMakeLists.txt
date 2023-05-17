@@ -55,5 +55,5 @@ add_executable(rasta_grpc_bridge
 
 set_target_properties(rasta_grpc_bridge PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
 target_compile_options(rasta_grpc_bridge PRIVATE ${DEFAULT_COMPILE_OPTIONS})
-target_link_libraries(rasta_grpc_bridge rasta_udp ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
+target_link_libraries(rasta_grpc_bridge rasta_tls ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
 target_include_directories(rasta_grpc_bridge PRIVATE ../common/headers PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
