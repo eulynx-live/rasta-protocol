@@ -269,8 +269,8 @@ int transport_connect(rasta_connection *h, rasta_transport_socket *socket, rasta
     // channel->remote_port = port;
     // channel->send_callback = send_callback;
     // strncpy(channel->remote_ip_address, host, INET_ADDRSTRLEN-1);
-    // channel->tls_mode = socket->tls_mode;
     // TODO: TBD
+    channel->tls_mode = socket->tls_mode;
     channel->tls_state = RASTA_TLS_CONNECTION_READY;
     channel->ctx = socket->ctx;
     channel->ssl = socket->ssl;
@@ -313,6 +313,7 @@ void transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, cons
 
     memset(&socket->receive_event_data, 0, sizeof(socket->receive_event_data));
     socket->receive_event_data.socket = socket;
+    socket->receive_event_data.h = h;
 
     add_fd_event(h->ev_sys, &socket->receive_event, EV_READABLE);
 }
