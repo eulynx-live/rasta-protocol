@@ -62,6 +62,10 @@ int channel_receive_event(void *carry_data) {
     unsigned char buffer[MAX_DEFER_QUEUE_MSG_SIZE] = {0};
     struct sockaddr_in sender = {0};
 
+    // when performing DTLS accept, len = 0 doesn't signal a broken connection
+    // TODO: find a better way for handling this
+    bool ignore_connection_broken = data->socket->tls_mode == TLS_MODE_DTLS_1_2 && data->socket->tls_state == RASTA_TLS_CONNECTION_READY;
+    
     ssize_t len = receive_callback(data, buffer, &sender);
 
     char str[INET_ADDRSTRLEN];
@@ -101,7 +105,7 @@ int channel_receive_event(void *carry_data) {
 
     logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive", "Channel %d calling receive", transport_channel->id);
 
-    if (len <= 0) {
+    if (len <= 0 && !ignore_connection_broken) {
         // Connection is broken
         // TODO: What about disabling events?
         transport_channel->connected = false;
@@ -119,7 +123,7 @@ int channel_receive_event(void *carry_data) {
         // transport_redial(transport_channel);
     }
 
-    if (len <= 0) {
+    if (len <= 0 && !ignore_connection_broken) {
         if (connection != NULL) {
             return handle_closed_transport(connection, connection->redundancy_channel);
         }
