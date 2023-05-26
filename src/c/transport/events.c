@@ -65,7 +65,7 @@ int channel_receive_event(void *carry_data) {
     // when performing DTLS accept, len = 0 doesn't signal a broken connection
     // ifdef needed because UDP/TCP do not know about the tls_state
 #ifdef ENABLE_TLS
-    bool is_dtls_conn_ready = data->socket->tls_mode == TLS_MODE_DTLS_1_2 && data->socket->tls_state == RASTA_TLS_CONNECTION_READY;
+    bool is_dtls_conn_ready = data->socket != NULL && data->socket->tls_mode == TLS_MODE_DTLS_1_2 && data->socket->tls_state == RASTA_TLS_CONNECTION_READY;
 #else
     bool is_dtls_conn_ready = false;
 #endif
