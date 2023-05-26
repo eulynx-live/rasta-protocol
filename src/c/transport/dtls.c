@@ -69,12 +69,41 @@ static void wolfssl_accept(rasta_transport_socket *transport_state) {
 static size_t wolfssl_receive_dtls(rasta_transport_socket *transport_state, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
     int receive_len, received_total = 0;
     socklen_t sender_size = sizeof(*sender);
+    struct receive_event_data *data = &transport_state->receive_event_data;
 
     get_client_addr_from_socket(transport_state, sender, &sender_size);
+    
+    // TODO: we should probably synchronize socket and channel somewhere else
+    // set socket connected if corresponding channel is already connected
+    char str[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &sender->sin_addr, str, INET_ADDRSTRLEN);
+    rasta_transport_channel *channel = NULL;
+    for (unsigned i = 0; i < data->h->mux.redundancy_channels_count; i++) {
+        for (unsigned j = 0; j < data->h->mux.redundancy_channels[i].transport_channel_count; j++) {
+            rasta_transport_channel *current_channel = &data->h->mux.redundancy_channels[i].transport_channels[j];
+            if (strncmp(current_channel->remote_ip_address, str, INET_ADDRSTRLEN) == 0
+                && current_channel->remote_port == ntohs(sender->sin_port)) {
+                channel = current_channel;
+                break;
+            }
+        }
+    }
+
+    if(channel != NULL && channel->tls_state == RASTA_TLS_CONNECTION_ESTABLISHED){
+        transport_state->tls_state = RASTA_TLS_CONNECTION_ESTABLISHED;
+        transport_state->ssl = channel->ssl;
+    }
 
     if (transport_state->tls_state == RASTA_TLS_CONNECTION_READY) {
         wolfssl_accept(transport_state);
         transport_state->tls_state = RASTA_TLS_CONNECTION_ESTABLISHED;
+
+        // copy tls config to channel
+        if(channel != NULL) {
+            channel->tls_state = transport_state->tls_state;
+            channel->tls_mode = transport_state->tls_mode;
+            channel->ssl = transport_state->ssl;
+        }
         return 0;
     }
     if (transport_state->tls_state == RASTA_TLS_CONNECTION_ESTABLISHED) {
