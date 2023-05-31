@@ -84,11 +84,8 @@ typedef struct rasta_transport_socket {
     const rasta_config_tls *tls_config;
 
 #ifdef ENABLE_TLS
-
     WOLFSSL_CTX *ctx;
-
     WOLFSSL *ssl;
-
     enum rasta_tls_connection_state tls_state;
 #endif
 

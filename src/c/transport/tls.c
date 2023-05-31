@@ -230,8 +230,8 @@ ssize_t do_receive(rasta_transport_channel *transport_state, unsigned char *rece
     return 0;
 }
 
-void do_send(rasta_transport_channel *transport_state, unsigned char *message, size_t message_len) {
-    wolfssl_send_tls(transport_state->ssl, message, message_len);
+void do_send(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len) {
+    wolfssl_send_tls(transport_channel->ssl, message, message_len);
 }
 
 void tcp_close(rasta_transport_socket *transport_state) {

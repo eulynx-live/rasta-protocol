@@ -227,23 +227,24 @@ void wolfssl_send(WOLFSSL *ssl, unsigned char *message, size_t message_len) {
     }
 }
 
-void wolfssl_send_dtls(rasta_transport_channel *transport_state, unsigned char *message, size_t message_len, struct sockaddr_in *receiver) {
-    if (transport_state->tls_state != RASTA_TLS_CONNECTION_ESTABLISHED) {
-        wolfSSL_dtls_set_peer(transport_state->ssl, receiver, sizeof(*receiver));
+void wolfssl_send_dtls(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len, struct sockaddr_in *receiver) {
+    if (transport_channel->tls_state != RASTA_TLS_CONNECTION_ESTABLISHED) {
+        wolfSSL_dtls_set_peer(transport_channel->ssl, receiver, sizeof(*receiver));
 
-        if (wolfSSL_connect(transport_state->ssl) != SSL_SUCCESS) {
-            int connect_error = wolfSSL_get_error(transport_state->ssl, 0);
+        if (wolfSSL_connect(transport_channel->ssl) != SSL_SUCCESS) {
+            int connect_error = wolfSSL_get_error(transport_channel->ssl, 0);
             fprintf(stderr, "WolfSSL connect error: %s\n", wolfSSL_ERR_reason_error_string(connect_error));
             abort();
         }
 
-        tls_pin_certificate(transport_state->ssl, transport_state->tls_config->peer_tls_cert_path);
+        tls_pin_certificate(transport_channel->ssl, transport_channel->tls_config->peer_tls_cert_path);
 
-        transport_state->tls_state = RASTA_TLS_CONNECTION_ESTABLISHED;
-        set_socket_async(transport_state, wolfSSL_dtls_set_using_nonblock);
+        transport_channel->tls_state = RASTA_TLS_CONNECTION_ESTABLISHED;
+
+        set_socket_async(transport_channel, wolfSSL_dtls_set_using_nonblock);
     }
 
-    wolfssl_send(transport_state->ssl, message, message_len);
+    wolfssl_send(transport_channel->ssl, message, message_len);
 }
 
 void wolfssl_send_tls(WOLFSSL *ssl, unsigned char *message, size_t message_len) {
