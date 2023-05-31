@@ -59,14 +59,17 @@ jobs:
     - name: Test
       run: cd ${{github.workspace}}/build && ctest .
 
-    # - name: Local Test
-    #   run: cd ${{github.workspace}} && ./examples/example_scripts/example_local.sh
+    - name: UDP Test
+      run: cd ${{github.workspace}} && ./examples/example_scripts/example_udp.sh
+      
+    - name: TCP Test
+      run: cd ${{github.workspace}} && ./examples/example_scripts/example_tcp.sh
 
-    # - name: DTLS Test
-    #   run: cd ${{github.workspace}} && ./examples/example_scripts/example_dtls.sh
+    - name: TLS Test
+      run: cd ${{github.workspace}} && ./examples/example_scripts/example_tls.sh
 
-    # - name: Key Exchange Test
-    #   run: cd ${{github.workspace}} && ./examples/example_scripts/example_kex.sh
+    - name: DTLS Test
+      run: cd ${{github.workspace}} && ./examples/example_scripts/example_dtls.sh
 
     - name: Configure CMake without extensions
       # force full rebuild

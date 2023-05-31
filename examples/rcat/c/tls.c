@@ -56,8 +56,7 @@ int send_input_data(void *carry_data) {
                 if (read_len > 0) {
                     rasta_send(data->rc, data->connection, buf, read_len);
                 }
-                // TODO: Disconnect
-                // sr_cleanup(&data->rc->h);
+                sr_disconnect(data->connection);
                 return 1;
             }
 

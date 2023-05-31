@@ -1,15 +1,14 @@
 #! /bin/bash
-
-# needs to be run from top-level directory, i.e. ./examples/example_scripts/example_tls.sh
+# needs to be run from top-level directory, i.e. ./examples/example_scripts/example_local.sh
 cd build/examples || exit 1
 
 echo "Starting server..."
-../rcat_tls r &
+../rcat_tcp r &
 SERVER_PID=$!
 sleep 1
 
 echo "Starting client..." 
-echo "RastaTest" | ../rcat_tls s &
+echo "RastaTest" | ../rcat_tcp s &
 CLIENT_PID=$!
 sleep 1
 
