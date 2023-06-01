@@ -35,6 +35,7 @@ void find_channel_by_ip_address(struct rasta_handle *h, struct sockaddr_in sende
                 && current_channel->remote_port == ntohs(sender.sin_port)) {
                 *red_channel_idx = i;
                 *transport_channel_idx = j;
+                break;
             }
         }
     }
