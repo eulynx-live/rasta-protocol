@@ -71,6 +71,9 @@ jobs:
     - name: DTLS Test
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_dtls.sh
 
+    - name: KEX / Opaque Test
+      run: cd ${{github.workspace}} && ./examples/example_scripts/example_kex.sh
+
     - name: Configure CMake without extensions
       # force full rebuild
       run: rm -r ${{github.workspace}}/build && cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_RASTA_GRPC_BRIDGE=ON -DENABLE_RASTA_TLS=ON
@@ -82,8 +85,8 @@ jobs:
     - name: Test without extensions
       run: cd ${{github.workspace}}/build && ctest .
 
-    # - name: Local Test without extensions
-    #   run: cd ${{github.workspace}} && ./examples/example_scripts/example_local.sh
+    - name: UDP Test without extensions
+      run: cd ${{github.workspace}} && ./examples/example_scripts/example_udp.sh
 
     - name: Log in to the Container registry
       uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
