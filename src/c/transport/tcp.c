@@ -133,6 +133,7 @@ int transport_redial(rasta_transport_channel* channel) {
 void transport_close(rasta_transport_channel *channel) {
     if (channel->connected) {
         bsd_close(channel->file_descriptor);
+        channel->connected = false;
     }
 
     disable_fd_event(&channel->receive_event);
