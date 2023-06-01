@@ -107,3 +107,4 @@ void transport_close(rasta_transport_channel *channel);
 
 // Protected methods
 void transport_init_base(struct rasta_handle *h, rasta_transport_channel* channel, unsigned id, const char *host, uint16_t port, const rasta_config_tls *tls_config);
+void find_channel_by_ip_address(struct rasta_handle *h, struct sockaddr_in sender, int *red_channel_idx, int *transport_channel_idx);

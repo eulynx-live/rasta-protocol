@@ -73,20 +73,13 @@ static size_t wolfssl_receive_dtls(rasta_transport_socket *transport_socket, uns
 
     get_client_addr_from_socket(transport_socket, sender, &sender_size);
 
-    // TODO: we should probably synchronize socket and channel somewhere else
-    // set socket connected if corresponding channel is already connected
-    char str[INET_ADDRSTRLEN];
-    inet_ntop(AF_INET, &sender->sin_addr, str, INET_ADDRSTRLEN);
+    int red_channel_idx, transport_channel_idx;
     rasta_transport_channel *channel = NULL;
-    for (unsigned i = 0; i < data->h->mux.redundancy_channels_count; i++) {
-        for (unsigned j = 0; j < data->h->mux.redundancy_channels[i].transport_channel_count; j++) {
-            rasta_transport_channel *current_channel = &data->h->mux.redundancy_channels[i].transport_channels[j];
-            if (strncmp(current_channel->remote_ip_address, str, INET_ADDRSTRLEN) == 0
-                && current_channel->remote_port == ntohs(sender->sin_port)) {
-                channel = current_channel;
-                break;
-            }
-        }
+
+    // find the transport channel corresponding to this socket
+    find_channel_by_ip_address(data->h, *sender, &red_channel_idx, &transport_channel_idx);
+    if(red_channel_idx != -1 && transport_channel_idx != -1){
+        channel = &data->h->mux.redundancy_channels[red_channel_idx].transport_channels[transport_channel_idx];
     }
 
     // If this is a client and the channel was connected using udp_send, we may not have
@@ -101,7 +94,7 @@ static size_t wolfssl_receive_dtls(rasta_transport_socket *transport_socket, uns
         wolfssl_accept(transport_socket);
         transport_socket->tls_state = RASTA_TLS_CONNECTION_ESTABLISHED;
 
-        // copy tls config to channel
+        // propagate our TLS config to the channel
         if (channel != NULL) {
             channel->tls_state = transport_socket->tls_state;
             channel->tls_mode = transport_socket->tls_mode;

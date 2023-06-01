@@ -19,17 +19,13 @@ int channel_accept_event(void *carry_data) {
     char str[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &addr.sin_addr, str, INET_ADDRSTRLEN);
 
+    int red_channel_idx, transport_channel_idx;
+    rasta_transport_channel *channel = NULL;
+
     // Find the suitable transport channel in the mux
-    rasta_transport_channel * channel = NULL;
-    for (unsigned i = 0; i < data->h->mux.redundancy_channels_count; i++) {
-        for (unsigned j = 0; j < data->h->mux.redundancy_channels[i].transport_channel_count; j++) {
-            rasta_transport_channel *current_channel = &data->h->mux.redundancy_channels[i].transport_channels[j];
-            if (strncmp(current_channel->remote_ip_address, str, INET_ADDRSTRLEN) == 0
-                && current_channel->remote_port == ntohs(addr.sin_port)) {
-                channel = current_channel;
-                break;
-            }
-        }
+    find_channel_by_ip_address(data->h, addr, &red_channel_idx, &transport_channel_idx);
+    if(red_channel_idx != -1 && transport_channel_idx != -1){
+        channel = &data->h->mux.redundancy_channels[red_channel_idx].transport_channels[transport_channel_idx];
     }
 
     if (channel != NULL) {
@@ -79,23 +75,19 @@ int channel_receive_event(void *carry_data) {
 
     if (transport_channel == NULL) {
         // We will only enter this branch for UDP and DTLS
+        int red_channel_idx, transport_channel_idx;
 
         // Find the suitable transport channel in the mux
-        for (unsigned i = 0; i < data->h->mux.redundancy_channels_count; i++) {
-            for (unsigned j = 0; j < data->h->mux.redundancy_channels[i].transport_channel_count; j++) {
-                rasta_transport_channel *current_channel = &data->h->mux.redundancy_channels[i].transport_channels[j];
-                if (strncmp(current_channel->remote_ip_address, str, INET_ADDRSTRLEN) == 0
-                    && current_channel->remote_port == ntohs(sender.sin_port)) {
-                    transport_channel = current_channel;
-                    connection = &data->h->rasta_connections[i];
-                    break;
-                }
-            }
+        find_channel_by_ip_address(data->h, sender, &red_channel_idx, &transport_channel_idx);
+        if(red_channel_idx != -1 && transport_channel_idx != -1){
+            transport_channel = &data->h->mux.redundancy_channels[red_channel_idx].transport_channels[transport_channel_idx];
+            connection = &data->h->rasta_connections[red_channel_idx];
         }
 
         if (transport_channel == NULL) {
             // Ignore and continue
-            logger_log(data->connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive", "Discarding packet from unknown peer %s:%u", str, ntohs(sender.sin_port));
+            // TODO: in this case, connection will also be NULL, so we can't use its logger
+            logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive", "Discarding packet from unknown peer %s:%u", str, ntohs(sender.sin_port));
             return 0;
         }
 
