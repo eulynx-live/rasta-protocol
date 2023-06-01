@@ -77,11 +77,6 @@ int main(int argc, char *argv[]) {
 
     rasta_ip_data toServer[2];
 
-    strcpy(toServer[0].ip, "127.0.0.1");
-    strcpy(toServer[1].ip, "127.0.0.1");
-    toServer[0].port = 8888;
-    toServer[1].port = 8889;
-
     fd_event input_available_event;
     struct connect_event_data input_available_event_data;
 
@@ -96,11 +91,17 @@ int main(int argc, char *argv[]) {
         rasta_config_info config;
         struct logger_t logger;
         load_configfile(&config, &logger, CONFIG_PATH_S);
+
+        strcpy(toServer[0].ip, "127.0.0.1");
+        strcpy(toServer[1].ip, "127.0.0.1");
+        toServer[0].port = 9998;
+        toServer[1].port = 9999;
+
         rasta_connection_config connection = {
             .config = &config,
             .rasta_id = ID_S,
             .transport_sockets = toServer,
-            .transport_sockets_count = sizeof(toServer)
+            .transport_sockets_count = sizeof(toServer) / sizeof(toServer[0])
         };
 
         rasta_lib_init_configuration(rc, &config, &logger, &connection, 1);
@@ -134,11 +135,17 @@ int main(int argc, char *argv[]) {
         rasta_config_info config;
         struct logger_t logger;
         load_configfile(&config, &logger, CONFIG_PATH_C);
+
+        strcpy(toServer[0].ip, "127.0.0.1");
+        strcpy(toServer[1].ip, "127.0.0.1");
+        toServer[0].port = 8888;
+        toServer[1].port = 8889;
+
         rasta_connection_config connection = {
             .config = &config,
             .rasta_id = ID_R,
             .transport_sockets = toServer,
-            .transport_sockets_count = sizeof(toServer)
+            .transport_sockets_count = sizeof(toServer) / sizeof(toServer[0])
         };
 
         rasta_lib_init_configuration(rc, &config, &logger, &connection, 1);

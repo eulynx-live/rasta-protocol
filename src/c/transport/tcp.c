@@ -96,21 +96,7 @@ void tcp_close(rasta_transport_channel *transport_state) {
 void transport_listen(struct rasta_handle *h, rasta_transport_socket *socket) {
     UNUSED(h);
     tcp_listen(socket);
-
-    // Register accept event
-
-    memset(&socket->accept_event, 0, sizeof(fd_event));
-    socket->accept_event.carry_data = &socket->accept_event_data;
-
-    socket->accept_event.callback = channel_accept_event;
-    socket->accept_event.fd = socket->file_descriptor;
-    socket->accept_event.enabled = 1;
-
-    socket->accept_event_data.socket = socket;
-    socket->accept_event_data.event = &socket->accept_event;
-    socket->accept_event_data.h = h;
-
-    add_fd_event(h->ev_sys, &socket->accept_event, EV_READABLE);
+    enable_fd_event(&socket->accept_event);
 }
 
 int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr) {
@@ -158,8 +144,7 @@ void send_callback(redundancy_mux *mux, struct RastaByteArray data_to_send, rast
     do_send(channel, data_to_send.bytes, data_to_send.length);
 }
 
-ssize_t receive_callback(redundancy_mux *mux, struct receive_event_data *data, unsigned char *buffer, struct sockaddr_in *sender) {
-    UNUSED(mux);
+ssize_t receive_callback(struct receive_event_data *data, unsigned char *buffer, struct sockaddr_in *sender) {
     // TODO: exchange MAX_DEFER_QUEUE_MSG_SIZE by something depending on send_max (i.e. the receive buffer size)
     // search for connected_recv_buffer_size
     // TODO: Manage possible remaining data in the receive buffer on next call to rasta_recv
@@ -171,6 +156,7 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
     socket->id = id;
     tcp_init(socket, tls_config);
 
+    // register accept event
     memset(&socket->accept_event, 0, sizeof(fd_event));
 
     socket->accept_event.callback = channel_accept_event;
@@ -190,19 +176,5 @@ void transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, cons
 }
 
 void transport_init(struct rasta_handle *h, rasta_transport_channel* channel, unsigned id, const char *host, uint16_t port, const rasta_config_tls *tls_config) {
-    channel->id = id;
-    channel->remote_port = port;
-    strncpy(channel->remote_ip_address, host, INET_ADDRSTRLEN-1);
-    channel->send_callback = send_callback;
-    channel->tls_config = tls_config;
-
-    memset(&channel->receive_event, 0, sizeof(fd_event));
-    channel->receive_event.carry_data = &channel->receive_event_data;
-    channel->receive_event.callback = channel_receive_event;
-
-    memset(&channel->receive_event_data, 0, sizeof(channel->receive_event_data));
-    channel->receive_event_data.channel = channel;
-    channel->receive_event_data.connection = NULL;
-
-    add_fd_event(h->ev_sys, &channel->receive_event, EV_READABLE);
+    transport_init_base(h, channel, id, host, port, tls_config);
 }

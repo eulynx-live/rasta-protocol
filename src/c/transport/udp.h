@@ -39,7 +39,7 @@ void udp_bind(rasta_transport_socket *transport_state, uint16_t port);
  * @param port the port the socket will listen on
  * @param ip the IPv4 address of the network interface the socket will listen on.
  */
-void udp_bind_device(rasta_transport_socket *transport_state, uint16_t port, char *ip);
+void udp_bind_device(rasta_transport_socket *transport_state, const char *ip, uint16_t port);
 
 /**
  * Receive data on the given @p file descriptor and store it in the given buffer.

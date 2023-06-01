@@ -66,21 +66,46 @@ static void wolfssl_accept(rasta_transport_socket *transport_state) {
     set_dtls_async(transport_state);
 }
 
-static size_t wolfssl_receive_dtls(rasta_transport_socket *transport_state, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
+static size_t wolfssl_receive_dtls(rasta_transport_socket *transport_socket, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
     int receive_len, received_total = 0;
     socklen_t sender_size = sizeof(*sender);
+    struct receive_event_data *data = &transport_socket->receive_event_data;
 
-    get_client_addr_from_socket(transport_state, sender, &sender_size);
+    get_client_addr_from_socket(transport_socket, sender, &sender_size);
 
-    if (transport_state->tls_state == RASTA_TLS_CONNECTION_READY) {
-        wolfssl_accept(transport_state);
-        transport_state->tls_state = RASTA_TLS_CONNECTION_ESTABLISHED;
+    int red_channel_idx, transport_channel_idx;
+    rasta_transport_channel *channel = NULL;
+
+    // find the transport channel corresponding to this socket
+    find_channel_by_ip_address(data->h, *sender, &red_channel_idx, &transport_channel_idx);
+    if(red_channel_idx != -1 && transport_channel_idx != -1){
+        channel = &data->h->mux.redundancy_channels[red_channel_idx].transport_channels[transport_channel_idx];
+    }
+
+    // If this is a client and the channel was connected using udp_send, we may not have
+    // told the socket about it. In this case, propagate the connection information to the
+    // socket here:
+    if (channel != NULL && channel->tls_state == RASTA_TLS_CONNECTION_ESTABLISHED) {
+        transport_socket->tls_state = RASTA_TLS_CONNECTION_ESTABLISHED;
+        transport_socket->ssl = channel->ssl;
+    }
+
+    if (transport_socket->tls_state == RASTA_TLS_CONNECTION_READY) {
+        wolfssl_accept(transport_socket);
+        transport_socket->tls_state = RASTA_TLS_CONNECTION_ESTABLISHED;
+
+        // propagate our TLS config to the channel
+        if (channel != NULL) {
+            channel->tls_state = transport_socket->tls_state;
+            channel->tls_mode = transport_socket->tls_mode;
+            channel->ssl = transport_socket->ssl;
+        }
         return 0;
     }
-    if (transport_state->tls_state == RASTA_TLS_CONNECTION_ESTABLISHED) {
+    if (transport_socket->tls_state == RASTA_TLS_CONNECTION_ESTABLISHED) {
         // read as many bytes as available at this time
         do {
-            receive_len = wolfSSL_read(transport_state->ssl, received_message, (int)max_buffer_len);
+            receive_len = wolfSSL_read(transport_socket->ssl, received_message, (int)max_buffer_len);
             if (receive_len < 0) {
                 break;
             }
@@ -90,7 +115,7 @@ static size_t wolfssl_receive_dtls(rasta_transport_socket *transport_state, unsi
         } while (receive_len > 0 && max_buffer_len);
 
         if (receive_len < 0) {
-            int readErr = wolfSSL_get_error(transport_state->ssl, 0);
+            int readErr = wolfSSL_get_error(transport_socket->ssl, 0);
             if (readErr != SSL_ERROR_WANT_READ && readErr != SSL_ERROR_WANT_WRITE) {
                 fprintf(stderr, "WolfSSL decryption failed: %s.\n", wolfSSL_ERR_reason_error_string(readErr));
                 abort();
@@ -144,7 +169,7 @@ void udp_bind(rasta_transport_socket *transport_state, uint16_t port) {
     handle_tls_mode(transport_state);
 }
 
-void udp_bind_device(rasta_transport_socket *transport_state, uint16_t port, char *ip) {
+void udp_bind_device(rasta_transport_socket *transport_state, const char *ip, uint16_t port) {
     struct sockaddr_in local;
 
     // set struct to 0s
@@ -204,15 +229,15 @@ size_t udp_receive(rasta_transport_socket *transport_state, unsigned char *recei
     return 0;
 }
 
-void udp_send(rasta_transport_channel *transport_state, unsigned char *message, size_t message_len, char *host, uint16_t port) {
+void udp_send(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len, char *host, uint16_t port) {
     struct sockaddr_in receiver = host_port_to_sockaddr(host, port);
-    if (transport_state->tls_mode == TLS_MODE_DISABLED) {
+    if (transport_channel->tls_mode == TLS_MODE_DISABLED) {
 
         // send the message using the other send function
-        udp_send_sockaddr(transport_state, message, message_len, receiver);
+        udp_send_sockaddr(transport_channel, message, message_len, receiver);
     }
-    else if (transport_state->tls_mode == TLS_MODE_DTLS_1_2) {
-        wolfssl_send_dtls(transport_state, message, message_len, &receiver);
+    else if (transport_channel->tls_mode == TLS_MODE_DTLS_1_2) {
+        wolfssl_send_dtls(transport_channel, message, message_len, &receiver);
     }
 }
 
@@ -269,8 +294,8 @@ int transport_connect(rasta_connection *h, rasta_transport_socket *socket, rasta
     // channel->remote_port = port;
     // channel->send_callback = send_callback;
     // strncpy(channel->remote_ip_address, host, INET_ADDRSTRLEN-1);
-    // channel->tls_mode = socket->tls_mode;
     // TODO: TBD
+    channel->tls_mode = socket->tls_mode;
     channel->tls_state = RASTA_TLS_CONNECTION_READY;
     channel->ctx = socket->ctx;
     channel->ssl = socket->ssl;
@@ -291,8 +316,7 @@ void send_callback(redundancy_mux *mux, struct RastaByteArray data_to_send, rast
     udp_send(channel, data_to_send.bytes, data_to_send.length, channel->remote_ip_address, channel->remote_port);
 }
 
-ssize_t receive_callback(redundancy_mux *mux, struct receive_event_data *data, unsigned char *buffer, struct sockaddr_in *sender) {
-    UNUSED(mux);
+ssize_t receive_callback(struct receive_event_data *data, unsigned char *buffer, struct sockaddr_in *sender) {
     return udp_receive(data->socket, buffer, MAX_DEFER_QUEUE_MSG_SIZE, sender);
 }
 
@@ -314,6 +338,7 @@ void transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, cons
 
     memset(&socket->receive_event_data, 0, sizeof(socket->receive_event_data));
     socket->receive_event_data.socket = socket;
+    socket->receive_event_data.h = h;
 
     add_fd_event(h->ev_sys, &socket->receive_event, EV_READABLE);
 }
@@ -325,10 +350,5 @@ int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr) {
 }
 
 void transport_init(struct rasta_handle *h, rasta_transport_channel* channel, unsigned id, const char *host, uint16_t port, const rasta_config_tls *tls_config) {
-    UNUSED(h);
-    channel->id = id;
-    channel->remote_port = port;
-    strncpy(channel->remote_ip_address, host, INET_ADDRSTRLEN-1);
-    channel->send_callback = send_callback;
-    channel->tls_config = tls_config;
+    transport_init_base(h, channel, id, host, port, tls_config);
 }

@@ -309,14 +309,7 @@ struct rasta_connection *handle_conreq(struct rasta_connection *connection, stru
 
             connection->current_state = RASTA_CONNECTION_START;
 
-            // check if the connection was just closed
-            // if (connection) {
-                // logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: ConnectionRequest", "Update Client %d", receivedPacket->sender_id);
-                fire_on_connection_state_change(sr_create_notification_result(NULL, connection));
-            // } else {
-            //     fire_on_connection_state_change(sr_create_notification_result(NULL, connection));
-            //     logger_log(connection->logger, LOG_LEVEL_INFO, "RaSTA HANDLE: ConnectionRequest", "Add new client %d", receivedPacket->sender_id);
-            // }
+            fire_on_connection_state_change(sr_create_notification_result(NULL, connection));
 
             logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: ConnectionRequest", "Send Connection Response - waiting for Heartbeat");
 
