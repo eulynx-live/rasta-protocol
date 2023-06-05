@@ -347,9 +347,13 @@ int transport_connect(struct rasta_connection *h, rasta_transport_socket *socket
 }
 
 int transport_redial(rasta_transport_channel* channel) {
-    UNUSED(channel);
+    // TODO: just reconnecting does not work!
+    if (tcp_connect(channel) != 0) {
+        return -1;
+    }
+
+    enable_fd_event(&channel->receive_event);
     return 0;
-    // return tcp_connect(channel);
 }
 
 void transport_close(rasta_transport_channel *channel) {
