@@ -103,14 +103,15 @@ int channel_receive_event(void *carry_data) {
 
     if (len <= 0 && !is_dtls_conn_ready) {
         // Connection is broken
-        // TODO: What about disabling events?
         transport_channel->connected = false;
 
-        // Why should a readable UDP socket return len <= 0?
-        // if (data->socket != NULL) {
-        //     disable_fd_event(&data->socket->receive_event);
-        //     remove_fd_event(data->h->ev_sys, &data->socket->receive_event);
-        // }
+        // Disable receive events so this handler doesn't get called endlessly
+        if (data->socket != NULL) {
+            disable_fd_event(&data->socket->receive_event);
+        }
+        if (data->channel != NULL) {
+            disable_fd_event(&data->channel->receive_event);
+        }
     }
 
     if (len < 0) {
