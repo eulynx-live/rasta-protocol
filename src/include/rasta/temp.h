@@ -6,11 +6,7 @@
 #include "logging.h"
 #include "rastafactory.h"
 #include "rastahashing.h"
-
-typedef enum {
-    RASTA_ROLE_CLIENT = 0,
-    RASTA_ROLE_SERVER = 1
-} rasta_role;
+#include "rastarole.h"
 
 /**
  * representation of the connection state in the SR layer
