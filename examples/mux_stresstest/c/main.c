@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
         while (1) {
             struct RastaPacket hb = createHeartbeat(SERVER_ID, CLIENT_ID, current_seq, current_seq, current_seq, current_seq, &hashing_context);
             current_seq++;
-            redundancy_mux_send(&mux, hb);
+            redundancy_mux_send(&mux, hb, RASTA_ROLE_CLIENT);
             printf("Sent HB %lu\n", current_seq);
 
             struct RastaPacket received = redundancy_mux_retrieve_all(&mux);
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
             received.sender_id = SERVER_ID;
             received.receiver_id = CLIENT_ID;
 
-            redundancy_mux_send(&mux, received);
+            redundancy_mux_send(&mux, received, RASTA_ROLE_SERVER);
 
             printf("Sent HB %lu back to client\n", received.sequence_number);
         }

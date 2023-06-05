@@ -11,6 +11,7 @@ extern "C" { // only need to export C interface if
 #include <rasta/event_system.h>
 #include <rasta/rastamodule.h>
 #include <rasta/rastaredundancy.h>
+#include <rasta/rastarole.h>
 
 #define UNUSED(x) (void)(x)
 
@@ -170,7 +171,7 @@ void redundancy_mux_close(redundancy_mux *mux);
  */
 rasta_redundancy_channel *redundancy_mux_get_channel(redundancy_mux *mux, unsigned long id);
 
-void redundancy_mux_send(rasta_redundancy_channel *channel, struct RastaPacket *data);
+void redundancy_mux_send(rasta_redundancy_channel *channel, struct RastaPacket *data, rasta_role role);
 
 /**
  * retrieves a message from the queue of the redundancy channel to entity with RaSTA ID @p id.

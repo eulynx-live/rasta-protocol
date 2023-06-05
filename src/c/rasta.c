@@ -42,7 +42,7 @@ void send_KexRequest(struct rasta_connection *connection) {
         logger_log(connection->logger, LOG_LEVEL_INFO, "RaSTA KEX", "Rekeying at %" PRIu64, get_current_time_ms());
     }
 
-    redundancy_mux_send(connection->redundancy_channel, &hb);
+    redundancy_mux_send(connection->redundancy_channel, &hb, connection->role);
 
     connection->sn_t = connection->sn_t + 1;
 
@@ -212,7 +212,7 @@ int data_send_event(void *carry_data) {
                 logger_log(h->logger, LOG_LEVEL_INFO, "RaSTA send handler", "discarding packet because retransmission queue is full");
             }
 
-            redundancy_mux_send(con->redundancy_channel, &data);
+            redundancy_mux_send(con->redundancy_channel, &data, con->role);
 
             logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA send handler", "Sent data packet from queue");
 
@@ -314,7 +314,7 @@ struct rasta_connection *handle_conreq(struct rasta_connection *connection, stru
             logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: ConnectionRequest", "Send Connection Response - waiting for Heartbeat");
 
             // Send connection response immediately (don't go through packet batching)
-            redundancy_mux_send(connection->redundancy_channel, &conresp);
+            redundancy_mux_send(connection->redundancy_channel, &conresp, connection->role);
 
             freeRastaByteArray(&conresp.data);
         } else {
@@ -584,7 +584,7 @@ struct rasta_connection* sr_connect(struct rasta_handle *h, unsigned long id) {
     connection->sn_i = connection->sn_t;
 
     // Send connection request immediately (don't go through packet batching)
-    redundancy_mux_send(connection->redundancy_channel, &conreq);
+    redundancy_mux_send(connection->redundancy_channel, &conreq, connection->role);
 
     // increase sequence number
     connection->sn_t++;

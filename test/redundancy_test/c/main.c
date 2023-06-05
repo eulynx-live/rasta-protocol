@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
         printf("Sending message to server\n");
         struct RastaPacket data = createConnectionRequest(SERVER_ID, CLIENT_1_ID, 42, 42, 42, "0303", &hashing_context);
 
-        redundancy_mux_send(&mux, data);
+        redundancy_mux_send(&mux, data, RASTA_ROLE_CLIENT);
         printf("Data sent, exiting...\n");
         redundancy_mux_close(&mux);
         printf("Connection closed\n");
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
         // by receiving data from Client 2 the server will detect the transport channels and it's possible to send to
         // Client 2
         struct RastaPacket hello = createConnectionRequest(SERVER_ID, CLIENT_2_ID, 0, 0, 0, "0303", &hashing_context);
-        redundancy_mux_send(&mux, hello);
+        redundancy_mux_send(&mux, hello, RASTA_ROLE_CLIENT);
 
         printf("Done\n");
         printf("Waiting for message from server...\n");
@@ -170,7 +170,7 @@ int main(int argc, char *argv[]) {
         received.sender_id = SERVER_ID;
         received.receiver_id = CLIENT_2_ID;
 
-        redundancy_mux_send(&mux, received);
+        redundancy_mux_send(&mux, received, RASTA_ROLE_SERVER);
         printf("Sent PDU to Client 2\n");
         printf("Closing connection...\n");
 

@@ -371,7 +371,7 @@ void sr_retransmit_data(rasta_connection *connection) {
         }
 
         // send packet
-        redundancy_mux_send(connection->redundancy_channel, &data);
+        redundancy_mux_send(connection->redundancy_channel, &data, connection->role);
         logger_log(connection->logger, LOG_LEVEL_INFO, "RaSTA retransmission", "retransmitted packet with old sn=%lu",
                    (long unsigned int)old_p.sequence_number);
 
