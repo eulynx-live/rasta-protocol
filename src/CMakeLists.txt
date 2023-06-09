@@ -187,3 +187,8 @@ if(ENABLE_RASTA_TLS)
     target_link_libraries(${target}_dtls wolfssl)
     target_link_libraries(${target}_tls wolfssl)
 endif(ENABLE_RASTA_TLS)
+
+if(ENABLE_SLEEP_ON_CONNECT)
+    target_compile_definitions(${target}_tcp PUBLIC SLEEP_ON_CONNECT)
+    target_compile_definitions(${target}_tls PUBLIC SLEEP_ON_CONNECT)
+endif(ENABLE_SLEEP_ON_CONNECT)
