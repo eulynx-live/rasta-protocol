@@ -100,7 +100,7 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
 void transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port);
 void transport_listen(struct rasta_handle *h, rasta_transport_socket *socket);
 int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr);
-int transport_connect(rasta_connection *h, rasta_transport_socket *socket, rasta_transport_channel *channel);
+int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel, rasta_config_tls tls_config);
 int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *socket);
 void transport_close(rasta_transport_channel *channel);
 

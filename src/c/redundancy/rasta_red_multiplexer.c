@@ -363,7 +363,7 @@ void redundancy_mux_listen_channels(struct rasta_handle *h, redundancy_mux *mux,
 
 int rasta_red_connect_transport_channel(rasta_connection *h, rasta_redundancy_channel *channel, rasta_transport_socket *transport_socket) {
     rasta_transport_channel *transport_connection = &channel->transport_channels[transport_socket->id];
-    transport_connect(h, transport_socket, transport_connection);
+    transport_connect(transport_socket, transport_connection, h->config->tls);
     return transport_connection->connected;
 }
 

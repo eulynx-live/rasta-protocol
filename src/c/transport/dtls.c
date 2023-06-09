@@ -287,8 +287,8 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
     add_fd_event(h->ev_sys, &socket->accept_event, EV_READABLE);
 }
 
-int transport_connect(rasta_connection *h, rasta_transport_socket *socket, rasta_transport_channel *channel) {
-    UNUSED(h);
+int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel, rasta_config_tls tls_config) {
+    UNUSED(tls_config);
 
     // channel->id = socket->id;
     // channel->remote_port = port;
