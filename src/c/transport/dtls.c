@@ -307,9 +307,9 @@ int transport_connect(rasta_connection *h, rasta_transport_socket *socket, rasta
     return 0;
 }
 
-int transport_redial(rasta_transport_channel *channel) {
+int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *socket) {
     // We can't reconnect when using DTLS
-    UNUSED(channel);
+    UNUSED(channel); UNUSED(socket);
     return -1;
 }
 

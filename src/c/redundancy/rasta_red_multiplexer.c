@@ -303,9 +303,12 @@ void redundancy_mux_send(rasta_redundancy_channel *receiver, struct RastaPacket 
             if (role == RASTA_ROLE_CLIENT) {
                 logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux send", "Channel %d/%d is not connected, re-trying %s:%d", 
                     i + 1, receiver->transport_channel_count, channel->remote_ip_address, channel->remote_port);
-                if (transport_redial(channel) != 0) {
+                rasta_transport_socket *socket = &mux->transport_sockets[channel->id];
+                if (transport_redial(channel, socket) != 0) {
                     continue;
                 }
+                logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux send", "Reconnected channel %d/%d",
+                i + 1, receiver->transport_channel_count);
             } else {
                 logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux send", "Skipping unconnected channel %d/%d",
                 i + 1, receiver->transport_channel_count);

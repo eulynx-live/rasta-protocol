@@ -126,13 +126,26 @@ int transport_connect(struct rasta_connection *h, rasta_transport_socket *socket
     return 0;
 }
 
-int transport_redial(rasta_transport_channel* channel) {
-    // TODO: just reconnecting does not work!
+int transport_redial(rasta_transport_channel* channel, rasta_transport_socket *socket) {
+    // create a new socket (closed socket cannot be reused)
+    socket->file_descriptor = bsd_create_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    channel->file_descriptor = socket->file_descriptor;
+
+    // bind new socket to the configured ip/port
+    rasta_handle *h = socket->accept_event_data.h;
+    const rasta_ip_data *ip_data = &h->mux.config->redundancy.connections.data[socket->id];
+    transport_bind(h, socket, ip_data->ip, (uint16_t)ip_data->port);
+
     if (tcp_connect(channel) != 0) {
         return -1;
     }
+    
+    socket->receive_event.fd = socket->file_descriptor;
+    socket->accept_event.fd = socket->file_descriptor;
 
+    channel->receive_event.fd = channel->file_descriptor;
     enable_fd_event(&channel->receive_event);
+
     return 0;
 }
 
