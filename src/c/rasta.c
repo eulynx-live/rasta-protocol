@@ -234,7 +234,6 @@ int data_send_event(void *carry_data) {
 }
 
 void log_main_loop_state(struct rasta_handle *h, event_system *ev_sys, const char *message) {
-    UNUSED(h); UNUSED(message);
     int fd_event_count = 0, fd_event_active_count = 0, timed_event_count = 0, timed_event_active_count = 0;
     for (fd_event *ev = ev_sys->fd_events.first; ev; ev = ev->next) {
         fd_event_count++;
@@ -285,11 +284,8 @@ struct rasta_connection *handle_conreq(struct rasta_connection *connection, stru
             // same version, or lower version -> client has to decide -> send ConResp
 
             // set values according to 5.6.2 [3]
-            connection->sn_r = receivedPacket->sequence_number + 1;
-            connection->cs_t = receivedPacket->sequence_number;
-            connection->ts_r = receivedPacket->timestamp;
-            connection->cts_r = receivedPacket->confirmed_timestamp;
-            connection->cs_r = receivedPacket->confirmed_sequence_number;
+            update_connection_attrs(connection, receivedPacket);
+            update_confirmed_attrs(connection, receivedPacket);
 
             // save N_SENDMAX of partner
             connection->connected_recv_buffer_size = connectionData.send_max;
@@ -358,9 +354,7 @@ struct rasta_connection *handle_conresp(struct rasta_connection *con, struct Ras
                 // same version or accepted versions -> send hb to complete handshake
 
                 // set values according to 5.6.2 [3]
-                con->sn_r = receivedPacket->sequence_number + 1;
-                con->cs_t = receivedPacket->sequence_number;
-                con->ts_r = receivedPacket->timestamp;
+                update_connection_attrs(con, receivedPacket);
                 con->cs_r = receivedPacket->confirmed_sequence_number;
 
                 // update state, ready to send data
@@ -442,10 +436,8 @@ int handle_hb(rasta_connection *connection, struct RastaPacket *receivedPacket) 
         if (sr_cts_in_seq(connection, &connection->config->sending, receivedPacket)) {
             // set values according to 5.6.2 [3]
             logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: Heartbeat", "Heartbeat is valid connection successful");
-            connection->sn_r = receivedPacket->sequence_number + 1;
-            connection->cs_t = receivedPacket->sequence_number;
+            update_connection_attrs(connection, receivedPacket);
             connection->cs_r = receivedPacket->confirmed_sequence_number;
-            connection->ts_r = receivedPacket->timestamp;
 
             if (connection->config->kex.mode == KEY_EXCHANGE_MODE_NONE) {
                 // sequence number correct, ready to receive data
@@ -494,12 +486,8 @@ int handle_hb(rasta_connection *connection, struct RastaPacket *receivedPacket) 
                 updateDiagnostic(connection, receivedPacket, &connection->config->sending);
 
                 // set values according to 5.6.2 [3]
-                connection->sn_r = receivedPacket->sequence_number + 1;
-                connection->cs_t = receivedPacket->sequence_number;
-                connection->cs_r = receivedPacket->confirmed_sequence_number;
-                connection->ts_r = receivedPacket->timestamp;
-
-                connection->cts_r = receivedPacket->confirmed_timestamp;
+                update_connection_attrs(connection, receivedPacket);
+                update_confirmed_attrs(connection, receivedPacket);
 
                 // cs_r updated, remove confirmed messages
                 sr_remove_confirmed_messages(connection);
@@ -543,20 +531,7 @@ struct rasta_connection* sr_connect(struct rasta_handle *h, unsigned long id) {
         }
     }
 
-    // rasta_redundancy_channel *channel = NULL;
-    // for (unsigned i = 0; i < h->mux.redundancy_channels_count; i++) {
-    //     if (h->mux.redundancy_channels[i].associated_id == id) {
-    //         channel = &h->mux.redundancy_channels[i];
-    //         break;
-    //     }
-    // }
-
-    if (connection == NULL) {
-        return NULL;
-    }
-
-
-    if (redundancy_mux_connect_channel(connection, &h->mux, connection->redundancy_channel) != 0) {
+    if (connection == NULL || redundancy_mux_connect_channel(connection, &h->mux, connection->redundancy_channel) != 0) {
         return NULL;
     }
 

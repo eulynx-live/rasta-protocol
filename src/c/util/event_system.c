@@ -129,18 +129,6 @@ void event_system_start(event_system *ev_sys) {
         current->last_call = cur_time;
     }
     for (;;) {
-        // {
-        //     int fd_event_count = 0, fd_event_active_count = 0, timed_event_count = 0, timed_event_active_count = 0;
-        //     for (fd_event *ev = ev_sys->fd_events.first; ev; ev = ev->next) {
-        //         fd_event_count++;
-        //         fd_event_active_count += !!ev->enabled;
-        //     }
-        //     for (timed_event *ev = ev_sys->timed_events.first; ev; ev = ev->next) {
-        //         timed_event_count++;
-        //         timed_event_active_count += !!ev->enabled;
-        //     }
-        //     printf("%d/%d fd events and %d/%d timed events active\n", fd_event_active_count, fd_event_count, timed_event_active_count, timed_event_count);
-        // }
         timed_event *next_event;
         cur_time = get_nanotime();
         uint64_t time_to_wait = calc_next_timed_event(&ev_sys->timed_events, &next_event, cur_time);

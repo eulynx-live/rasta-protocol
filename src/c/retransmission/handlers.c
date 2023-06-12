@@ -2,6 +2,17 @@
 #include "safety_retransmission.h"
 #include "protocol.h"
 
+void update_connection_attrs(struct rasta_connection *connection, struct RastaPacket *receivedPacket) {
+    connection->sn_r = receivedPacket->sequence_number + 1;
+    connection->cs_t = receivedPacket->sequence_number;
+    connection->ts_r = receivedPacket->timestamp;
+}
+
+void update_confirmed_attrs(struct rasta_connection *connection, struct RastaPacket *receivedPacket) {
+    connection->cts_r = receivedPacket->confirmed_timestamp;
+    connection->cs_r = receivedPacket->confirmed_sequence_number;
+}
+
 int handle_discreq(struct rasta_connection *connection, struct RastaPacket *receivedPacket) {
     logger_log(connection->logger, LOG_LEVEL_INFO, "RaSTA HANDLE: DisconnectionRequest", "received DiscReq");
 
@@ -48,11 +59,8 @@ int handle_data(struct rasta_connection *connection, struct RastaPacket *receive
                 result = 1;
 
                 // set values according to 5.6.2 [3]
-                connection->sn_r = receivedPacket->sequence_number + 1;
-                connection->cs_t = receivedPacket->sequence_number;
-                connection->cs_r = receivedPacket->confirmed_sequence_number;
-                connection->ts_r = receivedPacket->timestamp;
-                connection->cts_r = receivedPacket->confirmed_timestamp;
+                update_connection_attrs(connection, receivedPacket);
+                update_confirmed_attrs(connection, receivedPacket);
 
                 // cs_r updated, remove confirmed messages
                 sr_remove_confirmed_messages(connection);
@@ -69,9 +77,7 @@ int handle_data(struct rasta_connection *connection, struct RastaPacket *receive
         } else if (connection->current_state == RASTA_CONNECTION_RETRRUN) {
             if (sr_cts_in_seq(connection, &connection->config->sending, receivedPacket)) {
                 // set values according to 5.6.2 [3]
-                connection->sn_r = receivedPacket->sequence_number + 1;
-                connection->cs_t = receivedPacket->sequence_number;
-                connection->ts_r = receivedPacket->timestamp;
+                update_connection_attrs(connection, receivedPacket);
             } else {
                 logger_log(connection->logger, LOG_LEVEL_INFO, "RaSTA HANDLE: Data", "retransmission failed, disconnect and close");
                 // retransmission failed, disconnect and close
@@ -123,12 +129,9 @@ int handle_retrreq(struct rasta_connection *connection, struct RastaPacket *rece
             // printf("Connection closed / DiscReq sent!\n");
         }
 
-        // FIXME: update connection attr (copy from RASTA_TYPE_DATA case, DRY)
         // set values according to 5.6.2 [3]
-        connection->sn_r = receivedPacket->sequence_number + 1;
-        connection->cs_t = receivedPacket->sequence_number;
+        update_connection_attrs(connection, receivedPacket);
         connection->cs_r = receivedPacket->confirmed_sequence_number;
-        connection->ts_r = receivedPacket->timestamp;
 
         // cs_r updated, remove confirmed messages
         sr_remove_confirmed_messages(connection);
@@ -186,12 +189,8 @@ int handle_retrresp(struct rasta_connection *connection, struct RastaPacket *rec
         connection->current_state = RASTA_CONNECTION_RETRRUN;
 
         // set values according to 5.6.2 [3]
-        connection->sn_r = receivedPacket->sequence_number + 1;
-        connection->cs_t = receivedPacket->sequence_number;
-        connection->cs_r = receivedPacket->confirmed_sequence_number;
-        connection->ts_r = receivedPacket->timestamp;
-
-        connection->cts_r = receivedPacket->confirmed_timestamp;
+        update_connection_attrs(connection, receivedPacket);
+        update_confirmed_attrs(connection, receivedPacket);
     } else {
         logger_log(connection->logger, LOG_LEVEL_ERROR, "RaSTA receive", "received packet type retr_resp, but not in state retr_req");
         sr_close_connection(connection, RASTA_DISC_REASON_UNEXPECTEDTYPE, 0);
@@ -224,10 +223,8 @@ int handle_retrdata(struct rasta_connection *connection, struct RastaPacket *rec
                 result = 1;
 
                 // set values according to 5.6.2 [3]
-                connection->sn_r = receivedPacket->sequence_number + 1;
-                connection->cs_t = receivedPacket->sequence_number;
+                update_connection_attrs(connection, receivedPacket);
                 connection->cs_r = receivedPacket->confirmed_sequence_number;
-                connection->ts_r = receivedPacket->timestamp;
             }
         }
     } else {

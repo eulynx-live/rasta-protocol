@@ -137,7 +137,7 @@ int red_f_receiveData(rasta_redundancy_channel *channel, struct RastaRedundancyP
             unsigned long ts = deferqueue_get_ts(&channel->diagnostics_packet_buffer, packet.sequence_number);
             if (ts != 0) {
                 // seq_pdu was in queue, received time is ts
-                unsigned long delay = current_ts() - ts;
+                unsigned long delay = cur_timestamp() - ts;
 
                 // if delay > T_SEQ, message is late
                 if (delay > channel->configuration_parameters.t_seq) {
@@ -161,7 +161,7 @@ int red_f_receiveData(rasta_redundancy_channel *channel, struct RastaRedundancyP
 
         { // Diagnostics
             // received packet as first transport channel -> add with ts to diagnostics buffer
-            if (!deferqueue_add(&channel->diagnostics_packet_buffer, packet, current_ts())) {
+            if (!deferqueue_add(&channel->diagnostics_packet_buffer, packet, cur_timestamp())) {
                 logger_log(channel->logger, LOG_LEVEL_INFO, "RaSTA Red receive", "diagnostics packet buffer is full");
             }
         }
@@ -170,7 +170,7 @@ int red_f_receiveData(rasta_redundancy_channel *channel, struct RastaRedundancyP
         // packets into the defer queue. This is to support the case where we receive data from
         // connections that we don't currently rasta_recv from
 
-        if (!deferqueue_add(&channel->defer_q, packet, current_ts())) {
+        if (!deferqueue_add(&channel->defer_q, packet, cur_timestamp())) {
             logger_log(channel->logger, LOG_LEVEL_INFO, "RaSTA Red receive", "discarded packet because defer queue was full");
         }
 
@@ -212,7 +212,7 @@ int red_f_receiveData(rasta_redundancy_channel *channel, struct RastaRedundancyP
                            channel_id);
 
                 // add message to defer queue
-                if (!deferqueue_add(&channel->defer_q, packet, current_ts())) {
+                if (!deferqueue_add(&channel->defer_q, packet, cur_timestamp())) {
                     logger_log(channel->logger, LOG_LEVEL_INFO, "RaSTA Red receive", "discarded packet because defer queue was full");
                 }
             }

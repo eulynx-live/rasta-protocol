@@ -30,11 +30,11 @@ void wolfssl_start_tls_server(rasta_transport_socket *transport_state, const ras
     wolfssl_start_server(transport_state, tls_config, wolfTLSv1_3_server_method());
 }
 
-void wolfssl_start_server(rasta_transport_socket *transport_state, const rasta_config_tls *tls_config, WOLFSSL_METHOD *server_method) {
+void wolfssl_start_server(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config, WOLFSSL_METHOD *server_method) {
     int err;
     wolfssl_initialize_if_necessary();
-    transport_state->ctx = wolfSSL_CTX_new(server_method);
-    if (!transport_state->ctx) {
+    transport_socket->ctx = wolfSSL_CTX_new(server_method);
+    if (!transport_socket->ctx) {
         fprintf(stderr, "Could not allocate WolfSSL context!\n");
         abort();
     }
@@ -45,42 +45,42 @@ void wolfssl_start_server(rasta_transport_socket *transport_state, const rasta_c
     }
 
     /* Load CA certificates */
-    if (wolfSSL_CTX_load_verify_locations(transport_state->ctx, tls_config->ca_cert_path, 0) !=
+    if (wolfSSL_CTX_load_verify_locations(transport_socket->ctx, tls_config->ca_cert_path, 0) !=
         SSL_SUCCESS) {
         fprintf(stderr, "Error loading CA certificate file %s.\n", tls_config->ca_cert_path);
         abort();
     }
     /* Load server certificates */
-    if (wolfSSL_CTX_use_certificate_file(transport_state->ctx, tls_config->cert_path, SSL_FILETYPE_PEM) !=
+    if (wolfSSL_CTX_use_certificate_file(transport_socket->ctx, tls_config->cert_path, SSL_FILETYPE_PEM) !=
         SSL_SUCCESS) {
         printf("Error loading server certificate file %s as PEM file.\n", tls_config->cert_path);
         abort();
     }
     /* Load server Keys */
-    if ((err = wolfSSL_CTX_use_PrivateKey_file(transport_state->ctx, tls_config->key_path,
+    if ((err = wolfSSL_CTX_use_PrivateKey_file(transport_socket->ctx, tls_config->key_path,
                                                SSL_FILETYPE_PEM)) != SSL_SUCCESS) {
         printf("Error loading server private key file %s as PEM file: %d.\n", tls_config->key_path, err);
         abort();
     }
-    transport_state->tls_config = tls_config;
+    transport_socket->tls_config = tls_config;
 }
 
-void set_dtls_async(rasta_transport_socket *transport_state) {
+void set_dtls_async(rasta_transport_socket *transport_socket) {
     int socket_flags;
     // set socket to non-blocking so we can select() on it
-    socket_flags = fcntl(transport_state->file_descriptor, F_GETFL, 0);
+    socket_flags = fcntl(transport_socket->file_descriptor, F_GETFL, 0);
     if (socket_flags < 0) {
         perror("Error getting socket flags");
         abort();
     }
     socket_flags |= O_NONBLOCK;
-    if (fcntl(transport_state->file_descriptor, F_SETFL, socket_flags) != 0) {
+    if (fcntl(transport_socket->file_descriptor, F_SETFL, socket_flags) != 0) {
         perror("Error setting socket non-blocking");
         abort();
     }
 
     // inform wolfssl to expect read / write errors due to non-blocking nature of socket
-    (*wolfSSL_dtls_set_using_nonblock)(transport_state->ssl, 1);
+    (*wolfSSL_dtls_set_using_nonblock)(transport_socket->ssl, 1);
 }
 
 void set_tls_async(int fd, WOLFSSL *ssl) {
@@ -101,28 +101,28 @@ void set_tls_async(int fd, WOLFSSL *ssl) {
     wolfSSL_set_using_nonblock(ssl, 1);
 }
 
-void set_socket_async(rasta_transport_channel *transport_state, WOLFSSL_ASYNC_METHOD *wolfssl_async_method) {
+void set_socket_async(rasta_transport_channel *transport_channel, WOLFSSL_ASYNC_METHOD *wolfssl_async_method) {
     int socket_flags;
     // set socket to non-blocking so we can select() on it
-    socket_flags = fcntl(transport_state->file_descriptor, F_GETFL, 0);
+    socket_flags = fcntl(transport_channel->file_descriptor, F_GETFL, 0);
     if (socket_flags < 0) {
         perror("Error getting socket flags");
         abort();
     }
     socket_flags |= O_NONBLOCK;
-    if (fcntl(transport_state->file_descriptor, F_SETFL, socket_flags) != 0) {
+    if (fcntl(transport_channel->file_descriptor, F_SETFL, socket_flags) != 0) {
         perror("Error setting socket non-blocking");
         abort();
     }
 
     // inform wolfssl to expect read / write errors due to non-blocking nature of socket
-    (*wolfssl_async_method)(transport_state->ssl, 1);
+    (*wolfssl_async_method)(transport_channel->ssl, 1);
 }
 
-void wolfssl_start_dtls_client(rasta_transport_socket *transport_state, const rasta_config_tls *tls_config) {
+void wolfssl_start_dtls_client(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config) {
     wolfssl_initialize_if_necessary();
-    transport_state->ctx = wolfSSL_CTX_new(wolfDTLSv1_2_client_method());
-    if (!transport_state->ctx) {
+    transport_socket->ctx = wolfSSL_CTX_new(wolfDTLSv1_2_client_method());
+    if (!transport_socket->ctx) {
         fprintf(stderr, "Could not allocate WolfSSL context!\n");
         abort();
     }
@@ -133,7 +133,7 @@ void wolfssl_start_dtls_client(rasta_transport_socket *transport_state, const ra
     }
 
     /* Load CA certificates */
-    if (wolfSSL_CTX_load_verify_locations(transport_state->ctx, tls_config->ca_cert_path, 0) !=
+    if (wolfSSL_CTX_load_verify_locations(transport_socket->ctx, tls_config->ca_cert_path, 0) !=
         SSL_SUCCESS) {
 
         fprintf(stderr, "Error loading CA certificate file %s\n", tls_config->ca_cert_path);
@@ -142,49 +142,49 @@ void wolfssl_start_dtls_client(rasta_transport_socket *transport_state, const ra
 
     if (tls_config->cert_path[0] && tls_config->key_path[0]) {
         /* Load client certificates */
-        if (wolfSSL_CTX_use_certificate_file(transport_state->ctx, tls_config->cert_path, SSL_FILETYPE_PEM) !=
+        if (wolfSSL_CTX_use_certificate_file(transport_socket->ctx, tls_config->cert_path, SSL_FILETYPE_PEM) !=
             SSL_SUCCESS) {
             printf("Error loading client certificate file %s as PEM file.\n", tls_config->cert_path);
             abort();
         }
         /* Load client Keys */
         int err;
-        if ((err = wolfSSL_CTX_use_PrivateKey_file(transport_state->ctx, tls_config->key_path,
+        if ((err = wolfSSL_CTX_use_PrivateKey_file(transport_socket->ctx, tls_config->key_path,
                                                    SSL_FILETYPE_PEM)) != SSL_SUCCESS) {
             fprintf(stderr, "Error loading client private key file %s as PEM file: %d.\n", tls_config->key_path, err);
             abort();
         }
     }
 
-    transport_state->ssl = wolfSSL_new(transport_state->ctx);
-    if (!transport_state->ssl) {
-        const char *error_str = wolfSSL_ERR_reason_error_string(wolfSSL_get_error(transport_state->ssl, 0));
+    transport_socket->ssl = wolfSSL_new(transport_socket->ctx);
+    if (!transport_socket->ssl) {
+        const char *error_str = wolfSSL_ERR_reason_error_string(wolfSSL_get_error(transport_socket->ssl, 0));
         fprintf(stderr, "Error allocating WolfSSL session: %s.\n", error_str);
         abort();
     }
 
-    if (transport_state->tls_config->tls_hostname[0]) {
-        const int ret = wolfSSL_check_domain_name(transport_state->ssl, transport_state->tls_config->tls_hostname);
+    if (transport_socket->tls_config->tls_hostname[0]) {
+        const int ret = wolfSSL_check_domain_name(transport_socket->ssl, transport_socket->tls_config->tls_hostname);
         if (ret != SSL_SUCCESS) {
-            fprintf(stderr, "Could not add domain name check for domain %s: %d", transport_state->tls_config->tls_hostname, ret);
+            fprintf(stderr, "Could not add domain name check for domain %s: %d", transport_socket->tls_config->tls_hostname, ret);
             abort();
         }
     } else {
         fprintf(stderr, "No TLS hostname specified. Will accept ANY valid TLS certificate. Double-check configuration file.\n");
     }
 
-    wolfSSL_set_fd(transport_state->ssl, transport_state->file_descriptor);
-    transport_state->tls_state = RASTA_TLS_CONNECTION_READY;
+    wolfSSL_set_fd(transport_socket->ssl, transport_socket->file_descriptor);
+    transport_socket->tls_state = RASTA_TLS_CONNECTION_READY;
 }
 
-void wolfssl_start_tls_client(rasta_transport_channel *transport_state, const rasta_config_tls *tls_config) {
-    wolfssl_start_client(transport_state, tls_config, wolfTLSv1_3_client_method());
+void wolfssl_start_tls_client(rasta_transport_channel *transport_channel, const rasta_config_tls *tls_config) {
+    wolfssl_start_client(transport_channel, tls_config, wolfTLSv1_3_client_method());
 }
 
-void wolfssl_start_client(rasta_transport_channel *transport_state, const rasta_config_tls *tls_config, WOLFSSL_METHOD *client_method) {
+void wolfssl_start_client(rasta_transport_channel *transport_channel, const rasta_config_tls *tls_config, WOLFSSL_METHOD *client_method) {
     wolfssl_initialize_if_necessary();
-    transport_state->ctx = wolfSSL_CTX_new(client_method);
-    if (!transport_state->ctx) {
+    transport_channel->ctx = wolfSSL_CTX_new(client_method);
+    if (!transport_channel->ctx) {
         fprintf(stderr, "Could not allocate WolfSSL context!\n");
         abort();
     }
@@ -195,7 +195,7 @@ void wolfssl_start_client(rasta_transport_channel *transport_state, const rasta_
     }
 
     /* Load CA certificates */
-    if (wolfSSL_CTX_load_verify_locations(transport_state->ctx, tls_config->ca_cert_path, 0) !=
+    if (wolfSSL_CTX_load_verify_locations(transport_channel->ctx, tls_config->ca_cert_path, 0) !=
         SSL_SUCCESS) {
 
         fprintf(stderr, "Error loading CA certificate file %s\n", tls_config->ca_cert_path);
@@ -204,14 +204,14 @@ void wolfssl_start_client(rasta_transport_channel *transport_state, const rasta_
 
     if (tls_config->cert_path[0] && tls_config->key_path[0]) {
         /* Load client certificates */
-        if (wolfSSL_CTX_use_certificate_file(transport_state->ctx, tls_config->cert_path, SSL_FILETYPE_PEM) !=
+        if (wolfSSL_CTX_use_certificate_file(transport_channel->ctx, tls_config->cert_path, SSL_FILETYPE_PEM) !=
             SSL_SUCCESS) {
             printf("Error loading client certificate file %s as PEM file.\n", tls_config->cert_path);
             abort();
         }
         /* Load client Keys */
         int err;
-        if ((err = wolfSSL_CTX_use_PrivateKey_file(transport_state->ctx, tls_config->key_path,
+        if ((err = wolfSSL_CTX_use_PrivateKey_file(transport_channel->ctx, tls_config->key_path,
                                                    SSL_FILETYPE_PEM)) != SSL_SUCCESS) {
             fprintf(stderr, "Error loading client private key file %s as PEM file: %d.\n", tls_config->key_path, err);
             abort();

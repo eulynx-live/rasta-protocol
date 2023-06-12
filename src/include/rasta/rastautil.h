@@ -29,7 +29,7 @@ void allocateRastaByteArray(struct RastaByteArray* data, unsigned int length);
  * this will generate a 4 byte timestamp of the current system time
  * @return current system time in s since 1970
  */
-uint32_t current_ts();
+uint32_t cur_timestamp();
 
 int isBigEndian();
 

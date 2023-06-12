@@ -266,6 +266,9 @@ struct RastaConnectionData extractRastaConnectionData(struct RastaPacket *p) {
         rastafactoryLastError = RASTA_ERRORS_WRONG_PACKAGE_FORMAT;
     }
 
+    // set null terminator correctly
+    result.version[4] = '\0';
+
     return result;
 }
 

@@ -87,6 +87,11 @@ void sr_cleanup(struct rasta_handle *h);
 
 void sr_recv(struct rasta_handle *h, event_system *event_system, int wait_for_handshake, int listen);
 
+// Event handlers
+int event_connection_expired(void *carry_data);
+int heartbeat_send_event(void *carry_data);
+int send_timed_key_exchange(void *arg);
+
 #ifdef __cplusplus
 }
 #endif
