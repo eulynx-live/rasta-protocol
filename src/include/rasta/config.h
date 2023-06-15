@@ -115,7 +115,7 @@ typedef struct rasta_config_info {
     uint32_t initial_sequence_number;
 
     size_t accepted_version_count;
-    char (*accepted_versions)[4];
+    char (*accepted_versions)[5];
 
     /**
      * all values for the sending part

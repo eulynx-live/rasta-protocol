@@ -18,7 +18,7 @@ void sendDisconnectionRequest(struct rasta_connection *connection, rasta_disconn
                                                             connection->sn_t, connection->cs_t,
                                                             cur_timestamp(), connection->ts_r, disconnectionData, &connection->redundancy_channel->mux->sr_hashing_context);
 
-    redundancy_mux_send(connection->redundancy_channel, &discReq);
+    redundancy_mux_send(connection->redundancy_channel, &discReq, connection->role);
 
     freeRastaByteArray(&discReq.data);
 }
@@ -33,7 +33,7 @@ void sendHeartbeat(struct rasta_connection *connection, char reschedule_manually
     struct RastaPacket hb = createHeartbeat(connection->remote_id, connection->my_id, connection->sn_t,
                                             connection->cs_t, cur_timestamp(), connection->ts_r, &connection->redundancy_channel->mux->sr_hashing_context);
 
-    redundancy_mux_send(connection->redundancy_channel, &hb);
+    redundancy_mux_send(connection->redundancy_channel, &hb, connection->role);
 
     connection->sn_t = connection->sn_t + 1;
     if (reschedule_manually) {
@@ -46,7 +46,7 @@ void sendRetransmissionRequest(struct rasta_connection *connection) {
                                                              connection->sn_t, connection->cs_t, cur_timestamp(),
                                                              connection->ts_r, &connection->redundancy_channel->mux->sr_hashing_context);
 
-    redundancy_mux_send(connection->redundancy_channel, &retrreq);
+    redundancy_mux_send(connection->redundancy_channel, &retrreq, connection->role);
 
     connection->sn_t = connection->sn_t + 1;
 }
@@ -56,6 +56,6 @@ void sendRetransmissionResponse(struct rasta_connection *connection) {
                                                                connection->sn_t, connection->cs_t, cur_timestamp(),
                                                                connection->ts_r, &connection->redundancy_channel->mux->sr_hashing_context);
 
-    redundancy_mux_send(connection->redundancy_channel, &retrresp);
+    redundancy_mux_send(connection->redundancy_channel, &retrresp, connection->role);
     connection->sn_t = connection->sn_t + 1;
 }

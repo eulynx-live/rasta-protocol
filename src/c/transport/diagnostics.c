@@ -87,7 +87,7 @@ void run_channel_diagnostics(rasta_redundancy_channel* current, unsigned int tra
 
     unsigned long channel_diag_start_time = current->transport_channels[transport_channel_index].diagnostics_data.start_time;
 
-    if (current_ts() - channel_diag_start_time >= (unsigned long)n_diagnose) {
+    if (cur_timestamp() - channel_diag_start_time >= (unsigned long)n_diagnose) {
         // increase n_missed by amount of messages that are not received
 
         // amount of missed packets
@@ -111,7 +111,7 @@ void run_channel_diagnostics(rasta_redundancy_channel* current, unsigned int tra
         current->transport_channels[transport_channel_index].diagnostics_data.received_packets = 0;
         current->transport_channels[transport_channel_index].diagnostics_data.t_drift = 0;
         current->transport_channels[transport_channel_index].diagnostics_data.t_drift2 = 0;
-        current->transport_channels[transport_channel_index].diagnostics_data.start_time = current_ts();
+        current->transport_channels[transport_channel_index].diagnostics_data.start_time = cur_timestamp();
 
         deferqueue_clear(&current->diagnostics_packet_buffer);
     }

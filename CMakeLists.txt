@@ -16,6 +16,7 @@ option(ENABLE_RASTA_TLS "Enable RaSTA over TLS" OFF)
 option(ENABLE_RASTA_OPAQUE "Enable Password-Authenticated Session Key Exchange based on OPAQUE" OFF)
 option(ENABLE_CODE_COVERAGE "Provide command to generate code coverage report" OFF)
 option(ENABLE_STATIC_ANALYSIS "Run cppcheck along with the compiler" OFF)
+option(ENABLE_SLEEP_ON_CONNECT "Sleep for 5 seconds after connecting a transport channel" ON)
 
 if(ENABLE_STATIC_ANALYSIS)
     set(CMAKE_C_CPPCHECK "cppcheck" "--enable=performance,information")

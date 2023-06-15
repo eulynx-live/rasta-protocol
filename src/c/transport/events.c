@@ -30,7 +30,6 @@ int channel_accept_event(void *carry_data) {
 
     if (channel != NULL) {
         channel->file_descriptor = fd;
-        // We may not forget this:
         channel->receive_event.fd = fd;
         channel->tls_mode = data->socket->tls_mode;
         channel->connected = true;
@@ -103,23 +102,16 @@ int channel_receive_event(void *carry_data) {
 
     if (len <= 0 && !is_dtls_conn_ready) {
         // Connection is broken
-        // TODO: What about disabling events?
         transport_channel->connected = false;
 
-        // Why should a readable UDP socket return len <= 0?
-        // if (data->socket != NULL) {
-        //     disable_fd_event(&data->socket->receive_event);
-        //     remove_fd_event(data->h->ev_sys, &data->socket->receive_event);
-        // }
-    }
-
-    if (len < 0) {
-        // Peer has not performed an orderly shutdown
-        // TODO: If this is a RaSTA client, try to re-establish a connection somewhere else
-        // transport_redial(transport_channel);
-    }
-
-    if (len <= 0 && !is_dtls_conn_ready) {
+        // Disable receive events so this handler doesn't get called endlessly
+        if (data->socket != NULL) {
+            disable_fd_event(&data->socket->receive_event);
+        }
+        if (data->channel != NULL) {
+            disable_fd_event(&data->channel->receive_event);
+        }
+      
         if (connection != NULL) {
             return handle_closed_transport(connection, connection->redundancy_channel);
         }
@@ -127,14 +119,12 @@ int channel_receive_event(void *carry_data) {
         return 0;
     }
 
-    int result = receive_packet(connection->redundancy_channel->mux, transport_channel, buffer, len);
-
-    if (result) {
+    if (receive_packet(connection->redundancy_channel->mux, transport_channel, buffer, len)) {
         // Deliver messages to the upper layer
         return red_f_deliverDeferQueue(connection, connection->redundancy_channel);
     }
 
     logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive thread", "Channel %d receive done",
                transport_channel->id);
-    return !!result;
+    return 0;
 }

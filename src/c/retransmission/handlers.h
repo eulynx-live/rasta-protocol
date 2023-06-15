@@ -11,3 +11,7 @@ int handle_retrresp(struct rasta_connection *connection, struct RastaPacket *rec
 int handle_retrdata(struct rasta_connection *connection, struct RastaPacket *receivedPacket);
 struct rasta_connection *handle_conreq(struct rasta_connection *connection, struct RastaPacket *receivedPacket);
 struct rasta_connection *handle_conresp(struct rasta_connection *con, struct RastaPacket *receivedPacket);
+
+// protected methods
+void update_connection_attrs(struct rasta_connection *connection, struct RastaPacket *receivedPacket);
+void update_confirmed_attrs(struct rasta_connection *connection, struct RastaPacket *receivedPacket);

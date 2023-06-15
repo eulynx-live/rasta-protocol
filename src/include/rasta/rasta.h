@@ -76,6 +76,11 @@ void sr_disconnect(struct rasta_connection *con);
  */
 void sr_cleanup(struct rasta_handle *h);
 
+// Event handlers
+int event_connection_expired(void *carry_data);
+int heartbeat_send_event(void *carry_data);
+int send_timed_key_exchange(void *arg);
+
 #ifdef __cplusplus
 }
 #endif

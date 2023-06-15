@@ -9,7 +9,6 @@
 #include "retransmission/protocol.h"
 #include "retransmission/safety_retransmission.h"
 
-int event_connection_expired(void *carry_data);
 void init_connection_timeout_event(timed_event *ev, struct timed_event_data *carry_data,
                                    struct rasta_connection *connection) {
     memset(ev, 0, sizeof(timed_event));
@@ -20,7 +19,6 @@ void init_connection_timeout_event(timed_event *ev, struct timed_event_data *car
     carry_data->connection = connection;
 }
 
-int heartbeat_send_event(void *carry_data);
 void init_send_heartbeat_event(timed_event *ev, struct timed_event_data *carry_data,
                                struct rasta_connection *connection) {
     memset(ev, 0, sizeof(timed_event));
@@ -31,7 +29,6 @@ void init_send_heartbeat_event(timed_event *ev, struct timed_event_data *carry_d
     carry_data->connection = connection;
 }
 
-int send_timed_key_exchange(void *arg);
 void init_send_key_exchange_event(timed_event *ev, struct timed_event_data *carry_data,
                                   struct rasta_connection *connection) {
     ev->callback = send_timed_key_exchange;
@@ -133,6 +130,7 @@ void rasta_lib_init_configuration(rasta_lib_configuration_t user_configuration, 
 
         init_connection_events(h, connection);
     }
+    
     h->rasta_connections_length = connections_length;
 }
 
@@ -141,9 +139,6 @@ void rasta_cleanup(rasta_lib_configuration_t user_configuration) {
     for (unsigned i = 0; i < user_configuration->h.rasta_connections_length; i++) {
         fifo_destroy(&user_configuration->h.rasta_connections[i].fifo_retransmission);
         fifo_destroy(&user_configuration->h.rasta_connections[i].fifo_send);
-        // for (unsigned j = 0; j < user_configuration->h.rasta_connections[i].redundancy_channel->transport_channel_count; j++) {
-
-        // }
     }
     rfree(user_configuration->h.rasta_connections);
 

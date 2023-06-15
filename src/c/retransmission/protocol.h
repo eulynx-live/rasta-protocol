@@ -12,8 +12,7 @@
 #define MS_PER_S 1000
 #define NS_PER_MS 1000000
 
-uint32_t cur_timestamp();
 uint64_t get_current_time_ms();
 
-int compare_version(const char local_version[4], const char remote_version[4]);
-int version_accepted(rasta_config_info *config, const char version[4]);
+int compare_version(char (*local_version)[5], char (*remote_version)[5]);
+int version_accepted(rasta_config_info *config, char (*version)[5]);

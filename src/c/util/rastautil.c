@@ -7,7 +7,11 @@
 #define rasta_htole32(X) (X)
 #define rasta_le32toh(X) (X)
 
-uint32_t current_ts() {
+/**
+ * this will generate a 4 byte timestamp of the current system time
+ * @return current system time in milliseconds since the boot time (on Linux, behaviour on other systems may differ)
+ */
+uint32_t cur_timestamp() {
     long ms;
     time_t s;
     struct timespec spec;

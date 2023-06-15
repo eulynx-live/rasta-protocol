@@ -17,7 +17,7 @@ extern "C" { // only need to export C interface if
  */
 struct RastaConnectionData {
     unsigned short send_max;
-    char version[4];
+    char version[5];
 };
 
 /**

@@ -7,7 +7,6 @@ typedef struct rasta_transport_channel rasta_transport_channel;
 typedef struct rasta_redundancy_channel rasta_redundancy_channel;
 typedef struct rasta_connection rasta_connection;
 
-int channel_accept_event_tls(void *carry_data);
 int channel_accept_event(void *carry_data);
 int channel_receive_event(void *carry_data);
 

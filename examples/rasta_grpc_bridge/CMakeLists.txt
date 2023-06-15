@@ -44,16 +44,24 @@ add_custom_command(
         "${hw_proto}"
       DEPENDS "${hw_proto}")
 
-add_executable(rasta_grpc_bridge
-    cpp/main.cpp
-    ../common/c/configfile.c
-    ../common/c/dictionary.c
-    ${hw_grpc_srcs}
-    ${hw_grpc_hdrs}
-    ${hw_proto_srcs}
-    ${hw_proto_hdrs})
+if(ENABLE_RASTA_TLS)
+    set(RASTA_VARIANTS udp tcp dtls tls)
+else()
+    set(RASTA_VARIANTS udp tcp)
+endif(ENABLE_RASTA_TLS)
 
-set_target_properties(rasta_grpc_bridge PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
-target_compile_options(rasta_grpc_bridge PRIVATE ${DEFAULT_COMPILE_OPTIONS})
-target_link_libraries(rasta_grpc_bridge rasta_tls ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
-target_include_directories(rasta_grpc_bridge PRIVATE ../common/headers PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+foreach(RASTA_VARIANT ${RASTA_VARIANTS})
+    add_executable(rasta_grpc_bridge_${RASTA_VARIANT}
+        cpp/main.cpp
+        ../common/c/configfile.c
+        ../common/c/dictionary.c
+        ${hw_grpc_srcs}
+        ${hw_grpc_hdrs}
+        ${hw_proto_srcs}
+        ${hw_proto_hdrs})
+
+    set_target_properties(rasta_grpc_bridge_${RASTA_VARIANT} PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
+    target_compile_options(rasta_grpc_bridge_${RASTA_VARIANT} PRIVATE ${DEFAULT_COMPILE_OPTIONS})
+    target_link_libraries(rasta_grpc_bridge_${RASTA_VARIANT} rasta_${RASTA_VARIANT} ${_REFLECTION} ${_GRPC_GRPCPP} ${_PROTOBUF_LIBPROTOBUF})
+    target_include_directories(rasta_grpc_bridge_${RASTA_VARIANT} PRIVATE ../common/headers PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+endforeach()

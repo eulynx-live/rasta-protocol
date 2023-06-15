@@ -43,13 +43,13 @@ int handle_kex_request(struct rasta_connection *connection, struct RastaPacket *
                 // valid Key Exchange request packet received
 
                 response = createKexResponse(connection->remote_id, connection->my_id, connection->sn_t,
-                                             receivedPacket->sequence_number, current_ts(),
+                                             receivedPacket->sequence_number, cur_timestamp(),
                                              receivedPacket->timestamp, &connection->redundancy_channel->mux->sr_hashing_context, connection->config->kex.psk,
                                              (uint8_t *)receivedPacket->data.bytes, receivedPacket->data.length, connection->sn_i,
                                              &connection->kex_state,
                                              &connection->config->kex, connection->logger);
 
-                redundancy_mux_send(connection->redundancy_channel, &response);
+                redundancy_mux_send(connection->redundancy_channel, &response, connection->role);
 
                 // set values according to 5.6.2 [3]
                 connection->sn_r = receivedPacket->sequence_number + 1;
@@ -129,9 +129,9 @@ int handle_kex_response(struct rasta_connection *connection, struct RastaPacket 
                     sr_close_connection(connection, RASTA_DISC_REASON_UNEXPECTEDTYPE, 0);
                     return 1;
                 }
-                response = createKexAuthentication(connection->remote_id, connection->my_id, connection->sn_t, receivedPacket->sequence_number, current_ts(), receivedPacket->timestamp, &connection->redundancy_channel->mux->sr_hashing_context, connection->kex_state.user_auth_server, sizeof(connection->kex_state.user_auth_server), connection->logger);
+                response = createKexAuthentication(connection->remote_id, connection->my_id, connection->sn_t, receivedPacket->sequence_number, cur_timestamp(), receivedPacket->timestamp, &connection->redundancy_channel->mux->sr_hashing_context, connection->kex_state.user_auth_server, sizeof(connection->kex_state.user_auth_server), connection->logger);
 
-                redundancy_mux_send(connection->redundancy_channel, &response);
+                redundancy_mux_send(connection->redundancy_channel, &response, connection->role);
 
                 // set values according to 5.6.2 [3]
                 connection->sn_r = receivedPacket->sequence_number + 1;
