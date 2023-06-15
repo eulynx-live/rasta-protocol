@@ -44,7 +44,7 @@ uint32_t bytesToLong2(const unsigned char v[4]) {
  *         -1 if local_version < remote_version
  *          1 if local_version > remote_version
  */
-int compare_version(const char (*local_version)[5], const char (*remote_version)[5]) {
+int compare_version(char (*local_version)[5], char (*remote_version)[5]) {
     return strncmp(*local_version, *remote_version, 4);
 }
 
@@ -53,7 +53,7 @@ int compare_version(const char (*local_version)[5], const char (*remote_version)
  * @param version the version of the remote
  * @return 1 if the remote version is accepted, else 0
  */
-int version_accepted(rasta_config_info *config, const char (*version)[5]) {
+int version_accepted(rasta_config_info *config, char (*version)[5]) {
     for (unsigned int i = 0; i < config->accepted_version_count; ++i) {
         if (compare_version(&config->accepted_versions[i], version) == 0) {
             // match, version is in accepted version list
