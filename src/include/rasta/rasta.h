@@ -63,15 +63,6 @@ struct rasta_connection* sr_connect(struct rasta_handle *h, unsigned long id);
 void sr_send(struct rasta_handle *h, struct rasta_connection *con, struct RastaMessageData app_messages);
 
 /**
- * get data from message buffer
- * this is used in the onReceive Event to get the received message
- * @param h
- * @param connection
- * @return the applicationmessage, where id is the sender rasta id and appMessage is the received data
- */
-rastaApplicationMessage sr_get_received_data(struct rasta_handle *h, struct rasta_connection *connection);
-
-/**
  * closes the connection to the connection
  * @param h
  * @param con
@@ -84,8 +75,6 @@ void sr_disconnect(struct rasta_connection *con);
  * @param h
  */
 void sr_cleanup(struct rasta_handle *h);
-
-void sr_recv(struct rasta_handle *h, event_system *event_system, int wait_for_handshake, int listen);
 
 #ifdef __cplusplus
 }
