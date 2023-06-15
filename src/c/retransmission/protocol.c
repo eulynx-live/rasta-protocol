@@ -55,7 +55,6 @@ int compare_version(const char (*local_version)[5], const char (*remote_version)
  */
 int version_accepted(rasta_config_info *config, const char (*version)[5]) {
     for (unsigned int i = 0; i < config->accepted_version_count; ++i) {
-        // const (char[5]) * av = ;
         if (compare_version(&config->accepted_versions[i], version) == 0) {
             // match, version is in accepted version list
             return 1;
