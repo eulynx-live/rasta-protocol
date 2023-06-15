@@ -14,5 +14,5 @@
 
 uint64_t get_current_time_ms();
 
-int compare_version(const char local_version[5], const char remote_version[5]);
-int version_accepted(rasta_config_info *config, const char version[5]);
+int compare_version(const char (*local_version)[5], const char (*remote_version)[5]);
+int version_accepted(rasta_config_info *config, const char (*version)[5]);

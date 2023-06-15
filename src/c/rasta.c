@@ -275,9 +275,9 @@ struct rasta_connection *handle_conreq(struct rasta_connection *connection, stru
 
         logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: ConnectionRequest", "Client has version %.4s", connectionData.version);
 
-        if (compare_version(RASTA_VERSION, connectionData.version) == 0 ||
-            compare_version(RASTA_VERSION, connectionData.version) == -1 ||
-            version_accepted(connection->config, connectionData.version)) {
+        if (compare_version(&RASTA_VERSION, &connectionData.version) == 0 ||
+            compare_version(&RASTA_VERSION, &connectionData.version) == -1 ||
+            version_accepted(connection->config, &connectionData.version)) {
 
             logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: ConnectionRequest", "Version accepted");
 
@@ -347,7 +347,7 @@ struct rasta_connection *handle_conresp(struct rasta_connection *con, struct Ras
 
             logger_log(con->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: ConnectionResponse", "Client has version %s", connectionData.version);
 
-            if (version_accepted(con->config, connectionData.version)) {
+            if (version_accepted(con->config, &connectionData.version)) {
 
                 logger_log(con->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: ConnectionResponse", "Version accepted");
 

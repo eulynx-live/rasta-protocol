@@ -190,5 +190,7 @@ endif(ENABLE_RASTA_TLS)
 
 if(ENABLE_SLEEP_ON_CONNECT)
     target_compile_definitions(${target}_tcp PUBLIC SLEEP_ON_CONNECT)
+    if(ENABLE_RASTA_TLS)
     target_compile_definitions(${target}_tls PUBLIC SLEEP_ON_CONNECT)
+    endif(ENABLE_RASTA_TLS)
 endif(ENABLE_SLEEP_ON_CONNECT)
