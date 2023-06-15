@@ -12,41 +12,33 @@
 #define CONFIG_PATH_S "rasta_server_local.cfg"
 #define CONFIG_PATH_C "rasta_client_local.cfg"
 
-#define ID_R 0x61
-#define ID_S 0x60
+#define ID_S 0x61
+#define ID_C 0x60
 
-#define SCI_NAME_R "R"
 #define SCI_NAME_S "S"
+#define SCI_NAME_C "C"
 
 #define BUF_SIZE 500
 
 scils_t *scils;
 
 void printHelpAndExit(void) {
-    printf("Invalid Arguments!\n use 'r' to start in receiver mode and 's' to start in sender mode.\n");
+    printf("Invalid Arguments!\n use 's' to start in server mode and 's' to start in client mode.\n");
     exit(1);
 }
 
-void onReceive(struct rasta_notification_result *result) {
-    rastaApplicationMessage message = sr_get_received_data(result->handle, &result->connection);
-    scils_on_rasta_receive(scils, message);
-}
+void send_hp0(void) {
+    printf("Sending show signal aspect command...\n");
+    scils_signal_aspect *signal_aspect = scils_signal_aspect_defaults();
+    signal_aspect->main = SCILS_MAIN_HP_0;
 
-void onHandshakeComplete(struct rasta_notification_result *result) {
-    if (result->connection.my_id == ID_R) {
+    sci_return_code code = scils_send_show_signal_aspect(scils, SCI_NAME_S, *signal_aspect);
 
-        printf("Sending show signal aspect command...\n");
-        scils_signal_aspect *signal_aspect = scils_signal_aspect_defaults();
-        signal_aspect->main = SCILS_MAIN_HP_0;
-
-        sci_return_code code = scils_send_show_signal_aspect(scils, SCI_NAME_S, *signal_aspect);
-
-        rfree(signal_aspect);
-        if (code == SUCCESS) {
-            printf("Sent show signal aspect command to server\n");
-        } else {
-            printf("Something went wrong, error code 0x%02X was returned!\n", code);
-        }
+    rfree(signal_aspect);
+    if (code == SUCCESS) {
+        printf("Sent show signal aspect command to server\n");
+    } else {
+        printf("Something went wrong, error code 0x%02X was returned!\n", code);
     }
 }
 
@@ -63,66 +55,19 @@ void onShowSignalAspect(scils_t *ls, char *sender, scils_signal_aspect signal_as
 }
 
 void onSignalAspectStatus(scils_t *ls, char *sender, scils_signal_aspect signal_aspect) {
-    (void)ls;
+    UNUSED(ls);
     printf("Received location status from %s. LS showing main = 0x%02X.\n", sci_get_name_string(sender), signal_aspect.main);
 }
 
-struct connect_event_data {
-    struct rasta_handle *h;
-    fd_event *connect_event;
-    fd_event *schwarzenegger;
-};
-
-int send_input_data(void *carry_data) {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF)
-        ;
-
-    printf("->   Connection request sent to 0x%lX\n", (unsigned long)ID_R);
-    struct connect_event_data *data = carry_data;
-    sr_connect(data->h, ID_R);
-    enable_fd_event(data->schwarzenegger);
-    disable_fd_event(data->connect_event);
-    return 0;
-}
-
-int terminator(void *h) {
-    printf("terminating\n");
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF)
-        ;
-    sr_cleanup(h);
-    return 1;
-}
-
 int main(int argc, char *argv[]) {
-
     if (argc != 2) printHelpAndExit();
 
     rasta_lib_configuration_t rc = {0};
-
     rasta_ip_data toServer[2];
+    unsigned char buf[BUF_SIZE];
 
-    fd_event termination_event, connect_on_stdin_event;
-    struct connect_event_data connect_on_stdin_event_data = {
-        .h = &rc->h,
-        .schwarzenegger = &termination_event,
-        .connect_event = &connect_on_stdin_event};
-
-    termination_event.callback = terminator;
-    termination_event.carry_data = &rc->h;
-    termination_event.fd = STDIN_FILENO;
-
-    connect_on_stdin_event.callback = send_input_data;
-    connect_on_stdin_event.carry_data = &connect_on_stdin_event_data;
-    connect_on_stdin_event.fd = STDIN_FILENO;
-
-    //char buf[BUF_SIZE];
-
-    printf("Server at %s:%d and %s:%d\n", toServer[0].ip, toServer[0].port, toServer[1].ip, toServer[1].port);
-
-    if (strcmp(argv[1], "r") == 0) {
-        printf("->   R (ID = 0x%lX)\n", (unsigned long)ID_R);
+    if (strcmp(argv[1], "s") == 0) {
+        printf("->   S (ID = 0x%lX)\n", (unsigned long)ID_S);
         rasta_config_info config;
         struct logger_t logger;
         load_configfile(&config, &logger, CONFIG_PATH_S);
@@ -132,30 +77,46 @@ int main(int argc, char *argv[]) {
         toServer[0].port = 9998;
         toServer[1].port = 9999;
 
-        rasta_connection_config connection = {
+        printf("Server at %s:%d and %s:%d\n", toServer[0].ip, toServer[0].port, toServer[1].ip, toServer[1].port);
+
+        rasta_connection_config connection_config = {
             .config = &config,
-            .rasta_id = ID_R,
+            .rasta_id = ID_C,
             .transport_sockets = toServer,
             .transport_sockets_count = sizeof(toServer) / sizeof(toServer[0])
         };
 
-        // Why was this API so weird? How did all this work back then?
-        rasta_lib_init_configuration(rc, &config, &logger, &connection, 1);
+        rasta_lib_init_configuration(rc, &config, &logger, &connection_config, 1);
         rasta_bind(&rc->h);
+        sr_listen(&rc->h);
 
-        rc->h.notifications.on_receive = onReceive;
-        rc->h.notifications.on_handshake_complete = onHandshakeComplete;
+        rasta_connection *connection = rasta_accept(rc);
+        if(connection == NULL) {
+            printf("Could not accept connection!\n");
+            return 1;
+        }
 
-        scils = scils_init(&rc->h, SCI_NAME_R);
+        scils = scils_init(&rc->h, SCI_NAME_S);
         scils->notifications.on_show_signal_aspect_received = onShowSignalAspect;
+        scils_register_sci_name(scils, SCI_NAME_S, ID_S);
+        scils_register_sci_name(scils, SCI_NAME_C, ID_C);
 
-        enable_fd_event(&termination_event);
-        disable_fd_event(&connect_on_stdin_event);
-        add_fd_event(&rc->rasta_lib_event_system, &termination_event, EV_READABLE);
-        add_fd_event(&rc->rasta_lib_event_system, &connect_on_stdin_event, EV_READABLE);
-        //rasta_recv(rc, 0, true);
-    } else if (strcmp(argv[1], "s") == 0) {
-        printf("->   S (ID = 0x%lX)\n", (unsigned long)ID_R);
+        ssize_t len;
+        while((len = rasta_recv(rc, connection, buf, BUF_SIZE)) > 0) {
+            rastaApplicationMessage msg = {
+                .appMessage = {
+                    .bytes = buf, 
+                    .length = len
+                }, 
+                .id = ID_C 
+            };
+            scils_on_rasta_receive(scils, msg);
+        }
+
+        sr_disconnect(connection);
+        
+    } else if (strcmp(argv[1], "c") == 0) {
+        printf("->   C (ID = 0x%lX)\n", (unsigned long)ID_C);
         rasta_config_info config;
         struct logger_t logger;
         load_configfile(&config, &logger, CONFIG_PATH_C);
@@ -165,33 +126,47 @@ int main(int argc, char *argv[]) {
         toServer[0].port = 8888;
         toServer[1].port = 8889;
 
-        rasta_connection_config connection = {
+        printf("Client at %s:%d and %s:%d\n", toServer[0].ip, toServer[0].port, toServer[1].ip, toServer[1].port);
+
+        rasta_connection_config connection_config = {
             .config = &config,
-            .rasta_id = ID_R,
+            .rasta_id = ID_S,
             .transport_sockets = toServer,
             .transport_sockets_count = sizeof(toServer) / sizeof(toServer[0])
         };
 
-        rasta_lib_init_configuration(rc, &config, &logger, &connection, 1);
+        rasta_lib_init_configuration(rc, &config, &logger, &connection_config, 1);
         rasta_bind(&rc->h);
 
-        rc->h.notifications.on_receive = onReceive;
-        rc->h.notifications.on_handshake_complete = onHandshakeComplete;
+        rasta_connection *connection = sr_connect(&rc->h, ID_S);
+        if(connection == NULL) {
+            printf("Failed to connect any channel!\n");
+            return 1;
+        }
 
-        scils = scils_init(&rc->h, SCI_NAME_S);
+        scils = scils_init(&rc->h, SCI_NAME_C);
         scils->notifications.on_signal_aspect_status_received = onSignalAspectStatus;
-        scils_register_sci_name(scils, SCI_NAME_R, ID_R);
+        scils_register_sci_name(scils, SCI_NAME_S, ID_S);
+        scils_register_sci_name(scils, SCI_NAME_C, ID_C);
 
-        printf("->   Press Enter to connect\n");
-        disable_fd_event(&termination_event);
-        enable_fd_event(&connect_on_stdin_event);
-        add_fd_event(&rc->rasta_lib_event_system, &termination_event, EV_READABLE);
-        add_fd_event(&rc->rasta_lib_event_system, &connect_on_stdin_event, EV_READABLE);
-        //rasta_recv(rc, 0, false);
+        send_hp0();
+
+        int len = rasta_recv(rc, connection, buf, BUF_SIZE);
+        if(len > 0) {
+            rastaApplicationMessage msg = {
+                .appMessage = {
+                    .bytes = buf, 
+                    .length = len
+                }, 
+                .id = ID_S 
+            };
+            scils_on_rasta_receive(scils, msg);
+        }
+
+        sr_disconnect(connection);
     }
 
-    getchar();
-
     scils_cleanup(scils);
+    sr_cleanup(&rc->h);
     return 0;
 }
