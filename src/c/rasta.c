@@ -227,8 +227,10 @@ int data_send_event(void *carry_data) {
         }
     }
 
-    // Disable this event until new data arrives
-    disable_timed_event(&h->send_event);
+    if (sr_send_queue_item_count(con) == 0) {
+        // Disable this event until new data arrives
+        disable_timed_event(&h->send_event);
+    }
 
     return 0;
 }

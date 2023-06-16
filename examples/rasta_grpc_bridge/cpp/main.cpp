@@ -64,16 +64,18 @@ void processConnection(std::function<std::thread()> run_thread) {
 
         RastaByteArray *msg = nullptr;
 
-        {
-            std::lock_guard<std::mutex> guard(s_fifo_mutex);
-            msg = reinterpret_cast<RastaByteArray *>(fifo_pop(s_message_fifo));
-        }
+        do {
+            {
+                std::lock_guard<std::mutex> guard(s_fifo_mutex);
+                msg = reinterpret_cast<RastaByteArray *>(fifo_pop(s_message_fifo));
+            }
 
-        if (msg != nullptr) {
-            rasta_send(s_rc, s_connection,  msg->bytes, msg->length);
+            if (msg != nullptr) {
+                rasta_send(s_rc, s_connection,  msg->bytes, msg->length);
 
-            freeRastaByteArray(msg);
-        }
+                freeRastaByteArray(msg);
+            }
+        } while (msg != nullptr);
 
         return 0;
     };
