@@ -43,7 +43,6 @@ static uint32_t s_remote_id = 0;
 rasta_connection *s_connection = NULL;
 static rasta_lib_configuration_t s_rc;
 
-static int s_terminator_fd;
 static int s_data_fd;
 
 static std::mutex s_fifo_mutex;
@@ -81,25 +80,6 @@ void processConnection(std::function<std::thread()> run_thread) {
     data_event.fd = s_data_fd;
     enable_fd_event(&data_event);
     add_fd_event(&s_rc->rasta_lib_event_system, &data_event, EV_READABLE);
-
-    // Terminator event
-    s_terminator_fd = eventfd(0, 0);
-    fd_event terminator_event;
-    memset(&terminator_event, 0, sizeof(fd_event));
-    terminator_event.callback = [](void *carry) {
-        // Invalidate the event
-        uint64_t u;
-        ssize_t ignored = read(s_terminator_fd, &u, sizeof(u));
-        UNUSED(ignored);
-
-        rasta_connection *h = reinterpret_cast<rasta_connection *>(carry);
-        sr_disconnect(h);
-        return 1;
-    };
-    terminator_event.carry_data = s_connection;
-    terminator_event.fd = s_terminator_fd;
-    enable_fd_event(&terminator_event);
-    add_fd_event(&s_rc->rasta_lib_event_system, &terminator_event, EV_READABLE);
 
     // Forward gRPC messages to rasta
     auto forwarderThread = run_thread();
@@ -141,10 +121,8 @@ void processConnection(std::function<std::thread()> run_thread) {
     s_connection = NULL;
 
     remove_fd_event(&s_rc->rasta_lib_event_system, &data_event);
-    remove_fd_event(&s_rc->rasta_lib_event_system, &terminator_event);
 
     close(s_data_fd);
-    close(s_terminator_fd);
 
     fifo_destroy(&s_message_fifo);
 }
@@ -240,10 +218,6 @@ class RastaService final : public sci::Rasta::Service {
                     uint64_t ignore = write(s_data_fd, &notify_data, sizeof(uint64_t));
                     (void)ignore;
                 }
-
-                uint64_t terminate = 1;
-                uint64_t ignore = write(s_terminator_fd, &terminate, sizeof(uint64_t));
-                (void)ignore;
             });
         };
 
@@ -357,10 +331,6 @@ int main(int argc, char *argv[]) {
                     s_currentStream = nullptr;
                     s_currentContext = nullptr;
                 }
-
-                uint64_t terminate = 1;
-                uint64_t ignore = write(s_terminator_fd, &terminate, sizeof(uint64_t));
-                (void)ignore;
             });
         };
 
