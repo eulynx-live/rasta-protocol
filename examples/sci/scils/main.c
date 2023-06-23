@@ -23,7 +23,7 @@
 scils_t *scils;
 
 void printHelpAndExit(void) {
-    printf("Invalid Arguments!\n use 's' to start in server mode and 's' to start in client mode.\n");
+    printf("Invalid Arguments!\n use 's' to start in server mode and 'c' to start in client mode.\n");
     exit(1);
 }
 

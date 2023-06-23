@@ -22,7 +22,7 @@
 scip_t *scip;
 
 void printHelpAndExit(void) {
-    printf("Invalid Arguments!\n use 'r' to start in receiver mode and 's' to start in sender mode.\n");
+    printf("Invalid Arguments!\n use 's' to start in server mode and 'c' to start in client mode.\n");
     exit(1);
 }
 
