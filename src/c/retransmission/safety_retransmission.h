@@ -17,8 +17,23 @@ void sr_init_connection(struct rasta_connection *connection, rasta_role role);
 void sr_retransmit_data(struct rasta_connection *connection);
 void rasta_socket(struct rasta_handle *handle, rasta_config_info *config, struct logger_t *logger);
 void sr_listen(struct rasta_handle *h);
+
+/**
+ * Disconnect a connection on request by the user.
+ * This should not be called from outside the library - use rasta_disconnect() instead!
+ * @param con the connection that should be disconnected
+*/
 void sr_disconnect(struct rasta_connection *con);
+
+
+/**
+ * Cleanup a connection after a disconnect and free assigned ressources.
+ * Always use this when a programm terminates, otherwise it may not start again.
+ * This should not be called from outside the library - use rasta_cleanup() instead!
+ * @param h the handle of the RaSTA instance
+ */
 void sr_cleanup(struct rasta_handle *h);
+
 int sr_cts_in_seq(struct rasta_connection *con, rasta_config_sending *cfg, struct RastaPacket *packet);
 int sr_sn_in_seq(struct rasta_connection *con, struct RastaPacket *packet);
 int sr_sn_range_valid(struct rasta_connection *con, rasta_config_sending *cfg, struct RastaPacket *packet);

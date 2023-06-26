@@ -72,18 +72,10 @@ void sr_send(struct rasta_handle *h, struct rasta_connection *con, struct RastaM
 rastaApplicationMessage sr_get_received_data(struct rasta_handle *h, struct rasta_connection *connection);
 
 /**
- * closes the connection to the connection
- * @param h
- * @param con
- */
-void sr_disconnect(struct rasta_connection *con);
-
-/**
- * used to end all threads an free assigned ressources
- * always use this when a programm terminates otherwise it may not start again
- * @param h
- */
-void sr_cleanup(struct rasta_handle *h);
+ * disconnect a connection on request by the user
+ * @param con the connection that should be disconnected
+*/
+void rasta_disconnect(struct rasta_connection *connection);
 
 void sr_recv(struct rasta_handle *h, event_system *event_system, int wait_for_handshake, int listen);
 

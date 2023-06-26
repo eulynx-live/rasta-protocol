@@ -99,8 +99,8 @@ void processConnection(std::function<std::thread()> run_thread) {
         ssize_t ignored = read(s_terminator_fd[0], &u, sizeof(u));
         UNUSED(ignored);
 
-        rasta_connection *h = reinterpret_cast<rasta_connection *>(carry);
-        sr_disconnect(h);
+        rasta_connection *con = reinterpret_cast<rasta_connection *>(carry);
+        rasta_disconnect(con);
         return 1;
     };
     terminator_event.carry_data = s_connection;
@@ -144,7 +144,7 @@ void processConnection(std::function<std::thread()> run_thread) {
 
     forwarderThread.join();
 
-    sr_disconnect(s_connection);
+    rasta_disconnect(s_connection);
     s_connection = NULL;
 
     remove_fd_event(&s_rc->rasta_lib_event_system, &data_event);

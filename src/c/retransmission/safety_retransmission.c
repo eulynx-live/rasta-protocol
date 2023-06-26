@@ -468,11 +468,6 @@ void sr_send(struct rasta_handle *h, struct rasta_connection *con, struct RastaM
     }
 }
 
-/**
- * cleanup a connection after a disconnect
- * @param h
- * @param remote_id
- */
 void sr_disconnect(struct rasta_connection *con) {
     logger_log(con->logger, LOG_LEVEL_INFO, "RaSTA connection", "disconnected %X", con->remote_id);
 

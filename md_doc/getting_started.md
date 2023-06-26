@@ -53,8 +53,8 @@ The complete functionality of the library can be used by including `rasta.h`.
 | `sr_connect`              | connects to another RaSTA entity. You have to pass the ID of the remote entity and the transport channel as well as an initialized handler as parameters                                                                               |
 | `sr_send`                 | sends a message to a connected entity (connect with `sr_connect`) with the passed ID                                                                                                                                                   |
 | `sr_get_received_data`    | gets the first message (i.e. the application message that arrived first in regard to time and order in the RaSTA PDU) from the receive buffer. If the buffer is empty, this call will block until an application message is available. |
-| `sr_disconnect`           | sends a disconnection request to the connected entity with the passed ID and closes the RaSTA connection.                                                                                                                              |
-| `sr_cleanup`              | cleans up allocated ressources, stops the threads, etc. Call this at the end of you program to avoid memory leak and some other problems (see *Further Information*)                                                                   |
+| `rasta_disconnect`           | sends a disconnection request to the passed RaSTA connection and closes this connection                                                                   |
+| `rasta_cleanup`              | cleans up allocated ressources etc. Call this at the end of you program to avoid memory leak and some other problems (see *Further Information*)                                                                   |
 
 #### Notifications
 The notifications are an easy way to react to events that occur during the protocol flow. Notifications are basically function pointers which you can set. The functions will be called when the respective event occurs. The notification functions have to be assigned in an initialized handle (`handle.notifications`).
@@ -85,7 +85,7 @@ echo "20" > /proc/sys/fs/mqueue/msg_max
 ```
 
 #### Problem: could not create mqueue
-Due to OS limitations, only a rather small amount of mqueues can be created. This might lead to a problem, where a program exits with the error message  *"Could not create mqueue"*. If you tested your program a few times without calling `sr_cleanup` (which frees the allocated mqueue) the solution is to restart your computer / VM. After the reboot it should work again.
+Due to OS limitations, only a rather small amount of mqueues can be created. This might lead to a problem, where a program exits with the error message  *"Could not create mqueue"*. If you tested your program a few times without calling `rasta_cleanup` (which frees the allocated mqueue) the solution is to restart your computer / VM. After the reboot it should work again.
 If Another way to solve the issue is to increase the maximum amount of mqueues that are allowed on the system. In order to do change the amout edit the file `/proc/sys/fs/mqueue/queues_max`
 
 #### Network interface IP by interface name

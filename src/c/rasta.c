@@ -594,6 +594,14 @@ struct rasta_connection* sr_connect(struct rasta_handle *h, unsigned long id) {
     return connection;
 }
 
+/**
+ * disconnect a connection on request by the user
+ * @param con the connection that should be disconnected
+*/
+void rasta_disconnect(struct rasta_connection *connection) {
+    sr_disconnect(connection);
+}
+
 int rasta_recv(rasta_lib_configuration_t user_configuration, struct rasta_connection *connection, void *buf, size_t len) {
     struct rasta_handle *h = &user_configuration->h;
     event_system *event_system = &user_configuration->rasta_lib_event_system;

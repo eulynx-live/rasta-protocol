@@ -131,12 +131,12 @@ JNIEXPORT void JNICALL Java_librasta_RastaNative_librasta_1send
 
 JNIEXPORT void JNICALL Java_librasta_RastaNative_librasta_1disconnectFrom
   (JNIEnv * env, jobject obj, jlong id, jint reason, jlong details){
-  		sr_disconnect(handle, (unsigned int) id);
+  		rasta_disconnect(handle, (unsigned int) id);
   }
 
 JNIEXPORT void JNICALL Java_librasta_RastaNative_librasta_1cleanup
   (JNIEnv * env, jobject obj){
-        sr_cleanup(handle);
+        rasta_cleanup(handle);
         rfree(handle);
         (*env)->DeleteGlobalRef(env, global_obj);
   }

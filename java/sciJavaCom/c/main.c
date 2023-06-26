@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
     printf("Press enter to disconnect.\n"),
     getchar();
 
-    sr_disconnect(&h, SERVER_ID);
+    rasta_disconnect(&h, SERVER_ID);
     printf("Sent disconnection request. Press Enter again to cleanup.\n");
 
     getchar();
@@ -128,5 +128,5 @@ int main(int argc, char *argv[]) {
     } else {
         scip_cleanup(scip);
     }
-    sr_cleanup(&h);
+    rasta_cleanup(&h);
 }

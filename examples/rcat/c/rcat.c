@@ -44,7 +44,7 @@ int send_input_data(void *carry_data) {
                     rasta_send(data->rc, data->connection, buf, read_len);
                 }
                 // TODO: Disconnect
-                sr_disconnect(data->connection);
+                rasta_disconnect(data->connection);
                 return 1;
             }
 
@@ -174,6 +174,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    sr_cleanup(&rc->h);
+    rasta_cleanup(rc);
     return 0;
 }
