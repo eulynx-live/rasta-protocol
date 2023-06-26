@@ -14,6 +14,7 @@
 #include "rastamd4_test.h"
 #include "rastamodule_test.h"
 #include "safety_retransmission_test.h"
+#include "transport/transport_test.h"
 
 int suite_init(void) {
     return 0;
@@ -87,6 +88,11 @@ void cunit_register() {
     // Tests for Safety and Retransmission layer
     CU_add_test(pSuiteMath, "test_sr_retransmit_data_shouldSendFinalHeartbeat", test_sr_retransmit_data_shouldSendFinalHeartbeat);
     CU_add_test(pSuiteMath, "test_sr_retransmit_data_shouldRetransmitPackage", test_sr_retransmit_data_shouldRetransmitPackage);
+
+    CU_add_test(pSuiteMath, "test_transport_init_should_initialize_channel_props", test_transport_init_should_initialize_channel_props);
+    CU_add_test(pSuiteMath, "test_transport_init_should_initialize_receive_event", test_transport_init_should_initialize_receive_event);
+    CU_add_test(pSuiteMath, "test_transport_init_should_initialize_receive_event_data", test_transport_init_should_initialize_receive_event_data);
+    CU_add_test(pSuiteMath, "test_transport_init_should_add_receive_event_to_event_system", test_transport_init_should_add_receive_event_to_event_system);
 
     // Tests for OPAQUE
 #ifdef ENABLE_OPAQUE
