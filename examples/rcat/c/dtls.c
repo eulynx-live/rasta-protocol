@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
 
         rasta_bind(&rc->h);
 
-        sr_listen(&rc->h);
+        rasta_listen(&rc->h);
 
         struct rasta_connection *c = rasta_accept(rc);
         if (c == NULL) {

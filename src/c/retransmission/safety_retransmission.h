@@ -16,6 +16,12 @@ void sr_diagnostic_interval_init(struct rasta_connection *connection, rasta_conf
 void sr_init_connection(struct rasta_connection *connection, rasta_role role);
 void sr_retransmit_data(struct rasta_connection *connection);
 void rasta_socket(struct rasta_handle *handle, rasta_config_info *config, struct logger_t *logger);
+
+/**
+ * Listen on all sockets specified by the given RaSTA handle.
+ * This should not be called from outside the library - use rasta_listen() instead!
+ * @param h the RaSTA handle containing the socket information
+*/
 void sr_listen(struct rasta_handle *h);
 
 /**

@@ -522,6 +522,10 @@ int handle_hb(rasta_connection *connection, struct RastaPacket *receivedPacket) 
     return 0;
 }
 
+void rasta_listen(struct rasta_handle *h) {
+    sr_listen(h);
+}
+
 // TODO: This should be moved into safety_retransmission, and not be called from the outside. Instead, add rasta_connect.
 struct rasta_connection* sr_connect(struct rasta_handle *h, unsigned long id) {
     rasta_connection *connection = NULL;
@@ -644,7 +648,7 @@ struct rasta_connection * rasta_accept(rasta_lib_configuration_t user_configurat
     struct rasta_handle *h = &user_configuration->h;
     event_system *event_system = &user_configuration->rasta_lib_event_system;
 
-    // accept events were already prepared by sr_listen
+    // accept events were already prepared by rasta_listen
     // event system will break when we have received the first heartbeat of a new connection
     log_main_loop_state(h, event_system, "event-system started");
     event_system_start(event_system);

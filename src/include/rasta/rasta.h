@@ -45,7 +45,11 @@ void rasta_socket(struct rasta_handle *handle, rasta_config_info *config, struct
 
 void rasta_bind(struct rasta_handle *handle);
 
-void sr_listen(struct rasta_handle *h);
+/**
+ * Listen on all sockets specified by the given RaSTA handle.
+ * @param h the RaSTA handle containing the socket information
+*/
+void rasta_listen(struct rasta_handle *h);
 
 /**
  * connects to another rasta instance

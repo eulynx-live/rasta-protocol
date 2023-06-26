@@ -193,7 +193,7 @@ void processRasta(std::string config_path,
         memset(&s_rc, 0, sizeof(rasta_lib_configuration_t));
         rasta_lib_init_configuration(s_rc, &config, &logger, &connection, 1);
         rasta_bind(&s_rc->h);
-        sr_listen(&s_rc->h);
+        rasta_listen(&s_rc->h);
         while (true) {
             s_connection = rasta_accept(s_rc);
             if (s_connection) {
