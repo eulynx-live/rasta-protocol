@@ -11,6 +11,7 @@
 #include "events.h"
 #include "transport.h"
 #include "../retransmission/messages.h"
+#include "../retransmission/protocol.h"
 #include "../retransmission/safety_retransmission.h"
 
 int channel_accept_event(void *carry_data) {

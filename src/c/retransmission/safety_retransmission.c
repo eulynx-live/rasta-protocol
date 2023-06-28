@@ -1,9 +1,11 @@
-#include "safety_retransmission.h"
-#include "protocol.h"
 #include <rasta/rasta.h>
 #include <rasta/rasta_lib.h>
 #include <rasta/rmemory.h>
 #include <rasta/rastahandle.h>
+
+#include "safety_retransmission.h"
+#include "protocol.h"
+
 #include "../transport/events.h"
 #include "../transport/transport.h"
 #include "../retransmission/handlers.h"
@@ -602,7 +604,7 @@ int sr_receive(rasta_connection *con, struct RastaPacket *receivedPacket) {
 
     // new client request
     if (receivedPacket->type == RASTA_TYPE_CONNREQ) {
-        con = handle_conreq(con, receivedPacket);
+        handle_conreq(con, receivedPacket);
 
         freeRastaByteArray(&receivedPacket->data);
         return 0;
@@ -619,7 +621,6 @@ int sr_receive(rasta_connection *con, struct RastaPacket *receivedPacket) {
 
     // handle response
     if (receivedPacket->type == RASTA_TYPE_CONNRESP) {
-        // TODO: Why is result ignored?
         handle_conresp(con, receivedPacket);
 
         freeRastaByteArray(&receivedPacket->data);
@@ -678,7 +679,7 @@ int sr_receive(rasta_connection *con, struct RastaPacket *receivedPacket) {
         return 0;
     }
 
-    return rasta_receive(con, receivedPacket);
+    return handle_received_packet(con, receivedPacket);
 }
 
 void sr_closed_connection(rasta_connection *connection, unsigned long id) {

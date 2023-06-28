@@ -68,38 +68,6 @@ struct rasta_connection* rasta_connect(rasta_lib_configuration_t user_configurat
     return sr_connect(&user_configuration->h, id);
 }
 
-// TODO this feels weird here, because it is called from safety_retransmission and is not an API function
-int rasta_receive(struct rasta_connection *con, struct RastaPacket *receivedPacket) {
-    switch (receivedPacket->type) {
-        case RASTA_TYPE_RETRDATA:
-            return handle_retrdata(con, receivedPacket);
-        case RASTA_TYPE_DATA:
-            return handle_data(con, receivedPacket);
-        case RASTA_TYPE_RETRREQ:
-            return handle_retrreq(con, receivedPacket);
-        case RASTA_TYPE_RETRRESP:
-            return handle_retrresp(con, receivedPacket);
-        case RASTA_TYPE_DISCREQ:
-            return handle_discreq(con, receivedPacket);
-        case RASTA_TYPE_HB:
-            return handle_hb(con, receivedPacket);
-#ifdef ENABLE_OPAQUE
-        case RASTA_TYPE_KEX_REQUEST:
-            return handle_kex_request(con, receivedPacket);
-        case RASTA_TYPE_KEX_RESPONSE:
-            return handle_kex_response(con, receivedPacket);
-        case RASTA_TYPE_KEX_AUTHENTICATION:
-            return handle_kex_auth(con, receivedPacket);
-#endif
-        default:
-            logger_log(con->logger, LOG_LEVEL_ERROR, "RaSTA RECEIVE", "Received unexpected packet type %d", receivedPacket->type);
-            // increase type error counter
-            con->errors.type++;
-            break;
-    }
-    return 0;
-}
-
 int rasta_recv(rasta_lib_configuration_t user_configuration, struct rasta_connection *connection, void *buf, size_t len) {
     struct rasta_handle *h = &user_configuration->h;
     event_system *event_system = &user_configuration->rasta_lib_event_system;

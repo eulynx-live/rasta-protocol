@@ -67,8 +67,6 @@ struct rasta_connection * rasta_accept(rasta_lib_configuration_t user_configurat
  */
 struct rasta_connection* rasta_connect(rasta_lib_configuration_t user_configuration, unsigned long id);
 
-int rasta_receive(struct rasta_connection *con, struct RastaPacket *receivedPacket);
-
 /**
  * Receive data on a given RaSTA connection
  * @param user_configuration the user configuration of the local RaSTA instance
