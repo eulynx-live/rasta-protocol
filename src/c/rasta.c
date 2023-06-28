@@ -5,18 +5,14 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <rasta/config.h>
 #include <rasta/event_system.h>
 #include <rasta/rasta.h>
 #include <rasta/rasta_lib.h>
 #include <rasta/rastahandle.h>
-#include <rasta/rastaredundancy.h>
 #include <rasta/rmemory.h>
 
 #include "experimental/handlers.h"
 #include "retransmission/handlers.h"
-#include "retransmission/messages.h"
-#include "retransmission/protocol.h"
 #include "retransmission/safety_retransmission.h"
 
 void log_main_loop_state(struct rasta_handle *h, event_system *ev_sys, const char *message) {
@@ -33,19 +29,20 @@ void log_main_loop_state(struct rasta_handle *h, event_system *ev_sys, const cha
                message, fd_event_active_count, fd_event_count, timed_event_active_count, timed_event_count);
 }
 
-void rasta_socket(struct rasta_handle *handle, rasta_config_info *config, struct logger_t *logger) {
+void rasta_socket(rasta_lib_configuration_t user_configuration, rasta_config_info *config, struct logger_t *logger) {
+    struct rasta_handle *handle = &user_configuration->h;
     rasta_handle_init(handle, config, logger);
 
     //  register redundancy layer diagnose notification handler
     handle->mux.notifications.on_diagnostics_available = handle->notifications.on_redundancy_diagnostic_notification;
 }
 
-void rasta_bind(struct rasta_handle *h) {
-    redundancy_mux_bind(h);
+void rasta_bind(rasta_lib_configuration_t user_configuration) {
+    redundancy_mux_bind(&user_configuration->h);
 }
 
-void rasta_listen(struct rasta_handle *h) {
-    sr_listen(h);
+void rasta_listen(rasta_lib_configuration_t user_configuration) {
+    sr_listen(&user_configuration->h);
 }
 
 struct rasta_connection * rasta_accept(rasta_lib_configuration_t user_configuration) {
@@ -67,10 +64,11 @@ struct rasta_connection * rasta_accept(rasta_lib_configuration_t user_configurat
     return NULL;
 }
 
-struct rasta_connection* rasta_connect(struct rasta_handle *h, unsigned long id) {
-    return sr_connect(h, id);
+struct rasta_connection* rasta_connect(rasta_lib_configuration_t user_configuration, unsigned long id) {
+    return sr_connect(&user_configuration->h, id);
 }
 
+// TODO this feels weird here, because it is called from safety_retransmission and is not an API function
 int rasta_receive(struct rasta_connection *con, struct RastaPacket *receivedPacket) {
     switch (receivedPacket->type) {
         case RASTA_TYPE_RETRDATA:

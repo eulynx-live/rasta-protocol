@@ -35,39 +35,61 @@ typedef struct {
 void log_main_loop_state(struct rasta_handle *h, event_system *ev_sys, const char *message);
 
 /**
- * initializes the rasta handle and starts all threads
- * configuration is loaded from file
- * @param handle the handle to initialize
+ * initializes the RaSTA handle with a given configuration and logger
+ * @param user_configuration the user configuration containing the handle to initialize
  * @param config the configuration to initialize the handle with
  * @param logger the logger to use
  */
-void rasta_socket(struct rasta_handle *handle, rasta_config_info *config, struct logger_t *logger);
+void rasta_socket(rasta_lib_configuration_t user_configuration, rasta_config_info *config, struct logger_t *logger);
 
-void rasta_bind(struct rasta_handle *handle);
+/**
+ * binds a RaSTA instance to the configured IP addresses and ports for the transport channels
+ * @param user_configuration the user configuration to be used
+ */
+void rasta_bind(rasta_lib_configuration_t user_configuration);
 
 /**
  * Listen on all sockets specified by the given RaSTA handle.
- * @param h the RaSTA handle containing the socket information
+ * @param user_configuration the user configuration containing the socket information
 */
-void rasta_listen(struct rasta_handle *h);
+void rasta_listen(rasta_lib_configuration_t user_configuration);
 
+/**
+ * Wait for connections on all sockets specified in the user_configuration.
+ * @param user_configuration the user configuration containing the socket information
+*/
 struct rasta_connection * rasta_accept(rasta_lib_configuration_t user_configuration);
 
 /**
- * connects to another rasta instance
- * @param h the handle of the local RaSTA instance
+ * Connect to another rasta instance
+ * @param user_configuration the user configuration of the local RaSTA instance
  * @param id the ID of the remote RaSTA instance to connect to
  */
-struct rasta_connection* rasta_connect(struct rasta_handle *h, unsigned long id);
+struct rasta_connection* rasta_connect(rasta_lib_configuration_t user_configuration, unsigned long id);
 
 int rasta_receive(struct rasta_connection *con, struct RastaPacket *receivedPacket);
 
+/**
+ * Receive data on a given RaSTA connection
+ * @param user_configuration the user configuration of the local RaSTA instance
+ * @param connection the connection from which to receive the data
+ * @param buf the buffer into which to save the received data
+ * @param len the size of buf in bytes
+*/
 int rasta_recv(rasta_lib_configuration_t user_configuration, struct rasta_connection *connection, void *buf, size_t len);
+
+/**
+ * Send data on a given RaSTA connection
+ * @param user_configuration the user configuration of the local RaSTA instance
+ * @param connection the connection on which to send the data
+ * @param buf the buffer from which to read the data to be sent
+ * @param len the size of buf in bytes
+*/
 int rasta_send(rasta_lib_configuration_t user_configuration, struct rasta_connection *connection, void *buf, size_t len);
 
 /**
  * disconnect a connection on request by the user
- * @param con the connection that should be disconnected
+ * @param connection the connection that should be disconnected
 */
 void rasta_disconnect(struct rasta_connection *connection);
 

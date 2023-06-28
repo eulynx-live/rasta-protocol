@@ -62,7 +62,7 @@ void init_connection_events(struct rasta_handle *h, struct rasta_connection *con
 
 void rasta_lib_init_configuration(rasta_lib_configuration_t user_configuration, rasta_config_info *config, struct logger_t *logger, rasta_connection_config *connections, size_t connections_length) {
     memset(user_configuration, 0, sizeof(rasta_lib_configuration_t));
-    rasta_socket(&user_configuration->h, config, logger);
+    rasta_socket(user_configuration, config, logger);
     memset(&user_configuration->rasta_lib_event_system, 0, sizeof(user_configuration->rasta_lib_event_system));
     memset(&user_configuration->callback, 0, sizeof(user_configuration->callback));
     user_configuration->h.user_handles = &user_configuration->callback;

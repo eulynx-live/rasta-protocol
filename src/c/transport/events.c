@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdlib.h>
 
 #include <rasta/logging.h>
