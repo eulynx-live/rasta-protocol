@@ -399,13 +399,6 @@ unsigned int sr_send_queue_item_count(struct rasta_connection *connection) {
     return fifo_get_size(connection->fifo_send);
 }
 
-void rasta_socket(struct rasta_handle *handle, rasta_config_info *config, struct logger_t *logger) {
-    rasta_handle_init(handle, config, logger);
-
-    //  register redundancy layer diagnose notification handler
-    handle->mux.notifications.on_diagnostics_available = handle->notifications.on_redundancy_diagnostic_notification;
-}
-
 void sr_listen(struct rasta_handle *h) {
     redundancy_mux_listen_channels(h, &h->mux, &h->config->tls);
 }
@@ -466,6 +459,77 @@ void sr_send(struct rasta_handle *h, struct rasta_connection *con, struct RastaM
         // leave with error code 1
         return;
     }
+}
+
+struct rasta_connection* sr_connect(struct rasta_handle *h, unsigned long id) {
+    rasta_connection *connection = NULL;
+
+    for (unsigned i = 0; i < h->rasta_connections_length; i++) {
+        if (h->rasta_connections[i].remote_id == id) {
+            connection = &h->rasta_connections[i];
+            break;
+        }
+    }
+
+    if (connection == NULL || redundancy_mux_connect_channel(connection, &h->mux, connection->redundancy_channel) != 0) {
+        return NULL;
+    }
+
+    sr_init_connection(connection, RASTA_ROLE_CLIENT);
+
+    // initialize seq nums and timestamps
+    connection->sn_t = h->config->initial_sequence_number;
+
+    logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA CONNECT", "Using %lu as initial sequence number",
+               (long unsigned int)connection->sn_t);
+
+    connection->cs_t = 0;
+    connection->cts_r = cur_timestamp();
+    connection->t_i = h->config->sending.t_max;
+
+    unsigned char *version = (unsigned char *)RASTA_VERSION;
+
+    logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA CONNECT", "Local version is %s", version);
+
+    // send ConReq
+    struct RastaPacket conreq = createConnectionRequest(connection->remote_id, connection->my_id,
+                                                        connection->sn_t, cur_timestamp(),
+                                                        h->config->sending.send_max,
+                                                        version, &connection->redundancy_channel->hashing_context);
+    connection->sn_i = connection->sn_t;
+
+    // Send connection request immediately (don't go through packet batching)
+    redundancy_mux_send(connection->redundancy_channel, &conreq, connection->role);
+
+    // increase sequence number
+    connection->sn_t++;
+
+    // update state
+    connection->current_state = RASTA_CONNECTION_START;
+
+    freeRastaByteArray(&conreq.data);
+
+    // fire connection state changed event
+    fire_on_connection_state_change(sr_create_notification_result(NULL, connection));
+    // Wait for connection response
+
+    enable_timed_event(&connection->handshake_timeout_event);
+
+    logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA CONNECT", "awaiting connection response from %d", connection->remote_id);
+    log_main_loop_state(h, h->ev_sys, "event-system started");
+    event_system_start(h->ev_sys);
+
+    disable_timed_event(&connection->handshake_timeout_event);
+
+    // What happened? Timeout, or user abort, or success?
+    if (connection->current_state != RASTA_CONNECTION_UP) {
+        redundancy_mux_close_channel(connection->redundancy_channel);
+        return NULL;
+    }
+
+    logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA CONNECT", "handshake completed with %d", connection->remote_id);
+
+    return connection;
 }
 
 void sr_disconnect(struct rasta_connection *con) {
@@ -532,9 +596,6 @@ bool sr_rekeying_skipped(struct rasta_connection *connection, struct RastaConfig
     return false;
 }
 #endif
-
-// TODO: Find a suitable header file for this
-int rasta_receive(struct rasta_connection *con, struct RastaPacket *receivedPacket);
 
 int sr_receive(rasta_connection *con, struct RastaPacket *receivedPacket) {
     logger_log(con->logger, LOG_LEVEL_DEBUG, "RaSTA RECEIVE", "Received packet %d from %d to %d %u", receivedPacket->type, receivedPacket->sender_id, receivedPacket->receiver_id, receivedPacket->length);

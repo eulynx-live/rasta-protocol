@@ -15,7 +15,6 @@ void sr_close_connection(struct rasta_connection *connection, rasta_disconnect_r
 void sr_diagnostic_interval_init(struct rasta_connection *connection, rasta_config_sending *cfg);
 void sr_init_connection(struct rasta_connection *connection, rasta_role role);
 void sr_retransmit_data(struct rasta_connection *connection);
-void rasta_socket(struct rasta_handle *handle, rasta_config_info *config, struct logger_t *logger);
 
 /**
  * Listen on all sockets specified by the given RaSTA handle.
@@ -23,6 +22,22 @@ void rasta_socket(struct rasta_handle *handle, rasta_config_info *config, struct
  * @param h the RaSTA handle containing the socket information
 */
 void sr_listen(struct rasta_handle *h);
+
+/**
+ * send data to another instance
+ * @param h the handle of the local RaSTA instance
+ * @param con the connection to send the data on
+ * @param app_messages the messages to send
+ */
+void sr_send(struct rasta_handle *h, struct rasta_connection *con, struct RastaMessageData app_messages);
+
+/**
+ * connects to another rasta instance
+ * This should not be called from outside the library - use rasta_connect() instead!
+ * @param h the handle of the local RaSTA instance
+ * @param id the ID of the remote RaSTA instance to connect to
+ */
+struct rasta_connection* sr_connect(struct rasta_handle *h, unsigned long id);
 
 /**
  * Disconnect a connection on request by the user.

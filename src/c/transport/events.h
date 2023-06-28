@@ -11,6 +11,10 @@ int channel_accept_event(void *carry_data);
 int channel_receive_event(void *carry_data);
 
 int data_send_event(void *carry_data);
+int heartbeat_send_event(void *carry_data);
+int event_connection_expired(void *carry_data);
+
+int send_timed_key_exchange(void *arg);
 
 struct accept_event_data {
     fd_event *event;

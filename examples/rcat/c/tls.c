@@ -6,7 +6,7 @@
 
 #include <rasta/fifo.h>
 #include <rasta/logging.h>
-#include <rasta/rasta_lib.h>
+#include <rasta/rasta.h>
 #include <rasta/rmemory.h>
 
 #include "configfile.h"
@@ -165,7 +165,7 @@ int main(int argc, char *argv[]) {
 
         rasta_bind(&rc->h);
 
-        struct rasta_connection *c = sr_connect(&rc->h, ID_R);
+        struct rasta_connection *c = rasta_connect(&rc->h, ID_R);
 
         if (c == NULL) {
             printf("->   Failed to connect any channel.\n");

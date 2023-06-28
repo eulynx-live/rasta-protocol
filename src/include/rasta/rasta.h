@@ -5,10 +5,9 @@ extern "C" { // only need to export C interface if
              // used by C++ source code
 #endif
 
-// TODO: check
-//#include <errno.h>
 #include "event_system.h"
 #include "rastahandle.h"
+#include "rasta_lib.h"
 
 /**
  * size of ring buffer where data is hold for retransmissions
@@ -33,13 +32,14 @@ typedef struct {
     struct RastaByteArray appMessage;
 } rastaApplicationMessage;
 
+void log_main_loop_state(struct rasta_handle *h, event_system *ev_sys, const char *message);
+
 /**
  * initializes the rasta handle and starts all threads
  * configuration is loaded from file
- * @param handle
- * @param config_file_path
- * @param listenports
- * @param port_count
+ * @param handle the handle to initialize
+ * @param config the configuration to initialize the handle with
+ * @param logger the logger to use
  */
 void rasta_socket(struct rasta_handle *handle, rasta_config_info *config, struct logger_t *logger);
 
@@ -51,29 +51,19 @@ void rasta_bind(struct rasta_handle *handle);
 */
 void rasta_listen(struct rasta_handle *h);
 
+struct rasta_connection * rasta_accept(rasta_lib_configuration_t user_configuration);
+
 /**
  * connects to another rasta instance
- * @param handle
- * @param id
+ * @param h the handle of the local RaSTA instance
+ * @param id the ID of the remote RaSTA instance to connect to
  */
-struct rasta_connection* sr_connect(struct rasta_handle *h, unsigned long id);
+struct rasta_connection* rasta_connect(struct rasta_handle *h, unsigned long id);
 
-/**
- * send data to another instance
- * @param h
- * @param remote_id
- * @param app_messages
- */
-void sr_send(struct rasta_handle *h, struct rasta_connection *con, struct RastaMessageData app_messages);
+int rasta_receive(struct rasta_connection *con, struct RastaPacket *receivedPacket);
 
-/**
- * get data from message buffer
- * this is used in the onReceive Event to get the received message
- * @param h
- * @param connection
- * @return the applicationmessage, where id is the sender rasta id and appMessage is the received data
- */
-rastaApplicationMessage sr_get_received_data(struct rasta_handle *h, struct rasta_connection *connection);
+int rasta_recv(rasta_lib_configuration_t user_configuration, struct rasta_connection *connection, void *buf, size_t len);
+int rasta_send(rasta_lib_configuration_t user_configuration, struct rasta_connection *connection, void *buf, size_t len);
 
 /**
  * disconnect a connection on request by the user
@@ -81,12 +71,12 @@ rastaApplicationMessage sr_get_received_data(struct rasta_handle *h, struct rast
 */
 void rasta_disconnect(struct rasta_connection *connection);
 
-void sr_recv(struct rasta_handle *h, event_system *event_system, int wait_for_handshake, int listen);
-
-// Event handlers
-int event_connection_expired(void *carry_data);
-int heartbeat_send_event(void *carry_data);
-int send_timed_key_exchange(void *arg);
+/**
+ * Cleanup a connection after a disconnect and free assigned ressources.
+ * Always use this when a programm terminates, otherwise it may not start again.
+ * @param user_configuration the RaSTA lib configuration
+ */
+void rasta_cleanup(rasta_lib_configuration_t user_configuration);
 
 #ifdef __cplusplus
 }

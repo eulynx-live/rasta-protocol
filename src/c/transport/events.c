@@ -1,12 +1,16 @@
-#include "events.h"
+#include <stdlib.h>
 
 #include <rasta/logging.h>
 #include <rasta/rmemory.h>
+#include <rasta/rasta.h>
 #include <rasta/rastahandle.h>
 #include <rasta/rastaredundancy.h>
 
-#include "transport.h"
 #include "diagnostics.h"
+#include "events.h"
+#include "transport.h"
+#include "../retransmission/messages.h"
+#include "../retransmission/safety_retransmission.h"
 
 int channel_accept_event(void *carry_data) {
     struct accept_event_data *data = carry_data;
@@ -126,5 +130,188 @@ int channel_receive_event(void *carry_data) {
 
     logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive thread", "Channel %d receive done",
                transport_channel->id);
+    return 0;
+}
+
+int event_connection_expired(void *carry_data) {
+    struct timed_event_data *data = carry_data;
+    struct rasta_heartbeat_handle *h = (struct rasta_heartbeat_handle *)data->handle;
+    logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA HEARTBEAT", "T_i timer expired");
+
+    struct rasta_connection *connection = data->connection;
+    // so check if connection is valid
+
+    if (connection == NULL) {
+        logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA HEARTBEAT", "connection is unknown");
+        return 0;
+    }
+
+    if (connection->hb_locked) {
+        logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA HEARTBEAT", "connection is hb_locked");
+        return 0;
+    }
+
+    // connection is valid, check current state
+    if (connection->current_state == RASTA_CONNECTION_UP || connection->current_state == RASTA_CONNECTION_RETRREQ || connection->current_state == RASTA_CONNECTION_RETRRUN) {
+
+        // fire heartbeat timeout event
+        fire_on_heartbeat_timeout(sr_create_notification_result(NULL, connection));
+
+        // T_i expired -> close connection
+        sr_close_connection(connection, RASTA_DISC_REASON_TIMEOUT, 0);
+        logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA HEARTBEAT", "T_i timer expired - \033[91mdisconnected\033[0m");
+    }
+
+    disable_timed_event(&connection->send_heartbeat_event);
+    disable_timed_event(&connection->timeout_event);
+    return 1;
+}
+
+int heartbeat_send_event(void *carry_data) {
+    struct timed_event_data *data = carry_data;
+    struct rasta_heartbeat_handle *h = (struct rasta_heartbeat_handle *)data->handle;
+
+    logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA HEARTBEAT", "send Heartbeat");
+
+    struct rasta_connection *connection = data->connection;
+
+    if (connection == NULL || connection->hb_locked) {
+        return 0;
+    }
+
+    // connection is valid, check current state
+    if (connection->current_state == RASTA_CONNECTION_UP || connection->current_state == RASTA_CONNECTION_RETRREQ || connection->current_state == RASTA_CONNECTION_RETRRUN) {
+        sendHeartbeat(connection, 0);
+
+        logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA HEARTBEAT", "Heartbeat sent to %d", connection->remote_id);
+    }
+
+    return 0;
+}
+
+int data_send_event(void *carry_data) {
+    rasta_sending_handle *h = carry_data;
+
+    logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA send handler", "send data");
+
+    rasta_connection *con = h->connection;
+
+    unsigned int retransmission_backlog_size = sr_retransmission_queue_item_count(con);
+    // Because of this condition, this method does not reliably free up space in the send queue.
+    // However, we need to pass on backpressure to the caller...
+    if (retransmission_backlog_size <= MAX_QUEUE_SIZE) {
+        unsigned int send_backlog_size = sr_send_queue_item_count(con);
+
+        if (send_backlog_size > 0) {
+            logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA send handler", "Messages waiting to be sent: %d",
+                        send_backlog_size);
+
+            struct RastaMessageData app_messages;
+            struct RastaByteArray msg;
+
+            if (send_backlog_size >= h->config->max_packet) {
+                send_backlog_size = h->config->max_packet;
+            }
+            allocateRastaMessageData(&app_messages, send_backlog_size);
+
+            logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA send handler",
+                        "Sending %d application messages from queue",
+                        send_backlog_size);
+
+            for (unsigned int i = 0; i < send_backlog_size; i++) {
+
+                struct RastaByteArray *elem;
+                elem = fifo_pop(con->fifo_send);
+                logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA send handler",
+                            "Adding application message to data packet");
+
+                allocateRastaByteArray(&msg, elem->length);
+                msg.bytes = rmemcpy(msg.bytes, elem->bytes, elem->length);
+                freeRastaByteArray(elem);
+                rfree(elem);
+                app_messages.data_array[i] = msg;
+            }
+
+            struct RastaPacket data = createDataMessage(con->remote_id, con->my_id, con->sn_t,
+                                                        con->cs_t, cur_timestamp(), con->ts_r,
+                                                        app_messages, h->hashing_context);
+
+            struct RastaByteArray packet = rastaModuleToBytes(&data, h->hashing_context);
+
+            struct RastaByteArray *to_fifo = rmalloc(sizeof(struct RastaByteArray));
+            allocateRastaByteArray(to_fifo, packet.length);
+            rmemcpy(to_fifo->bytes, packet.bytes, packet.length);
+            if (!fifo_push(con->fifo_retransmission, to_fifo)) {
+                logger_log(h->logger, LOG_LEVEL_INFO, "RaSTA send handler", "discarding packet because retransmission queue is full");
+            }
+
+            redundancy_mux_send(con->redundancy_channel, &data, con->role);
+
+            logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA send handler", "Sent data packet from queue");
+
+            con->sn_t = data.sequence_number + 1;
+
+            // set last message ts
+            reschedule_event(&con->send_heartbeat_event);
+
+            freeRastaMessageData(&app_messages);
+            freeRastaByteArray(&packet);
+            freeRastaByteArray(&data.data);
+        }
+    }
+
+    if (sr_send_queue_item_count(con) == 0) {
+        // Disable this event until new data arrives
+        disable_timed_event(&h->send_event);
+    }
+
+    return 0;
+}
+
+/**
+ * send a Key Exchange Request to the specified host
+ * @param connection the connection which should be used
+ * @param host the host where the HB will be sent to
+ * @param port the port where the HB will be sent to
+ */
+void send_KexRequest(struct rasta_connection *connection) {
+#ifdef ENABLE_OPAQUE
+    struct RastaPacket hb = createKexRequest(connection->remote_id, connection->my_id, connection->sn_t,
+                                             connection->cs_t, cur_timestamp(), connection->ts_r,
+                                             &connection->redundancy_channel->mux->sr_hashing_context, connection->config->kex.psk, &connection->kex_state, connection->logger);
+
+    if (!connection->kex_state.last_key_exchanged_millis && connection->config->kex.rekeying_interval_ms) {
+        // first key exchanged - need to enable periodic rekeying
+        init_send_key_exchange_event(&connection->rekeying_event, &connection->rekeying_carry_data, connection);
+        // TODO: Register event (somewhere else)
+        enable_timed_event(&connection->rekeying_event);
+    } else {
+        logger_log(connection->logger, LOG_LEVEL_INFO, "RaSTA KEX", "Rekeying at %" PRIu64, get_current_time_ms());
+    }
+
+    redundancy_mux_send(connection->redundancy_channel, &hb, connection->role);
+
+    connection->sn_t = connection->sn_t + 1;
+
+    connection->kex_state.last_key_exchanged_millis = get_current_time_ms();
+    connection->current_state = RASTA_CONNECTION_KEX_RESP;
+#else
+    // should never be called
+    (void)connection;
+    abort();
+#endif
+}
+
+int send_timed_key_exchange(void *arg) {
+#ifdef ENABLE_OPAQUE
+    struct timed_event_data *event_data = (struct timed_event_data *)arg;
+    // rasta_receive_handle *handle = (rasta_receive_handle *)event_data->handle;
+    send_KexRequest(event_data->connection);
+    // call periodically
+    reschedule_event(&event_data->connection->rekeying_event);
+#else
+    // should never be called
+    (void)arg;
+#endif
     return 0;
 }

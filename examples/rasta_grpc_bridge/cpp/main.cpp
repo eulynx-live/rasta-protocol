@@ -206,7 +206,7 @@ void processRasta(std::string config_path,
             memset(&s_rc, 0, sizeof(rasta_lib_configuration_t));
             rasta_lib_init_configuration(s_rc, &config, &logger, &connection, 1);
             rasta_bind(&s_rc->h);
-            s_connection = sr_connect(&s_rc->h, s_remote_id);
+            s_connection = rasta_connect(&s_rc->h, s_remote_id);
             if (s_connection) {
                 processConnection(run_thread);
             }
