@@ -87,6 +87,7 @@ int receive_packet(redundancy_mux *mux, rasta_transport_channel *transport_chann
         rasta_redundancy_channel *channel = redundancy_mux_get_channel(mux, receivedPacket.data.sender_id);
         if (deferqueue_isfull(&channel->defer_q)) {
             // Discard incoming packet
+            logger_log(channel->logger, LOG_LEVEL_INFO, "RaSTA Red receive", "discarding packet because defer queue is full");
         } else {
             // If this turned out to be a new connection or new application data, break from processing
             result |= red_f_receiveData(channel, receivedPacket, transport_channel->id);
