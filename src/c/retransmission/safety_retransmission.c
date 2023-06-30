@@ -9,7 +9,7 @@
 #include "../transport/transport.h"
 #include "../retransmission/handlers.h"
 
-void updateTimeoutInterval(long confirmed_timestamp, struct rasta_connection *con, rasta_config_sending *cfg) {
+void sr_update_timeout_interval(long confirmed_timestamp, struct rasta_connection *con, rasta_config_sending *cfg) {
     unsigned long t_local = cur_timestamp();
     unsigned long t_rtd = t_local + (1000 / sysconf(_SC_CLK_TCK)) - confirmed_timestamp;
     con->t_i = (uint32_t)(cfg->t_max - t_rtd);
@@ -18,14 +18,14 @@ void updateTimeoutInterval(long confirmed_timestamp, struct rasta_connection *co
     reschedule_event(&con->timeout_event);
 }
 
-void resetDiagnostic(struct rasta_connection *connection) {
+void reset_diagnostic(struct rasta_connection *connection) {
     for (unsigned int i = 0; i < connection->diagnostic_intervals_length; i++) {
         connection->diagnostic_intervals[i].message_count = 0;
         connection->diagnostic_intervals[i].t_alive_message_count = 0;
     }
 }
 
-void updateDiagnostic(struct rasta_connection *connection, struct RastaPacket *receivedPacket, rasta_config_sending *cfg) {
+void sr_diagnostic_update(struct rasta_connection *connection, struct RastaPacket *receivedPacket, rasta_config_sending *cfg) {
     unsigned long t_local = cur_timestamp();
     unsigned long t_rtd = t_local + (1000 / sysconf(_SC_CLK_TCK)) - receivedPacket->confirmed_timestamp;
     unsigned long t_alive = t_local - connection->cts_r;
@@ -44,7 +44,7 @@ void updateDiagnostic(struct rasta_connection *connection, struct RastaPacket *r
     ++connection->received_diagnostic_message_count;
     if (connection->received_diagnostic_message_count >= cfg->diag_window) {
         fire_on_diagnostic_notification(sr_create_notification_result(NULL, connection));
-        resetDiagnostic(connection);
+        reset_diagnostic(connection);
     }
 }
 
@@ -82,15 +82,11 @@ void sr_add_app_messages_to_buffer(struct rasta_connection *con, struct RastaPac
         // fire onReceive event
         fire_on_receive(sr_create_notification_result(NULL, con));
 
-        updateTimeoutInterval(packet->confirmed_timestamp, con, &con->config->sending);
-        updateDiagnostic(con, packet, &con->config->sending);
+        sr_update_timeout_interval(packet->confirmed_timestamp, con, &con->config->sending);
+        sr_diagnostic_update(con, packet, &con->config->sending);
     }
 }
 
-/**
- * removes all confirmed messages from the retransmission fifo
- * @param con the connection that is used
- */
 void sr_remove_confirmed_messages(struct rasta_connection *con) {
     // remove confirmed messages from retransmission fifo
     logger_log(con->logger, LOG_LEVEL_DEBUG, "RaSTA remove confirmed", "confirming messages with SN_PDU <= %lu", (long unsigned int)con->cs_r);
@@ -125,12 +121,6 @@ void sr_remove_confirmed_messages(struct rasta_connection *con) {
 
 /* ----- processing of received packet types ----- */
 
-/**
- * calculates cts_in_seq for the given @p packet
- * @param con the connection that is used
- * @param packet the packet
- * @return cts_in_seq (bool)
- */
 int sr_cts_in_seq(struct rasta_connection *con, rasta_config_sending *cfg, struct RastaPacket *packet) {
 
     if (packet->type == RASTA_TYPE_HB || packet->type == RASTA_TYPE_DATA || packet->type == RASTA_TYPE_RETRDATA) {
@@ -151,12 +141,6 @@ int sr_cts_in_seq(struct rasta_connection *con, rasta_config_sending *cfg, struc
     }
 }
 
-/**
- * calculates sn_in_seq for the given @p packet
- * @param con the connection that is used
- * @param packet the packet
- * @return sn_in_seq (bool)
- */
 int sr_sn_in_seq(struct rasta_connection *con, struct RastaPacket *packet) {
     if (packet->type == RASTA_TYPE_CONNREQ || packet->type == RASTA_TYPE_CONNRESP ||
         packet->type == RASTA_TYPE_RETRRESP || packet->type == RASTA_TYPE_DISCREQ) {
@@ -168,12 +152,6 @@ int sr_sn_in_seq(struct rasta_connection *con, struct RastaPacket *packet) {
     }
 }
 
-/**
- * Checks the sequence number range as in 5.5.3.2
- * @param con connection that is used
- * @param packet the packet
- * @return 1 if the sequency number of the @p packet is in range
- */
 int sr_sn_range_valid(struct rasta_connection *con, rasta_config_sending *cfg, struct RastaPacket *packet) {
     // for types ConReq, ConResp and RetrResp return true
     if (packet->type == RASTA_TYPE_CONNREQ || packet->type == RASTA_TYPE_CONNRESP || packet->type == RASTA_TYPE_RETRRESP) {
@@ -186,12 +164,6 @@ int sr_sn_range_valid(struct rasta_connection *con, rasta_config_sending *cfg, s
             (packet->sequence_number - con->sn_r) <= (cfg->send_max * 10));
 }
 
-/**
- * checks the confirmed sequence number integrity as in 5.5.4
- * @param con connection that is used
- * @param packet the packet
- * @return 1 if the integrity of the confirmed sequency number is confirmed, 0 otherwise
- */
 int sr_cs_valid(struct rasta_connection *con, struct RastaPacket *packet) {
     if (packet->type == RASTA_TYPE_CONNREQ) {
         // initial CS_PDU has to be 0
@@ -206,12 +178,6 @@ int sr_cs_valid(struct rasta_connection *con, struct RastaPacket *packet) {
     }
 }
 
-/**
- * checks the packet authenticity as in 5.5.2 2)
- * @param con connection that is used
- * @param packet the packet
- * @return 1 if sender and receiver of the @p packet are authentic, 0 otherwise
- */
 int sr_message_authentic(struct rasta_connection *con, struct RastaPacket *packet) {
     return (packet->sender_id == con->remote_id && packet->receiver_id == con->my_id);
 }
@@ -317,9 +283,6 @@ void sr_init_connection(struct rasta_connection *connection, rasta_role role) {
 }
 
 void sr_retransmit_data(rasta_connection *connection) {
-    /**
-     *  * retransmit messages in queue
-     */
 
     // prepare Array Buffer
     struct RastaByteArray packets[MAX_QUEUE_SIZE];

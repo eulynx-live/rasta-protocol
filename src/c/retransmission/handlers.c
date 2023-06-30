@@ -334,8 +334,8 @@ int handle_hb(rasta_connection *connection, struct RastaPacket *receivedPacket) 
             if (sr_cts_in_seq(connection, &connection->config->sending, receivedPacket)) {
                 logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: Heartbeat", "CTS in SEQ");
 
-                updateTimeoutInterval(receivedPacket->confirmed_timestamp, connection, &connection->config->sending);
-                updateDiagnostic(connection, receivedPacket, &connection->config->sending);
+                sr_update_timeout_interval(receivedPacket->confirmed_timestamp, connection, &connection->config->sending);
+                sr_diagnostic_update(connection, receivedPacket, &connection->config->sending);
 
                 // set values according to 5.6.2 [3]
                 update_connection_attrs(connection, receivedPacket);
