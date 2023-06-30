@@ -114,9 +114,9 @@ int main(int argc, char *argv[]) {
             rc->h.config->kex.rekeying_interval_ms = 0;
         }
 
-        rasta_bind(&rc->h);
+        rasta_bind(rc);
 
-        rasta_listen(&rc->h);
+        rasta_listen(rc);
 
         struct rasta_connection *c = rasta_accept(rc);
         if (c == NULL) {
@@ -162,9 +162,9 @@ int main(int argc, char *argv[]) {
             rc->h.config->kex.rekeying_interval_ms = 0;
         }
 
-        rasta_bind(&rc->h);
+        rasta_bind(rc);
 
-        struct rasta_connection *c = sr_connect(&rc->h, ID_R);
+        struct rasta_connection *c = rasta_connect(rc, ID_R);
 
         if (c == NULL) {
             printf("->   Failed to connect any channel.\n");

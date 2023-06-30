@@ -2,6 +2,8 @@
 
 #include <stdlib.h>
 
+#include <rasta/rasta_init.h>
+
 #include "../retransmission/safety_retransmission.h"
 #include "../retransmission/protocol.h"
 
@@ -242,4 +244,32 @@ int handle_kex_auth(struct rasta_connection *connection, struct RastaPacket *rec
         sr_close_connection(connection, RASTA_DISC_REASON_UNEXPECTEDTYPE, 0);
     }
     return 0;
+}
+
+void send_KexRequest(struct rasta_connection *connection) {
+#ifdef ENABLE_OPAQUE
+    struct RastaPacket hb = createKexRequest(connection->remote_id, connection->my_id, connection->sn_t,
+                                             connection->cs_t, cur_timestamp(), connection->ts_r,
+                                             &connection->redundancy_channel->mux->sr_hashing_context, connection->config->kex.psk, &connection->kex_state, connection->logger);
+
+    if (!connection->kex_state.last_key_exchanged_millis && connection->config->kex.rekeying_interval_ms) {
+        // first key exchanged - need to enable periodic rekeying
+        init_send_key_exchange_event(&connection->rekeying_event, &connection->rekeying_carry_data, connection);
+        // TODO: Register event (somewhere else)
+        enable_timed_event(&connection->rekeying_event);
+    } else {
+        logger_log(connection->logger, LOG_LEVEL_INFO, "RaSTA KEX", "Rekeying at %" PRIu64, get_current_time_ms());
+    }
+
+    redundancy_mux_send(connection->redundancy_channel, &hb, connection->role);
+
+    connection->sn_t = connection->sn_t + 1;
+
+    connection->kex_state.last_key_exchanged_millis = get_current_time_ms();
+    connection->current_state = RASTA_CONNECTION_KEX_RESP;
+#else
+    // should never be called
+    (void)connection;
+    abort();
+#endif
 }
