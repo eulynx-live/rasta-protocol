@@ -15,7 +15,6 @@
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/health_check_service_interface.h>
 
-#include <rasta/rasta_lib.h>
 #include <rasta/rasta.h>
 #include <rasta/rmemory.h>
 

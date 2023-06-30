@@ -1,7 +1,6 @@
 #include <memory.h>
 #include <rasta/rasta.h>
 #include <rasta/rmemory.h>
-#include <rasta/rasta_lib.h>
 #include <scils.h>
 #include <scils_telegram_factory.h>
 #include <stdio.h>

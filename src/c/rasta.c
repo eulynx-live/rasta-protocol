@@ -7,7 +7,7 @@
 
 #include <rasta/event_system.h>
 #include <rasta/rasta.h>
-#include <rasta/rasta_lib.h>
+#include <rasta/rasta_init.h>
 #include <rasta/rastahandle.h>
 #include <rasta/rmemory.h>
 
@@ -27,14 +27,6 @@ void log_main_loop_state(struct rasta_handle *h, event_system *ev_sys, const cha
     }
     logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA EVENT-SYSTEM", "%s | %d/%d fd events and %d/%d timed events active",
                message, fd_event_active_count, fd_event_count, timed_event_active_count, timed_event_count);
-}
-
-void rasta_socket(rasta_lib_configuration_t user_configuration, rasta_config_info *config, struct logger_t *logger) {
-    struct rasta_handle *handle = &user_configuration->h;
-    rasta_handle_init(handle, config, logger);
-
-    //  register redundancy layer diagnose notification handler
-    handle->mux.notifications.on_diagnostics_available = handle->notifications.on_redundancy_diagnostic_notification;
 }
 
 void rasta_bind(rasta_lib_configuration_t user_configuration) {

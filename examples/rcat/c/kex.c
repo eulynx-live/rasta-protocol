@@ -6,7 +6,7 @@
 
 #include <rasta/fifo.h>
 #include <rasta/logging.h>
-#include <rasta/rasta_lib.h>
+#include <rasta/rasta.h>
 #include <rasta/rmemory.h>
 
 #include "configfile.h"

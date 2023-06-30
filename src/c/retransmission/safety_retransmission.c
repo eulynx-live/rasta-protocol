@@ -1,5 +1,4 @@
 #include <rasta/rasta.h>
-#include <rasta/rasta_lib.h>
 #include <rasta/rmemory.h>
 #include <rasta/rastahandle.h>
 

@@ -30,7 +30,7 @@ set(headers
     include/rasta/rastafactory.h
     include/rasta/rastahandle.h
     include/rasta/temp.h
-    include/rasta/rasta_lib.h
+    include/rasta/rasta_init.h
     include/rasta/rastamd4.h
     include/rasta/rastamodule.h
     include/rasta/rastaredundancy.h
@@ -76,7 +76,7 @@ set(sources
     c/util/rastablake2.c
     c/util/rastasiphash24.c
     c/util/rastadeferqueue.c
-    c/rasta_lib.c
+    c/rasta_init.c
     c/rasta.c
     c/rastahandle.c
 )

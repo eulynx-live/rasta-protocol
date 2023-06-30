@@ -7,25 +7,9 @@ extern "C" { // only need to export C interface if
 
 #include "event_system.h"
 #include "rastahandle.h"
-#include "rasta_lib.h"
+#include "rasta_init.h"
 
-/**
- * size of ring buffer where data is hold for retransmissions
- */
-#define MAX_QUEUE_SIZE 100 // TODO: maybe in config file
-
-/**
- * the maximum length of application messages in the data of a RaSTA packet.
- * Length of a SCI PDU is max. 44 bytes
- */
-#define MAX_APP_MSG_LEN 60
-
-/**
- * maximum length of a RaSTA packet (16 byte MD4 + 5 * 44 bytes of app messages)
- */
-#define MAX_PACKET_LEN 264
-
-#define DIAGNOSTIC_INTERVAL_SIZE 500
+// The header, which the user will include later.
 
 typedef struct {
     unsigned long id;
@@ -33,14 +17,6 @@ typedef struct {
 } rastaApplicationMessage;
 
 void log_main_loop_state(struct rasta_handle *h, event_system *ev_sys, const char *message);
-
-/**
- * initializes the RaSTA handle with a given configuration and logger
- * @param user_configuration the user configuration containing the handle to initialize
- * @param config the configuration to initialize the handle with
- * @param logger the logger to use
- */
-void rasta_socket(rasta_lib_configuration_t user_configuration, rasta_config_info *config, struct logger_t *logger);
 
 /**
  * binds a RaSTA instance to the configured IP addresses and ports for the transport channels

@@ -1,7 +1,6 @@
 #include <memory.h>
 #include <rasta/rasta.h>
 #include <rasta/rmemory.h>
-#include <rasta/rasta_lib.h>
 #include <scip.h>
 #include <stdio.h>
 #include <stdlib.h>
