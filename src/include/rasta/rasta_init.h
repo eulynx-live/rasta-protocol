@@ -13,17 +13,6 @@ extern "C" { // only need to export C interface if
  */
 #define MAX_QUEUE_SIZE 100 // TODO: maybe in config file
 
-/**
- * the maximum length of application messages in the data of a RaSTA packet.
- * Length of a SCI PDU is max. 44 bytes
- */
-#define MAX_APP_MSG_LEN 60
-
-/**
- * maximum length of a RaSTA packet (16 byte MD4 + 5 * 44 bytes of app messages)
- */
-#define MAX_PACKET_LEN 264
-
 #define DIAGNOSTIC_INTERVAL_SIZE 500
 
 typedef struct rasta_connection rasta_lib_connection_t[1];
