@@ -129,7 +129,6 @@ void rasta_lib_init_configuration(rasta_lib_configuration_t user_configuration, 
         connection->fifo_send = fifo_init(2 * connection->config->sending.max_packet);
 
         // init receive queue
-        // TODO make capacity configurable by the user
         connection->fifo_receive = fifo_init(connection->config->receive.max_recvqueue_size);
 
         init_connection_events(h, connection);
