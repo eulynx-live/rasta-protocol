@@ -1,5 +1,8 @@
 #include "scils.h"
 #include "sci.h"
+
+#include "../../src/c/retransmission/safety_retransmission.h"
+
 #include <memory.h>
 #include <rasta/rasta.h>
 #include <rasta/rastafactory.h>

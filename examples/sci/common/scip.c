@@ -1,6 +1,9 @@
 #include "scip.h"
 #include "sci.h"
 #include "sci_telegram_factory.h"
+
+#include "../../src/c/retransmission/safety_retransmission.h"
+
 #include <memory.h>
 #include <rasta/rasta.h>
 #include <rasta/rmemory.h>
