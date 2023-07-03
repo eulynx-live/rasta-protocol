@@ -3,9 +3,11 @@
 #include <stdbool.h>
 
 #include "config.h"
+#include "event_system.h"
 #include "logging.h"
 #include "rastafactory.h"
 #include "rastahashing.h"
+#include "rastaredundancy.h"
 #include "rastarole.h"
 
 /**
