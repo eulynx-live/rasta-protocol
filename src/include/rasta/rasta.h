@@ -11,11 +11,6 @@ extern "C" { // only need to export C interface if
 #include "rastahandle.h"
 
 /**
- * size of ring buffer where data is hold for retransmissions
- */
-#define MAX_QUEUE_SIZE 100 // TODO: maybe in config file
-
-/**
  * the maximum length of application messages in the data of a RaSTA packet.
  * Length of a SCI PDU is max. 44 bytes
  */

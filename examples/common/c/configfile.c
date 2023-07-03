@@ -580,6 +580,32 @@ void config_setstd(struct RastaConfig *cfg) {
     }
 
     /*
+     * Receive part
+     */
+
+    entr = config_get(cfg, "RASTA_RECVQUEUE_SIZE");
+    if (entr.type != DICTIONARY_NUMBER || entr.value.number < 0) {
+        // set std
+        cfg->values.receive.max_recvqueue_size = 20;
+    } else {
+        // check valid format
+        cfg->values.receive.max_recvqueue_size = (unsigned int)entr.value.number;
+    }
+
+    /*
+     * Retransmission part
+     */
+
+    entr = config_get(cfg, "RASTA_RETRANSMISSION_QUEUE_SIZE");
+    if (entr.type != DICTIONARY_NUMBER || entr.value.number < 0) {
+        // set std
+        cfg->values.retransmission.max_retransmission_queue_size = 100;
+    } else {
+        // check valid format
+        cfg->values.retransmission.max_retransmission_queue_size = (unsigned int)entr.value.number;
+    }
+
+    /*
      * Redundancy part
      */
 

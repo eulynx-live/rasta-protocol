@@ -166,7 +166,7 @@ int data_send_event(void *carry_data) {
     unsigned int retransmission_backlog_size = sr_retransmission_queue_item_count(con);
     // Because of this condition, this method does not reliably free up space in the send queue.
     // However, we need to pass on backpressure to the caller...
-    if (retransmission_backlog_size <= MAX_QUEUE_SIZE) {
+    if (retransmission_backlog_size <= con->config->retransmission.max_retransmission_queue_size) {
         unsigned int send_backlog_size = sr_send_queue_item_count(con);
 
         if (send_backlog_size > 0) {
@@ -598,15 +598,9 @@ int rasta_recv(rasta_lib_configuration_t user_configuration, struct rasta_connec
     struct rasta_handle *h = &user_configuration->h;
     event_system *event_system = &user_configuration->rasta_lib_event_system;
 
-    sr_set_receive_buffer(buf, len);
-
-    size_t received_data_len = 0;
-
-    while (connection->current_state == RASTA_CONNECTION_UP && received_data_len == 0) {
+    while (connection->current_state == RASTA_CONNECTION_UP && sr_recv_queue_item_count(connection) == 0) {
         log_main_loop_state(h, event_system, "event-system started");
         event_system_start(event_system);
-
-        received_data_len = sr_get_received_data_len();
     }
 
     if (connection->current_state != RASTA_CONNECTION_UP) {
@@ -614,7 +608,20 @@ int rasta_recv(rasta_lib_configuration_t user_configuration, struct rasta_connec
         return -1;
     }
 
-    return sr_get_received_data_len();
+    struct RastaByteArray *elem;
+    elem = fifo_pop(connection->fifo_receive);
+    size_t received_len = (len < elem->length) ? len : elem->length;
+
+    if (len < elem->length) {
+        logger_log(connection->logger, LOG_LEVEL_INFO, "RaSTA receive", 
+            "supplied buffer (%ld bytes) is smaller than message length (%d bytes) - received message may be incomplete!", len, elem->length);
+    }
+
+    rmemcpy(buf, elem->bytes, received_len);
+    freeRastaByteArray(elem);
+    rfree(elem);
+
+    return received_len;
 }
 
 int rasta_send(rasta_lib_configuration_t user_configuration, struct rasta_connection *connection, void *buf, size_t len) {
