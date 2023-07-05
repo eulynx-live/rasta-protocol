@@ -357,13 +357,6 @@ unsigned int sr_recv_queue_item_count(struct rasta_connection *connection) {
     return fifo_get_size(connection->fifo_receive);
 }
 
-void rasta_socket(struct rasta_handle *handle, rasta_config_info *config, struct logger_t *logger) {
-    rasta_handle_init(handle, config, logger);
-
-    //  register redundancy layer diagnose notification handler
-    handle->mux.notifications.on_diagnostics_available = handle->notifications.on_redundancy_diagnostic_notification;
-}
-
 void sr_listen(struct rasta_handle *h) {
     redundancy_mux_listen_channels(h, &h->mux, &h->config->tls);
 }
