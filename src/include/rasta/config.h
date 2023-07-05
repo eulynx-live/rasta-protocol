@@ -34,6 +34,14 @@ typedef struct rasta_config_sending {
     rasta_hash_algorithm sr_hash_algorithm;
 } rasta_config_sending;
 
+typedef struct rasta_config_receive {
+    unsigned int max_recvqueue_size;
+} rasta_config_receive;
+
+typedef struct rasta_config_retransmission {
+    unsigned int max_retransmission_queue_size;
+} rasta_config_retransmission;
+
 /**
  * represents an IP and Port
  */
@@ -121,6 +129,14 @@ typedef struct rasta_config_info {
      * all values for the sending part
      */
     rasta_config_sending sending;
+    /**
+     * all values for the receive part
+     */
+    rasta_config_receive receive;
+    /**
+     * all values for the retransmission part
+     */
+    rasta_config_retransmission retransmission;
     /**
      * all values for the redundancy part
      */

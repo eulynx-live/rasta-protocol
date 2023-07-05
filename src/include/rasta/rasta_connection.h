@@ -223,6 +223,11 @@ typedef struct rasta_connection {
     fifo_t *fifo_send;
 
     /**
+     * queue for received messages that have not yet been rasta_recv()'d
+    */
+    fifo_t *fifo_receive;
+
+    /**
      * the N_SENDMAX of the connection partner,  -1 if not connected
      */
     int connected_recv_buffer_size;

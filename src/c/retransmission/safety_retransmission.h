@@ -143,7 +143,4 @@ void sr_update_timeout_interval(long confirmed_timestamp, struct rasta_connectio
 // queue lengths
 unsigned int sr_retransmission_queue_item_count(struct rasta_connection *connection);
 unsigned int sr_send_queue_item_count(struct rasta_connection *connection);
-
-// receive buffer accessors
-void sr_set_receive_buffer(void *buf, size_t len);
-size_t sr_get_received_data_len();
+unsigned int sr_recv_queue_item_count(struct rasta_connection *connection);

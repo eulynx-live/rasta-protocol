@@ -48,36 +48,26 @@ void sr_diagnostic_update(struct rasta_connection *connection, struct RastaPacke
     }
 }
 
-// HACK:
-static void* recv_buf;
-static size_t recv_buf_size;
-static size_t recv_len;
-
-void sr_set_receive_buffer(void *buf, size_t len) {
-    recv_buf = buf;
-    recv_buf_size = len;
-    recv_len = 0;
-}
-
-size_t sr_get_received_data_len() {
-    return recv_len;
-}
-
 void sr_add_app_messages_to_buffer(struct rasta_connection *con, struct RastaPacket *packet) {
     struct RastaMessageData received_data;
     received_data = extractMessageData(packet);
 
     logger_log(con->logger, LOG_LEVEL_DEBUG, "RaSTA add to buffer", "received %d application messages", received_data.count);
 
-    for (unsigned int i = 0; i < received_data.count && recv_buf_size; ++i) {
-        // TODO: What to do with possibly remaining data from received_data?
+    for (unsigned int i = 0; i < received_data.count; ++i) {
+        if (fifo_full(con->fifo_receive)) {
+            logger_log(con->logger, LOG_LEVEL_INFO, "RaSTA add to buffer", "discarding %d application messages because receive queue is full", received_data.count - i);
+            break;
+        }
 
-        size_t copy_size = recv_buf_size < received_data.data_array[i].length ? recv_buf_size : received_data.data_array[i].length;
-        rmemcpy(recv_buf, received_data.data_array[i].bytes, copy_size);
-
-        recv_buf_size -= copy_size;
-        recv_buf = ((uint8_t*)recv_buf) + copy_size;
-        recv_len += copy_size;
+        // push into queue
+        struct RastaByteArray *to_fifo = rmalloc(sizeof(struct RastaByteArray));
+        allocateRastaByteArray(to_fifo, received_data.data_array[i].length);
+        rmemcpy(to_fifo->bytes, received_data.data_array[i].bytes, received_data.data_array[i].length);
+        
+        if (!fifo_push(con->fifo_receive, to_fifo)) {
+            logger_log(con->logger, LOG_LEVEL_INFO, "RaSTA add to buffer", "could not insert message into receive queue because it is full");
+        }
 
         // fire onReceive event
         fire_on_receive(sr_create_notification_result(NULL, con));
@@ -285,7 +275,7 @@ void sr_init_connection(struct rasta_connection *connection, rasta_role role) {
 void sr_retransmit_data(rasta_connection *connection) {
 
     // prepare Array Buffer
-    struct RastaByteArray packets[MAX_QUEUE_SIZE];
+    struct RastaByteArray packets[connection->config->retransmission.max_retransmission_queue_size];
 
     int buffer_n = 0; // how many valid elements are in the buffer
     buffer_n = fifo_get_size(connection->fifo_retransmission);
@@ -361,6 +351,17 @@ unsigned int sr_retransmission_queue_item_count(struct rasta_connection *connect
 
 unsigned int sr_send_queue_item_count(struct rasta_connection *connection) {
     return fifo_get_size(connection->fifo_send);
+}
+
+unsigned int sr_recv_queue_item_count(struct rasta_connection *connection) {
+    return fifo_get_size(connection->fifo_receive);
+}
+
+void rasta_socket(struct rasta_handle *handle, rasta_config_info *config, struct logger_t *logger) {
+    rasta_handle_init(handle, config, logger);
+
+    //  register redundancy layer diagnose notification handler
+    handle->mux.notifications.on_diagnostics_available = handle->notifications.on_redundancy_diagnostic_notification;
 }
 
 void sr_listen(struct rasta_handle *h) {

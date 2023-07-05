@@ -130,10 +130,13 @@ void rasta_lib_init_configuration(rasta_lib_configuration_t user_configuration, 
         connection->receive_handle.hashing_context = &h->mux.sr_hashing_context;
 
         // init retransmission fifo
-        connection->fifo_retransmission = fifo_init(MAX_QUEUE_SIZE);
+        connection->fifo_retransmission = fifo_init(connection->config->retransmission.max_retransmission_queue_size);
 
         // create send queue
         connection->fifo_send = fifo_init(2 * connection->config->sending.max_packet);
+
+        // init receive queue
+        connection->fifo_receive = fifo_init(connection->config->receive.max_recvqueue_size);
 
         init_connection_events(h, connection);
     }
