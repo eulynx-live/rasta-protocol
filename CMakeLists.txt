@@ -102,8 +102,9 @@ if(BUILD_DOCUMENTATION)
     if(DOXYGEN_FOUND)
         doxygen_add_docs(
             documentation
-            src/rasta/headers
-            src/sci/headers
+            src/include/rasta
+            examples/sci/common
+            examples/common/headers/configfile.h
             README.md
             md_doc/
             ALL
