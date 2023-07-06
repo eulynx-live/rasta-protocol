@@ -8,11 +8,6 @@ extern "C" { // only need to export C interface if
 #include "logging.h"
 #include "rastahandle.h"
 
-/**
- * size of ring buffer where data is hold for retransmissions
- */
-#define MAX_QUEUE_SIZE 100 // TODO: maybe in config file
-
 #define DIAGNOSTIC_INTERVAL_SIZE 500
 
 typedef struct rasta_connection rasta_lib_connection_t[1];

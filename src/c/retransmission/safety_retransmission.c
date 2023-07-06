@@ -107,6 +107,11 @@ void sr_remove_confirmed_messages(struct rasta_connection *con) {
         freeRastaByteArray(&packet.data);
         rfree(elem);
     }
+
+    // sending is now possible again (space in the retransmission queue is available), so we should trigger it
+    if(fifo_full(con->fifo_send)){
+        data_send_event(&con->send_handle);
+    }
 }
 
 /* ----- processing of received packet types ----- */
@@ -361,6 +366,7 @@ void sr_listen(struct rasta_handle *h) {
     redundancy_mux_listen_channels(h, &h->mux, &h->config->tls);
 }
 
+// TODO make this method return an error code again, so the caller knows if sending went wrong
 void sr_send(struct rasta_handle *h, struct rasta_connection *con, struct RastaMessageData app_messages) {
     if (con == NULL)
         return;

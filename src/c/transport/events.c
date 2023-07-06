@@ -202,12 +202,18 @@ int data_send_event(void *carry_data) {
     unsigned int retransmission_backlog_size = sr_retransmission_queue_item_count(con);
     // Because of this condition, this method does not reliably free up space in the send queue.
     // However, we need to pass on backpressure to the caller...
-    if (retransmission_backlog_size <= MAX_QUEUE_SIZE) {
+    if (retransmission_backlog_size < con->config->retransmission.max_retransmission_queue_size) {
+        unsigned int retransmission_available_size = con->config->retransmission.max_retransmission_queue_size - retransmission_backlog_size;
         unsigned int send_backlog_size = sr_send_queue_item_count(con);
+
+        // to prevent discarding packets, we can send at most as many packets as can be added to the retransmission queue
+        if(retransmission_available_size < send_backlog_size) {
+            send_backlog_size = retransmission_available_size;
+        }
 
         if (send_backlog_size > 0) {
             logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA send handler", "Messages waiting to be sent: %d",
-                        send_backlog_size);
+                        sr_send_queue_item_count(con));
 
             struct RastaMessageData app_messages;
             struct RastaByteArray msg;
