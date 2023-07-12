@@ -1,4 +1,6 @@
 # HowTo - Docker
+**Note: This HowTo is out of date and there is currently no Dockerfile for running the examples. Please start them manually!**
+
 Instead of using Gradle to test and compile the RaSTA library and examples, Docker can be used instead.
 
 There are, however, some limitations compared to using Gradle as the Docker image uses CMake as the build tool

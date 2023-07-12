@@ -4,41 +4,24 @@ This tutorial is written for Linux. If you are using another operating system, t
 
 ## 1. Getting the library
 
-Clone the repository.
-
-
-To compile the library you can use the Gradle task `build`
-```
-gradle build
-```
-
-The library will be compiled and the unit tests executed. You should see
-```
-...
-BUILD SUCCESSFUL
-```
-after some time, which means the library and all examples have been compiled and are ready to use.
-The shared and static library files are located at `build/libs/rasta`
-
-You can also compile the binaries with
+Clone the repository. Then, you can compile the libraries and binaries with
 
 ```
 mkdir -p build
 cd build
 cmake ..
-make
+cmake --build .
 ```
 
 ## 2. Using the examples
 The RaSTA C library comes with some simple example to show the use of the library.
 The following examples are included
 
-- **redundancy_test:** a simple forwarding example using only the redundancy layer. A client sends a message to a server which forwards the received message to another client.
-- **rasta_example_new:** a simple forwarding example using the complete RaSTA protocol. A client sends a message to a server which forwards the received message to another client.
-- **rasta_example:** an example for communication between a client and a server. (This example uses the old version of the RaSTA implementation)
-- as well as some miscellaneous examples to test specific modules that are used in the RaSTA library.
-
-See [docker.md](docker.md) for instructions on the examples.
+- **mux_stresstest:** a simple forwarding example using only the redundancy layer. A client sends a message to a server which forwards the received message to another client.
+- **rcat:** an example for communication between a client and a server (provided in versions for all supported transport protocols), which allows sending text submitted on the commandline between client and server.
+- **scils_example** and **scip_example**: examples for the communication with points and light signals using SCI-P and SCI-LS. These examples just send one simple SCI telegram to change the point position / signal aspect and wait for the corresponding status message.
+- **rasta_grpc_bridge**: an extremely useful program, which sends messages submitted via gRPC on a RaSTA connection and sends received RaSTA messages back to you, also via gRPC. This allows you to fully focus on your application specific protocol without needing to know RaSTA.
+- **examples_localhost** and **logging_example**: These examples show you (as a RaSTA library developer) how logging, events and MD4 work. They are also meant to test these specific modules.
 
 ## 3. Using the library
 You learned to compile the sources and run the example programs, now it's time to write your own program!
@@ -47,14 +30,15 @@ In this section the various functions and some other things are listed and expla
 #### Functions
 The complete functionality of the library can be used by including `rasta.h`.
 
-| Name                      | Description                                                                                                                                                                                                                            |
-| ------------------------- | ---------------------------------------------------------                                                                                                                                                                              |
-| `rasta_socket`          | initializes the RaSTA handler, starts threads, loads configuration from config file, etc.                                                                                                                                              |
-| `rasta_connect`              | connects to another RaSTA entity. You have to pass the ID of the remote entity and the transport channel as well as an initialized handler as parameters                                                                               |
-| `rasta_send`                 | sends a message to a connected entity (connect with `sr_connect`) with the passed ID                                                                                                                                                   |
-| `rasta_recv`    | gets the first message (i.e. the application message that arrived first in regard to time and order in the RaSTA PDU) from the receive buffer. If the buffer is empty, this call will block until an application message is available. |
-| `rasta_disconnect`           | sends a disconnection request to the passed RaSTA connection and closes this connection                                                                   |
-| `rasta_cleanup`              | cleans up allocated ressources etc. Call this at the end of you program to avoid memory leak and some other problems (see *Further Information*)                                                                   |
+| Name                                       | Description                                                                                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `rasta_lib_init_configuration`             | initializes a provide `user_configuration` with a RaSTA configuration, logger and connection configurations.                                     |
+| `rasta_bind`/`rasta_listen`/`rasta_accept` | on the server side, these functions bind to, listen on and accept connections on the configured sockets.                                         |
+| `rasta_connect`                            | on the client side, this connects to another RaSTA entity. You have to pass the ID of the remote entity as parameter.                            |
+| `rasta_send`                               | sends a message to a connected entity (connect with `rasta_connect`) on the passed connection.                                                   |
+| `rasta_recv`                               | gets the first message (i.e. the application message that arrived first in regard to time and order in the RaSTA PDU) from the receive buffer of the passed connection. If the buffer is empty, this call will block until an application message is available.                                                                                      |
+| `rasta_disconnect`                         | sends a disconnection request to the passed RaSTA connection and closes this connection.                                                         |
+| `rasta_cleanup`                            | cleans up allocated ressources etc. Call this at the end of you program to avoid memory leak and some other problems (see *Further Information*) |
 
 #### Notifications
 The notifications are an easy way to react to events that occur during the protocol flow. Notifications are basically function pointers which you can set. The functions will be called when the respective event occurs. The notification functions have to be assigned in an initialized handle (`handle.notifications`).
@@ -68,6 +52,8 @@ This is a list of all available notifications.
 | `on_connection_state_change`            | the state of the connection has changed                                                                             |
 | `on_diagnostic_notification`            | diagnose data of the send-/retransmission layer is available                                                        |
 | `on_redundancy_diagnostic_notification` | diagnose data of the redundancy layer is available                                                                  |
+
+**Note: Notifications are currently not working (i.e., commented out in the code)!**
 
 #### Configuration
 In general the configuration can be specified in a configuration file. In the configuration file the RaSTA protocol paramters as well as some miscellaneous options like logging. Every option is documented in the example config files and their meaning should be easy understandable. The only one that is a bit more tricky is *RASTA_REDUNDANCY_CONNECTIONS*.

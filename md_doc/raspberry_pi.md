@@ -1,4 +1,7 @@
 ## Compiling on a Raspberry Pi (ARM)
+
+**Note: This file could potentially be outdated. Please use with caution!**
+
 As Gradle native is not compatible with the ARM architecture of the Raspberry Pi, [CMake](https://cmake.org/)  is used for the compilation process.
 
 ### Requirements
