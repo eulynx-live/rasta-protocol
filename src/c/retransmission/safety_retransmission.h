@@ -55,7 +55,7 @@ void sr_listen(struct rasta_handle *h);
  * @param con the connection to send the data on
  * @param app_messages the messages to send
  */
-void sr_send(struct rasta_handle *h, struct rasta_connection *con, struct RastaMessageData app_messages);
+int sr_send(struct rasta_handle *h, struct rasta_connection *con, struct RastaMessageData app_messages);
 
 /**
  * Handle a received packet on the safety/retransmission level and check validity

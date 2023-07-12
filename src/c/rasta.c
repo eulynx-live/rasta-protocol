@@ -96,9 +96,9 @@ int rasta_send(rasta_lib_configuration_t user_configuration, struct rasta_connec
     messageData1.data_array[0].bytes = buf;
     messageData1.data_array[0].length = len;
 
-    sr_send(&user_configuration->h, connection, messageData1);
+    int return_val = sr_send(&user_configuration->h, connection, messageData1);
     rfree(messageData1.data_array);
-    return 0;
+    return return_val;
 }
 
 void rasta_disconnect(struct rasta_connection *connection) {
