@@ -112,11 +112,13 @@ typedef struct rasta_redundancy_channel {
 
 /**
  * initializes a new RaSTA redundancy channel
+ * @param h the RaSTA handle to initialite the channel with
  * @param logger the logger that is used to log information
  * @param config the configuration for the redundancy layer
- * @param transport_channel_count the amount of transport channels of this redundancy channel
+ * @param transport_sockets the transport sockets belonging to this redundancy channel
+ * @param transport_channel_count the amount of transport channels that should be created in this redundancy channel (corresponds to the number of transport sockets supplied)
  * @param id the RaSTA ID that is associated with this redundancy channel
- * @return an initialized redundancy channel
+ * @param channel the redundancy channel to initialize
  */
 void red_f_init(struct rasta_handle *h, struct logger_t *logger, const rasta_config_info *config, rasta_ip_data *transport_sockets, unsigned int transport_channel_count,
                 unsigned long id, rasta_redundancy_channel *channel);
@@ -132,21 +134,13 @@ int red_f_deliverDeferQueue(rasta_connection *con, rasta_redundancy_channel *cha
 
 /**
  * the f_deferTmo function of the redundancy layer
+ * @param h the RaSTA connection that is used
  * @param channel the redundancy channel that is used
  */
 void red_f_deferTmo(rasta_connection *h, rasta_redundancy_channel *channel);
 
 /**
- * blocks until the state is closed and all notification threads terminate
- * @param channel the channel that is used
- */
-void rasta_red_wait_for_close(rasta_redundancy_channel *channel);
-
-/**
- * adds a (discovered) transport channel to the @p channel
- * @param channel the redundancy channel where the transport channel will be added
- * @param ip the remote IPv4 of the transport channel
- * @param port the remote port of the transport channel
+ * connects the transport channel of the given redundancy @p channel which corresponds to the supplied @p transport_socket, on the given @p connection
  */
 int rasta_red_connect_transport_channel(rasta_connection *h, rasta_redundancy_channel *channel, rasta_transport_socket *transport_socket);
 

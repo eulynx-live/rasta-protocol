@@ -50,6 +50,7 @@ void generateMD4(unsigned char *data, int length, int type, unsigned char *resul
  * @param data array of the data
  * @param length of data
  * @param type of security code (0 means no code, 1 means half the code, 2 all of the code)
+ * @param context the context/configuation for the MD4 algorithm
  * @param result array for the result
  */
 void generateMD4WithVector(unsigned char *data, int length, int type, MD4_CONTEXT *context, unsigned char *result);

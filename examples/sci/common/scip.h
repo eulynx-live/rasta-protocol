@@ -227,6 +227,7 @@ sci_return_code scip_send_timeout(scip_t *p, char *receiver);
 /**
  * Handles received messages from the underlying RaSTA instance.
  * You need to call this function inside RaSTA's onReceiver Notification in order to receive SCI-P telegrams!
+ * @param p the SCI-P instance
  * @param message the received RaSTA application message
  */
 void scip_on_rasta_receive(scip_t *p, rastaApplicationMessage message);

@@ -134,6 +134,7 @@ int kex_prepare_credential_response(struct key_exchange_state *kex_state,
  * [CLIENT] recover credential from key exchange
  * @param kex_state Key exchange state
  * @param received_server_response received credential response
+ * @param received_server_response_len the length of @p received_server_response in bytes
  * @param my_id client RaSTA ID
  * @param remote_id server RaSTA ID
  * @param initial_sequence_number server ISN
