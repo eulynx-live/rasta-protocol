@@ -76,6 +76,11 @@ int fifo_push(fifo_t *fifo, void *element);
  */
 unsigned int fifo_get_size(fifo_t *fifo);
 
+/**
+ * Checks if the FIFO has reached its maximum capacity.
+ * @param fifo the FIFO to use
+ * @return 1 if the capacity has been reached, 0 otherwise
+*/
 int fifo_full(fifo_t* fifo);
 
 #ifdef __cplusplus

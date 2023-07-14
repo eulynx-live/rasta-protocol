@@ -21,30 +21,67 @@ int rasta_blake2b_selftest();
  * https://tools.ietf.org/html/rfc7693#page-16
  */
 
-// state context
+/**
+ * state context
+ */
 typedef struct {
-    uint8_t b[128]; // input buffer
-    uint64_t h[8];  // chained state
-    uint64_t t[2];  // total number of bytes
-    size_t c;       // pointer for b[]
-    size_t outlen;  // digest size
+    /**
+     * input buffer
+    */
+    uint8_t b[128];
+    /**
+     * chained state
+    */
+    uint64_t h[8];
+    /**
+     * total number of bytes
+    */
+    uint64_t t[2];
+    /**
+     * pointer for b[]
+    */
+    size_t c;
+    /**
+     * digest size
+    */
+    size_t outlen;
 } rasta_blake2b_ctx;
 
-// Initialize the hashing context "ctx" with optional key "key".
-//      1 <= outlen <= 64 gives the digest size in bytes.
-//      Secret key (also <= 64 bytes) is optional (keylen = 0).
+/**
+ * Initialize the hashing context @p ctx with optional key @p key.
+ * @param ctx the hashing context
+ * @param outlen the digest size in bytes (1 <= outlen <= 64 ).
+ * @param key secret key (also <= 64 bytes), is optional (keylen = 0).
+ * @param keylen the length of the key
+*/
 int rasta_blake2b_init(rasta_blake2b_ctx *ctx, size_t outlen,
-                       const void *key, size_t keylen); // secret key
+                       const void *key, size_t keylen);
 
-// Add "inlen" bytes from "in" into the hash.
-void rasta_blake2b_update(rasta_blake2b_ctx *ctx,        // context
-                          const void *in, size_t inlen); // data to be hashed
+/**
+ * Add @p inlen bytes from @p in into the hash.
+ * @param ctx hashing context
+ * @param in data to be hashed
+ * @param inlen the length of the data
+*/
+void rasta_blake2b_update(rasta_blake2b_ctx *ctx,
+                          const void *in, size_t inlen);
 
-// Generate the message digest (size given in init).
-//      Result placed in "out".
+/**
+ * Generate the message digest (size given in init).
+ * @param ctx hashing context
+ * @param out pointer into which to place the digest
+*/
 void rasta_blake2b_final(rasta_blake2b_ctx *ctx, void *out);
 
-// All-in-one convenience function.
-int rasta_blake2b(void *out, size_t outlen,       // return buffer for digest
-                  const void *key, size_t keylen, // optional secret key
-                  const void *in, size_t inlen);  // data to be hashed
+/**
+ * All-in-one convenience function.
+ * @param out return buffer for digest
+ * @param outlen the length of @p out
+ * @param key optional secret key
+ * @param keylen the length of @p key
+ * @param in data to be hashed
+ * @param inlen the length of @p in
+*/
+int rasta_blake2b(void *out, size_t outlen,
+                  const void *key, size_t keylen,
+                  const void *in, size_t inlen);

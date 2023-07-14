@@ -18,8 +18,6 @@ extern "C" { // only need to export C interface if
 #define RASTA_CONFIG_KEY_LOGGER_MAX_LEVEL "LOGGER_MAX_LEVEL"
 #define RASTA_CONFIG_KEY_ACCEPTED_VERSIONS "RASTA_ACCEPTED_VERSIONS"
 
-void load_configfile(rasta_config_info *config, struct logger_t *logger, const char *config_file_path);
-
 /**
  * represents a rasta config
  * NOTE: please use the functions provided in config.h to access the dictionarys elements or use values for standard values
@@ -67,6 +65,14 @@ struct DictionaryEntry config_get(struct RastaConfig *cfg, const char *key);
  * @param cfg
  */
 void config_free(struct RastaConfig *cfg);
+
+/**
+ * load a configfile into a given config struct and initialize logger and accepted versions
+ * @param config the configuration to be loaded
+ * @param logger the logger to initialize
+ * @param config_file_path the path of the configuration file to load
+*/
+void load_configfile(rasta_config_info *config, struct logger_t *logger, const char *config_file_path);
 
 #ifdef __cplusplus
 }

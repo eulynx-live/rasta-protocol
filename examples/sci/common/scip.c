@@ -48,6 +48,7 @@ sci_return_code send_telegram(scip_t *p, sci_telegram *telegram) {
     freeRastaMessageData(&messageData);
     return SUCCESS;
 }
+
 scip_t *scip_init(struct rasta_handle *handle, char *sciName) {
     scip_t *scip = rmalloc(sizeof(scip_t));
 

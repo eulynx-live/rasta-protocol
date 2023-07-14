@@ -131,8 +131,8 @@ struct RastaPacket {
      * the length of the packet
      * NOTE: this field should never be set manually. Use the functions in rastafactory to create RastaPackets
      */
-
     unsigned short length;
+    
     /**
      *  the package type
      */
@@ -151,8 +151,10 @@ struct RastaPacket {
     struct RastaByteArray data;
     struct RastaByteArray checksum;
 
-    // 1 if the checksum is correct, 0 if it's not
-    // NOTE: this field is only set, if you use the "bytestoRastaPacket" function
+    /**
+     * 1 if the checksum is correct, 0 if it's not
+     * NOTE: this field is only set, if you use the "bytestoRastaPacket" function
+    */
     int checksum_correct;
 };
 

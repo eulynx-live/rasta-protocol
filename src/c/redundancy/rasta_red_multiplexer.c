@@ -355,8 +355,7 @@ void redundancy_mux_wait_for_entity(redundancy_mux *mux, unsigned long id) {
     logger_log(mux->logger, LOG_LEVEL_INFO, "RaSTA RedMux wait", "entity with id=0x%lX available", id);
 }
 
-void redundancy_mux_listen_channels(struct rasta_handle *h, redundancy_mux *mux, rasta_config_tls *tls_config) {
-    UNUSED(tls_config);
+void redundancy_mux_listen_channels(struct rasta_handle *h, redundancy_mux *mux) {
     for (unsigned i = 0; i < mux->port_count; ++i) {
         transport_listen(h, &mux->transport_sockets[i]);
     }

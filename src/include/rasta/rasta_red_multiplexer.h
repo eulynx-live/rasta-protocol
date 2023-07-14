@@ -149,13 +149,11 @@ redundancy_mux redundancy_mux_init(struct logger_t *logger, uint16_t *listen_por
  */
 void redundancy_mux_init_config(redundancy_mux *mux, struct logger_t *logger, rasta_config_info *config);
 
-void redundancy_mux_bind(struct rasta_handle *h);
-
 /**
- * starts the redundancy layer multiplexer and opens (if specified) all redundancy channels
- * @param mux the multiplexer that will be opened
- */
-void redundancy_mux_open(redundancy_mux *mux);
+ * binds all transport sockets of a redundancy layer multiplexer to their respective IP/port
+ * @param h the RaSTA handle containing the multiplexer
+*/
+void redundancy_mux_bind(struct rasta_handle *h);
 
 /**
  * stops the redundancy layer multiplexer and closes all redundancy channels before cleaning up memory
@@ -171,6 +169,12 @@ void redundancy_mux_close(redundancy_mux *mux);
  */
 rasta_redundancy_channel *redundancy_mux_get_channel(redundancy_mux *mux, unsigned long id);
 
+/**
+ * send a RaSTA packet on a given redundancy channel
+ * @param channel the redundancy channel to send on
+ * @param data the packet to send
+ * @param role whether to send as a client or server
+*/
 void redundancy_mux_send(rasta_redundancy_channel *channel, struct RastaPacket *data, rasta_role role);
 
 /**
@@ -186,7 +190,12 @@ void redundancy_mux_wait_for_notifications(redundancy_mux *mux);
  */
 void redundancy_mux_wait_for_entity(redundancy_mux *mux, unsigned long id);
 
-void redundancy_mux_listen_channels(struct rasta_handle *h, redundancy_mux *mux, rasta_config_tls *tls_config);
+/**
+ * listen on all transport sockets of the given multiplexer
+ * @param h the RaSTA handle
+ * @param mux the mux used for listening
+*/
+void redundancy_mux_listen_channels(struct rasta_handle *h, redundancy_mux *mux);
 
 /**
  * connects a given redundancy channel on a given connection and multiplexer.
@@ -202,10 +211,10 @@ int redundancy_mux_connect_channel(rasta_connection *h, redundancy_mux *mux, ras
  */
 void redundancy_mux_close_channel(rasta_redundancy_channel *c);
 
+// handlers
 int receive_packet(redundancy_mux *mux, rasta_transport_channel *channel, unsigned char *buffer, size_t len);
-int handle_closed_transport(rasta_connection *h, rasta_redundancy_channel *channel);
-
 void handle_received_data(redundancy_mux *mux, unsigned char *buffer, ssize_t len, struct RastaRedundancyPacket *receivedPacket);
+int handle_closed_transport(rasta_connection *h, rasta_redundancy_channel *channel);
 
 #ifdef __cplusplus
 }

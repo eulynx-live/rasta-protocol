@@ -242,8 +242,8 @@ struct RastaPacket createRetransmittedDataMessage(uint32_t receiver_id, uint32_t
 
 /**
  * extracts the additional data for data message and retransmitted data message
- * @param p
- * @return
+ * @param p the received RaSTA packet
+ * @return the extracted message data
  */
 struct RastaMessageData extractMessageData(struct RastaPacket *p);
 
