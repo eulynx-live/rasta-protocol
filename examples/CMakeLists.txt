@@ -83,15 +83,6 @@ configure_file(config/rasta_client1_local_kex.cfg rasta_client1_local_kex.cfg CO
 configure_file(config/rasta_client2_local_kex.cfg rasta_client2_local_kex.cfg COPYONLY)
 endif(BUILD_LOCAL_EXAMPLES)
 
-
-if(BUILD_REMOTE_EXAMPLES)
-# Copy RaSTA configs to build directory
-configure_file(config/rasta_server.cfg rasta_server.cfg COPYONLY)
-configure_file(config/rasta_client1.cfg rasta_client1.cfg COPYONLY)
-configure_file(config/rasta_client2.cfg rasta_client2.cfg COPYONLY)
-
-endif(BUILD_REMOTE_EXAMPLES)
-
 if(BUILD_RASTA_GRPC_BRIDGE)
 add_subdirectory(rasta_grpc_bridge)
 endif(BUILD_RASTA_GRPC_BRIDGE)
