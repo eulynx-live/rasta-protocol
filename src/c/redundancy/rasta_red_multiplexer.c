@@ -75,7 +75,7 @@ void red_call_on_new_connection(redundancy_mux *mux, unsigned long id) {
 
 int receive_packet(redundancy_mux *mux, rasta_transport_channel *transport_channel, unsigned char *buffer, size_t len) {
     int result = 0;
-    logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive", "channel %d received data len = %lu", transport_channel->id, len);
+    logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive", "channel %d received data len = %zu", transport_channel->id, len);
 
     size_t len_remaining = len;
     size_t read_offset = 0;
@@ -302,7 +302,7 @@ void redundancy_mux_send(rasta_redundancy_channel *receiver, struct RastaPacket 
             // Attempt to connect (maybe previous attempts were unsuccessful)
             // only a RaSTA client can initiate reconnect
             if (role == RASTA_ROLE_CLIENT) {
-                logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux send", "Channel %d/%d is not connected, re-trying %s:%d", 
+                logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux send", "Channel %d/%d is not connected, re-trying %s:%d",
                     i + 1, receiver->transport_channel_count, channel->remote_ip_address, channel->remote_port);
                 rasta_transport_socket *socket = &mux->transport_sockets[channel->id];
                 if (transport_redial(channel, socket) != 0) {
@@ -374,7 +374,7 @@ int redundancy_mux_connect_channel(rasta_connection *connection, redundancy_mux 
     for (unsigned int i = 0; i < channel->transport_channel_count; i++) {
         // Provided transport channels have to match with local ports configured
         success |= rasta_red_connect_transport_channel(connection, channel, &mux->transport_sockets[i]);
-#ifdef SLEEP_ON_CONNECT        
+#ifdef SLEEP_ON_CONNECT
         if (success) {
             logger_log(mux->logger, LOG_LEVEL_INFO, "RaSTA RedMux connect", "connection established, sleeping for 5 seconds");
             sleep(5);

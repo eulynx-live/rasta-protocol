@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     pw_len = strlen(pw);
 
     if (pw_len > sizeof(output)) {
-        fprintf(stderr, "Error: maximum password length is %lu bytes\n", sizeof(output));
+        fprintf(stderr, "Error: maximum password length is %zu bytes\n", sizeof(output));
         return 1;
     }
 

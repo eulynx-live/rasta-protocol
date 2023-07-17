@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM ubuntu:22.04 AS dependencies-notls
+FROM ubuntu:jammy-20230624 AS dependencies-notls
 RUN apt-get update && \
     export DEBIAN_FRONTEND=noninteractive && \
     apt-get -y install --no-install-recommends libtool autogen automake autoconf git ca-certificates build-essential cmake pkg-config libcunit1 libcunit1-doc libcunit1-dev
@@ -27,7 +27,7 @@ COPY . /tmp/rasta-protocol/
 RUN cd /tmp/rasta-protocol \
  && mkdir -p build \
  && cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_RASTA_GRPC_BRIDGE=ON -DENABLE_RASTA_TLS=ON \
- && cmake --build build --config Release
+ && cmake --build build --config Release -j16
 
 FROM dependencies-notls as tcp
 WORKDIR /app

@@ -177,7 +177,7 @@ void logger_hexdump(struct logger_t *logger, log_level level, const void *data, 
     if (level <= logger->max_log_level) {
         for (size_t line_start = 0; line_start < data_length; line_start += 16) {
             char line_number[LOGGER_MAX_MSG_SIZE / 2];
-            snprintf(line_number, LOGGER_MAX_MSG_SIZE / 2, "0x%04lx    ", line_start);
+            snprintf(line_number, LOGGER_MAX_MSG_SIZE / 2, "0x%04zx    ", line_start);
             do_log_message(logger, line_number);
             for (size_t line_cur = line_start; line_cur < data_length && line_cur < line_start + 16; line_cur++) {
                 char msg[3];
