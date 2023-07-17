@@ -10,10 +10,12 @@ The following dependencies are required for building the RaSTA library and binar
 
 * CUnit (package `libcunit1` or similar)
 * if `ENABLE_RASTA_OPAQUE` is enabled: libsodium (packages `libsodium-dev` and `pkgconf` or similar)
-* if `ENABLE_RASTA_TLS` is enabled: [WolfSSL](https://www.wolfssl.com/), built manually with the configuration flags `--enable-dtls --enable-debug --enable-certgen --enable-tls13 CFLAGS="-DHAVE_SECRET_CALLBACK" --enable-opensslextra`
+* if `ENABLE_RASTA_TLS` is enabled: [WolfSSL](https://www.wolfssl.com/) (package `wolfssl` or similar). built manually with the configuration flags `--enable-dtls --enable-debug --enable-certgen --enable-tls13 CFLAGS="-DHAVE_SECRET_CALLBACK" --enable-opensslextra`
 * if `BUILD_RASTA_GRPC_BRIDGE` is enabled: gRPC (package `grpc` or similar)
 
 We tested with WolfSSL version 5.2.0-stable and gRPC version 1.47.0. For other versions, we cannot guarantee that you will be able to build the library.
+
+For debug purposes (if you want to dissect recorded TLS traffic with Wireshark), it can be useful to enable the *secret callback* of WolfSSL, which gives you access to the TLS connection secrets. For this, WolfSSL needs to be built manually with the configuration flags `--enable-dtls --enable-debug --enable-certgen --enable-tls13 CFLAGS="-DHAVE_SECRET_CALLBACK" --enable-opensslextra`.
 
 ### Build options
 
@@ -39,7 +41,7 @@ cmake --build .
 You will get one library file for each transport implementation you selected (TCP/UDP/TLS/DTLS), named `librasta_{protocol}.so`.
 To install the library files on the system, you may use `make install`, if needed (might need root privileges).
 
-Note that on ARM systems, our default MD$ implementation does not work correctly, so you should use OpenSSL/`libcrypto` as a replacement. In this case, enable `USE_OPENSSL`.
+Note that on ARM systems, our default MD4 implementation does not work correctly, so you should use OpenSSL/`libcrypto` as a replacement. In this case, enable `USE_OPENSSL`.
 
 ## 2. Using the examples
 The RaSTA C library comes with some simple examples to show the use of the library.
@@ -107,19 +109,6 @@ This option is used to specify the network interfaces and ports where the RaSTA 
 Note that the send-behaviour in this case might not work as you expect (which interface sends the PDUs)!
 
 ## 4. Further Information
-
-### Buffer sizes greater than 10
-The library uses POSIX mqueues as FIFO buffers for receiving, sending, etc.
-By OS default the maximum number of messages in a mqueue is 10. The size of the receive buffer according to the SCI protocols has to be 20, so if you try to initialize a RaSTA entity with receive buffer size 20, it won't work out of the box. You need to set the maximum message count of a mqueue to a higher value in the file `/proc/sys/fs/mqueue/msg_max`
-To set the size to i.e. 20 you can use the following command
-
-```
-echo "20" > /proc/sys/fs/mqueue/msg_max
-```
-
-### Problem: could not create mqueue
-Due to OS limitations, only a rather small amount of mqueues can be created. This might lead to a problem, where a program exits with the error message  *"Could not create mqueue"*. If you tested your program a few times without calling `rasta_cleanup` (which frees the allocated mqueue) the solution is to restart your computer / VM. After the reboot it should work again.
-If Another way to solve the issue is to increase the maximum amount of mqueues that are allowed on the system. In order to do change the amout edit the file `/proc/sys/fs/mqueue/queues_max`
 
 ### Network interface IP by interface name
 If you want to get a network interfaces associated IP address by its name (e.g. `eth0`), for example because the IP is assigned dynamically with DHCP, have a look at the system function `getifaddrs` from `ifaddrs.h`. See the [Manpage](http://man7.org/linux/man-pages/man3/getifaddrs.3.html)  for more information.
