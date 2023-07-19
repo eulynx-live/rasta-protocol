@@ -248,14 +248,17 @@ bool redundancy_mux_bind(struct rasta_handle *h) {
 void redundancy_mux_close(redundancy_mux *mux) {
     // TODO: red_f_cleanup should be called when closing a rasta_connection
 
-    // Close listening ports
+    // Close listening ports (if not already closed for the case that we are a client)
     for (unsigned int i = 0; i < mux->port_count; ++i) {
-        logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux close", "closing socket %d/%d", i + 1, mux->port_count);
-        bsd_close(mux->transport_sockets[i].file_descriptor);
+        if (mux->transport_sockets[i].file_descriptor != -1) {
+            logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux close", "closing socket %d/%d", i + 1, mux->port_count);
+            bsd_close(mux->transport_sockets[i].file_descriptor);
+        }
     }
+
     mux->port_count = 0;
     rfree(mux->transport_sockets);
-    for (unsigned i = 0; i < mux->redundancy_channels_count; i++) {
+    for (unsigned int i = 0; i < mux->redundancy_channels_count; i++) {
         rfree(mux->redundancy_channels[i].transport_channels);
     }
     rfree(mux->redundancy_channels);
@@ -397,6 +400,10 @@ void redundancy_mux_close_channel(rasta_redundancy_channel *c) {
     for (unsigned int i = 0; i < c->transport_channel_count; ++i) {
         rasta_transport_channel *channel = &c->transport_channels[i];
         logger_log(c->mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux remove channel", "closing transport channel %u", i);
+        // if we are a client, the socket fd also becomes invalid when closing the channel
+        if(channel->file_descriptor == c->mux->transport_sockets[channel->id].file_descriptor) {
+            c->mux->transport_sockets[channel->id].file_descriptor = -1;
+        }
         transport_close(channel);
     }
 }

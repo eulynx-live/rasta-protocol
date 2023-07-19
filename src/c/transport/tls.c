@@ -350,6 +350,7 @@ int transport_redial(rasta_transport_channel* channel, rasta_transport_socket *s
 void transport_close(rasta_transport_channel *channel) {
     if (channel->connected) {
         bsd_close(channel->file_descriptor);
+        channel->file_descriptor = -1;
         if (channel->ssl) {
             wolfSSL_shutdown(channel->ssl);
             wolfSSL_free(channel->ssl);

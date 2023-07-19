@@ -149,6 +149,7 @@ int transport_redial(rasta_transport_channel* channel, rasta_transport_socket *s
 void transport_close(rasta_transport_channel *channel) {
     if (channel->connected) {
         bsd_close(channel->file_descriptor);
+        channel->file_descriptor = -1;
         channel->connected = false;
     }
 
