@@ -236,11 +236,13 @@ void redundancy_mux_allocate_channels(struct rasta_handle *h, redundancy_mux *mu
     }
 }
 
-void redundancy_mux_bind(struct rasta_handle *h) {
+bool redundancy_mux_bind(struct rasta_handle *h) {
+    bool success = false;
     for (unsigned i = 0; i < h->mux.port_count; ++i) {
         const rasta_ip_data *ip_data = &h->mux.config->redundancy.connections.data[i];
-        transport_bind(h, &h->mux.transport_sockets[i], ip_data->ip, (uint16_t)ip_data->port);
+        success |= transport_bind(h, &h->mux.transport_sockets[i], ip_data->ip, (uint16_t)ip_data->port);
     }
+    return success;
 }
 
 void redundancy_mux_close(redundancy_mux *mux) {
@@ -249,7 +251,7 @@ void redundancy_mux_close(redundancy_mux *mux) {
     // Close listening ports
     for (unsigned int i = 0; i < mux->port_count; ++i) {
         logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux close", "closing socket %d/%d", i + 1, mux->port_count);
-        // bsd_close(mux->transport_sockets[i].file_descriptor);
+        bsd_close(mux->transport_sockets[i].file_descriptor);
     }
     mux->port_count = 0;
     rfree(mux->transport_sockets);
@@ -302,7 +304,7 @@ void redundancy_mux_send(rasta_redundancy_channel *receiver, struct RastaPacket 
             // Attempt to connect (maybe previous attempts were unsuccessful)
             // only a RaSTA client can initiate reconnect
             if (role == RASTA_ROLE_CLIENT) {
-                logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux send", "Channel %d/%d is not connected, re-trying %s:%d", 
+                logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux send", "Channel %d/%d is not connected, re-trying %s:%d",
                     i + 1, receiver->transport_channel_count, channel->remote_ip_address, channel->remote_port);
                 rasta_transport_socket *socket = &mux->transport_sockets[channel->id];
                 if (transport_redial(channel, socket) != 0) {
@@ -373,7 +375,7 @@ int redundancy_mux_connect_channel(rasta_connection *connection, redundancy_mux 
     for (unsigned int i = 0; i < channel->transport_channel_count; i++) {
         // Provided transport channels have to match with local ports configured
         success |= rasta_red_connect_transport_channel(connection, channel, &mux->transport_sockets[i]);
-#ifdef SLEEP_ON_CONNECT        
+#ifdef SLEEP_ON_CONNECT
         if (success) {
             logger_log(mux->logger, LOG_LEVEL_INFO, "RaSTA RedMux connect", "connection established, sleeping for 5 seconds");
             sleep(5);

@@ -15,13 +15,9 @@
 
 #define MAX_WARNING_LENGTH_BYTES 128
 
-static void handle_port_unavailable(const uint16_t port) {
-    const char *warning_format = "could not bind the socket to port %d";
-    char warning_mbuf[MAX_WARNING_LENGTH_BYTES + 1];
-    snprintf(warning_mbuf, MAX_WARNING_LENGTH_BYTES, warning_format, port);
-
+static void handle_port_unavailable() {
     // bind failed
-    perror("warning_mbuf");
+    perror("bind");
     abort();
 }
 
@@ -163,7 +159,7 @@ void udp_bind(rasta_transport_socket *transport_socket, uint16_t port) {
     local.sin_addr.s_addr = htonl(INADDR_ANY);
     // bind socket to port
     if (bind(transport_socket->file_descriptor, (struct sockaddr *)&local, sizeof(local)) == -1) {
-        handle_port_unavailable(port);
+        handle_port_unavailable();
     }
     handle_tls_mode(transport_socket);
 }

@@ -31,7 +31,7 @@ void udp_init(rasta_transport_socket *transport_socket, const rasta_config_tls *
  * @param transport_socket transport_socket with the file descriptor which will be bound to to the @p port.
  * @param port the port the socket will listen on
  */
-void udp_bind(rasta_transport_socket *transport_socket, uint16_t port);
+bool udp_bind(rasta_transport_socket *transport_socket, uint16_t port);
 
 /**
  * Binds a given file descriptor to the given @p port at the network interface with IPv4 address @p ip
@@ -39,7 +39,7 @@ void udp_bind(rasta_transport_socket *transport_socket, uint16_t port);
  * @param port the port the socket will listen on
  * @param ip the IPv4 address of the network interface the socket will listen on.
  */
-void udp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port);
+bool udp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port);
 
 /**
  * Receive data on the given @p file descriptor and store it in the given buffer.

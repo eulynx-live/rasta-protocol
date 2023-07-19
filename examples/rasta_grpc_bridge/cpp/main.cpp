@@ -152,7 +152,7 @@ void processConnection(std::function<std::thread()> run_thread) {
     close(s_data_fd[0]);
     close(s_data_fd[1]);
     s_data_fd[0] = s_data_fd[1] = -1;
-    
+
     close(s_terminator_fd[0]);
     close(s_terminator_fd[1]);
     s_terminator_fd[0] = s_terminator_fd[1] = -1;
@@ -191,7 +191,12 @@ void processRasta(std::string config_path,
     if (server) {
         memset(&s_rc, 0, sizeof(rasta_lib_configuration_t));
         rasta_lib_init_configuration(s_rc, &config, &logger, &connection, 1);
-        rasta_bind(s_rc);
+
+        if (rasta_bind(s_rc) == false) {
+            rasta_cleanup(s_rc);
+            return;
+        }
+
         rasta_listen(s_rc);
         while (true) {
             s_connection = rasta_accept(s_rc);
@@ -204,7 +209,12 @@ void processRasta(std::string config_path,
         while (true) {
             memset(&s_rc, 0, sizeof(rasta_lib_configuration_t));
             rasta_lib_init_configuration(s_rc, &config, &logger, &connection, 1);
-            rasta_bind(s_rc);
+
+            if (rasta_bind(s_rc) == false) {
+                rasta_cleanup(s_rc);
+                continue;
+            }
+
             s_connection = rasta_connect(s_rc, s_remote_id);
             if (s_connection) {
                 processConnection(run_thread);

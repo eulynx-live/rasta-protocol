@@ -42,13 +42,14 @@ int bsd_create_socket(int family, int type, int protocol_type) {
     }
 
     // Make socket reusable
-    if (setsockopt(file_desc, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0) {
+    int one = 1;
+    if (setsockopt(file_desc, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(int)) < 0) {
         perror("setsockopt(SO_REUSEADDR) failed");
         abort();
     }
 
 #ifdef SO_REUSEPORT
-    if (setsockopt(file_desc, SOL_SOCKET, SO_REUSEPORT, &(int){1}, sizeof(int)) < 0) {
+    if (setsockopt(file_desc, SOL_SOCKET, SO_REUSEPORT, &one, sizeof(int)) < 0) {
         perror("setsockopt(SO_REUSEPORT) failed");
         abort();
     }
@@ -105,15 +106,8 @@ void bsd_send_sockaddr(int file_descriptor, unsigned char *message, size_t messa
 }
 
 void bsd_close(int file_descriptor) {
-    // close(file_descriptor);
     if (file_descriptor >= 0) {
-        getSO_ERROR(file_descriptor);                   // first clear any errors, which can cause close to fail
-        if (shutdown(file_descriptor, SHUT_RDWR) < 0)   // secondly, terminate the 'reliable' delivery
-            if (errno != ENOTCONN && errno != EINVAL) { // SGI causes EINVAL
-                perror("shutdown");
-                abort();
-            }
-        if (close(file_descriptor) < 0) // finally call close()
+        if (close(file_descriptor) < 0)
         {
             perror("close");
             abort();

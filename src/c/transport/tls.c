@@ -343,7 +343,7 @@ int transport_redial(rasta_transport_channel* channel, rasta_transport_socket *s
 
     socket->receive_event.fd = socket->file_descriptor;
     socket->accept_event.fd = socket->file_descriptor;
-    
+
     return 0;
 }
 
@@ -391,9 +391,9 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
     add_fd_event(h->ev_sys, &socket->accept_event, EV_READABLE);
 }
 
-void transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port) {
+bool transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port) {
     UNUSED(h);
-    tcp_bind_device(socket, ip, port);
+    return tcp_bind_device(socket, ip, port);
 }
 
 void transport_init(struct rasta_handle *h, rasta_transport_channel* channel, unsigned id, const char *host, uint16_t port, const rasta_config_tls *tls_config) {

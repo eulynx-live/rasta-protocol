@@ -29,8 +29,8 @@ void log_main_loop_state(struct rasta_handle *h, event_system *ev_sys, const cha
                message, fd_event_active_count, fd_event_count, timed_event_active_count, timed_event_count);
 }
 
-void rasta_bind(rasta_lib_configuration_t user_configuration) {
-    redundancy_mux_bind(&user_configuration->h);
+bool rasta_bind(rasta_lib_configuration_t user_configuration) {
+    return redundancy_mux_bind(&user_configuration->h);
 }
 
 void rasta_listen(rasta_lib_configuration_t user_configuration) {
@@ -79,7 +79,7 @@ int rasta_recv(rasta_lib_configuration_t user_configuration, struct rasta_connec
     size_t received_len = (len < elem->length) ? len : elem->length;
 
     if (len < elem->length) {
-        logger_log(connection->logger, LOG_LEVEL_INFO, "RaSTA receive", 
+        logger_log(connection->logger, LOG_LEVEL_INFO, "RaSTA receive",
             "supplied buffer (%ld bytes) is smaller than message length (%d bytes) - received message may be incomplete!", len, elem->length);
     }
 

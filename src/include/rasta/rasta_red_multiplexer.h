@@ -153,7 +153,7 @@ void redundancy_mux_init_config(redundancy_mux *mux, struct logger_t *logger, ra
  * binds all transport sockets of a redundancy layer multiplexer to their respective IP/port
  * @param h the RaSTA handle containing the multiplexer
 */
-void redundancy_mux_bind(struct rasta_handle *h);
+bool redundancy_mux_bind(struct rasta_handle *h);
 
 /**
  * stops the redundancy layer multiplexer and closes all redundancy channels before cleaning up memory
