@@ -47,6 +47,9 @@ jobs:
         make && sudo make install
         cd / && rm -rf /tmp/wolfssl
 
+    - name: Set LD_LIBRARY_PATH
+      run: echo "LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH):/usr/local/lib" >> $GITHUB_ENV
+
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
@@ -66,10 +69,10 @@ jobs:
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_tcp.sh
 
     - name: TLS Test
-      run: cd ${{github.workspace}} && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib ./examples/example_scripts/example_tls.sh
+      run: cd ${{github.workspace}} && ./examples/example_scripts/example_tls.sh
 
     - name: DTLS Test
-      run: cd ${{github.workspace}} && LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib ./examples/example_scripts/example_dtls.sh
+      run: cd ${{github.workspace}} && ./examples/example_scripts/example_dtls.sh
 
     - name: KEX / Opaque Test
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_kex.sh
