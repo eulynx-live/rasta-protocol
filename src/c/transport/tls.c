@@ -141,8 +141,8 @@ void tcp_bind(rasta_transport_socket *transport_socket, uint16_t port) {
     bsd_bind_port(transport_socket->file_descriptor, port);
 }
 
-void tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
-    bsd_bind_device(transport_socket->file_descriptor, port, ip);
+bool tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
+    return bsd_bind_device(transport_socket->file_descriptor, port, ip);
 }
 
 void tcp_listen(rasta_transport_socket *transport_socket) {

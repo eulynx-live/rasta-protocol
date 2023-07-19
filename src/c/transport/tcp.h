@@ -33,7 +33,7 @@ void tcp_listen(rasta_transport_socket *transport_socket);
  * @param ip the IPv4 address of the network interface the socket will listen on.
  * @param port the port the socket will listen on
  */
-void tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port);
+bool tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port);
 
 /**
  * Receive data on the given @p file descriptor and store it in the given buffer.

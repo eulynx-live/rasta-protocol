@@ -76,7 +76,7 @@ void bsd_bind_port(int file_descriptor, uint16_t port) {
     }
 }
 
-void bsd_bind_device(int file_descriptor, uint16_t port, const char *ip) {
+bool bsd_bind_device(int file_descriptor, uint16_t port, const char *ip) {
     struct sockaddr_in local = {0};
 
     local.sin_family = AF_INET;
@@ -86,9 +86,11 @@ void bsd_bind_device(int file_descriptor, uint16_t port, const char *ip) {
     // bind socket to port
     if (bind(file_descriptor, (struct sockaddr *)&local, sizeof(struct sockaddr_in)) < 0) {
         // bind failed
-        perror("could not bind the socket to port");
-        abort();
+        perror("bind");
+        return false;
     }
+
+    return true;
 }
 
 void bsd_send(int file_descriptor, unsigned char *message, size_t message_len, char *host, uint16_t port) {
