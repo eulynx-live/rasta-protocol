@@ -165,7 +165,7 @@ bool processRasta(std::string config_path,
                   std::string rasta_channel1_address, std::string rasta_channel1_port,
                   std::string rasta_channel2_address, std::string rasta_channel2_port,
                   std::string rasta_local_id, std::string rasta_target_id,
-                  std::function<std::thread()> run_thread, bool continuouslyTryToConnect = true) {
+                  std::function<std::thread()> run_thread, bool retry_connect = true) {
 
     unsigned long local_id = std::stoul(rasta_local_id);
     s_remote_id = std::stoul(rasta_target_id);
@@ -224,14 +224,12 @@ bool processRasta(std::string config_path,
                 success = true;
                 processConnection(run_thread);
             }
+            rasta_cleanup(s_rc);
 
             // If the transport layer cannot connect, we don't have a
             // delay between connection attempts without this
             sleep(1);
-
-            rasta_cleanup(s_rc);
-        } while(continuouslyTryToConnect);
-
+        } while(retry_connect && !success);
         return success;
     }
 }
@@ -286,11 +284,7 @@ class RastaService final : public sci::Rasta::Service {
             s_currentServerStream = nullptr;
         }
 
-        if (!success) {
-            return grpc::Status::CANCELLED;
-        }
-
-        return grpc::Status::OK;
+        return success ? grpc::Status::OK : grpc::Status::CANCELLED;
     }
 
   protected:

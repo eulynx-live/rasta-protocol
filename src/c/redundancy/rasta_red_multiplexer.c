@@ -399,7 +399,7 @@ int redundancy_mux_connect_channel(rasta_connection *connection, redundancy_mux 
 void redundancy_mux_close_channel(rasta_redundancy_channel *c) {
     for (unsigned int i = 0; i < c->transport_channel_count; ++i) {
         rasta_transport_channel *channel = &c->transport_channels[i];
-        logger_log(c->mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux remove channel", "closing transport channel %u/%u", i, c->transport_channel_count);
+        logger_log(c->mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux remove channel", "closing transport channel %u/%u", i+1, c->transport_channel_count);
         int channel_fd = channel->file_descriptor;
         transport_close(channel);
         // if we are a TCP/TLS client (and transport_close actually closes the channel), the socket fd also becomes invalid
