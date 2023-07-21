@@ -58,24 +58,6 @@ int bsd_create_socket(int family, int type, int protocol_type) {
     return file_desc;
 }
 
-void bsd_bind_port(int file_descriptor, uint16_t port) {
-    struct sockaddr_in local;
-
-    // set struct to 0s
-    rmemset((char *)&local, 0, sizeof(local));
-
-    local.sin_family = AF_INET;
-    local.sin_port = htons(port);
-    local.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    // bind socket to port
-    if (bind(file_descriptor, (struct sockaddr *)&local, sizeof(local)) < 0) {
-        // bind failed
-        fprintf(stderr, "could not bind the socket to port %d", port);
-        abort();
-    }
-}
-
 bool bsd_bind_device(int file_descriptor, uint16_t port, const char *ip) {
     struct sockaddr_in local = {0};
 

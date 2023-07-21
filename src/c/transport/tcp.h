@@ -15,13 +15,6 @@ typedef struct rasta_transport_channel rasta_transport_channel;
 void tcp_init(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config);
 
 /**
- * Binds a given file descriptor to the given @p port
- * @param file_descriptor the is the file descriptor which will be bound to to the @p port.
- * @param port the port the socket will listen on
- */
-void tcp_bind(rasta_transport_socket *transport_socket, uint16_t port);
-
-/**
  * Prepare to accept connections on the given @p file_descriptor.
  * @param file_descriptor the file descriptor to accept connections from
  */

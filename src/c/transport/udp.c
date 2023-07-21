@@ -29,24 +29,6 @@ static void handle_tls_mode(rasta_transport_socket *transport_socket) {
     }
 }
 
-bool udp_bind(rasta_transport_socket *transport_socket, uint16_t port) {
-    struct sockaddr_in local;
-    rmemset((char *)&local, 0, sizeof(local));
-
-    local.sin_family = AF_INET;
-    local.sin_port = htons(port);
-    local.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    // bind socket to port
-    if (bind(transport_socket->file_descriptor, (struct sockaddr *)&local, sizeof(local)) == -1) {
-        // bind failed
-        perror("bind");
-        return false;
-    }
-    handle_tls_mode(transport_socket);
-    return true;
-}
-
 bool udp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
     struct sockaddr_in local = {0};
 

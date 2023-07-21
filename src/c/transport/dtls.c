@@ -142,25 +142,6 @@ static void handle_tls_mode(rasta_transport_socket *transport_socket) {
     }
 }
 
-bool udp_bind(rasta_transport_socket *transport_socket, uint16_t port) {
-    struct sockaddr_in local;
-
-    // set struct to 0s
-    rmemset((char *)&local, 0, sizeof(local));
-
-    local.sin_family = AF_INET;
-    local.sin_port = htons(port);
-    local.sin_addr.s_addr = htonl(INADDR_ANY);
-    // bind socket to port
-    if (bind(transport_socket->file_descriptor, (struct sockaddr *)&local, sizeof(local)) == -1) {
-        perror("bind");
-        return false;
-    }
-
-    handle_tls_mode(transport_socket);
-    return true;
-}
-
 bool udp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
     struct sockaddr_in local;
 
@@ -323,9 +304,7 @@ void transport_listen(struct rasta_handle *h, rasta_transport_socket *socket) {
 }
 
 bool transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port) {
-    UNUSED(ip);
-    
-    if (!udp_bind(socket, port)) {
+    if (!udp_bind_device(socket, ip, port)) {
         return false;
     }
 
