@@ -192,7 +192,7 @@ void processRasta(std::string config_path,
         memset(&s_rc, 0, sizeof(rasta_lib_configuration_t));
         rasta_lib_init_configuration(s_rc, &config, &logger, &connection, 1);
 
-        if (rasta_bind(s_rc) == false) {
+        if (!rasta_bind(s_rc)) {
             rasta_cleanup(s_rc);
             return;
         }
@@ -210,7 +210,7 @@ void processRasta(std::string config_path,
             memset(&s_rc, 0, sizeof(rasta_lib_configuration_t));
             rasta_lib_init_configuration(s_rc, &config, &logger, &connection, 1);
 
-            if (rasta_bind(s_rc) == false) {
+            if (!rasta_bind(s_rc)) {
                 rasta_cleanup(s_rc);
                 continue;
             }
