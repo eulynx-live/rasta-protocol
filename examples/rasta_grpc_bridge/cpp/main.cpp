@@ -26,6 +26,7 @@
 using namespace std::chrono_literals;
 
 static std::mutex s_busy;
+static std::mutex s_rasta_busy;
 
 #define BUF_SIZE 500
 
@@ -160,11 +161,11 @@ void processConnection(std::function<std::thread()> run_thread) {
     fifo_destroy(&s_message_fifo);
 }
 
-void processRasta(std::string config_path,
+bool processRasta(std::string config_path,
                   std::string rasta_channel1_address, std::string rasta_channel1_port,
                   std::string rasta_channel2_address, std::string rasta_channel2_port,
                   std::string rasta_local_id, std::string rasta_target_id,
-                  std::function<std::thread()> run_thread) {
+                  std::function<std::thread()> run_thread, bool continuouslyTryToConnect = true) {
 
     unsigned long local_id = std::stoul(rasta_local_id);
     s_remote_id = std::stoul(rasta_target_id);
@@ -194,7 +195,7 @@ void processRasta(std::string config_path,
 
         if (!rasta_bind(s_rc)) {
             rasta_cleanup(s_rc);
-            return;
+            return false;
         }
 
         rasta_listen(s_rc);
@@ -205,26 +206,33 @@ void processRasta(std::string config_path,
             }
         }
         rasta_cleanup(s_rc);
+
+        return true;
     } else {
-        while (true) {
+        bool success = false;
+        do {
             memset(&s_rc, 0, sizeof(rasta_lib_configuration_t));
             rasta_lib_init_configuration(s_rc, &config, &logger, &connection, 1);
 
             if (!rasta_bind(s_rc)) {
                 rasta_cleanup(s_rc);
-                continue;
+                return false;
             }
 
             s_connection = rasta_connect(s_rc, s_remote_id);
             if (s_connection) {
+                success = true;
                 processConnection(run_thread);
             }
+
             // If the transport layer cannot connect, we don't have a
             // delay between connection attempts without this
             sleep(1);
 
             rasta_cleanup(s_rc);
-        }
+        } while(continuouslyTryToConnect);
+
+        return success;
     }
 }
 
@@ -237,6 +245,8 @@ class RastaService final : public sci::Rasta::Service {
         : _config(config), _rasta_channel1_address(rasta_channel1_address), _rasta_channel1_port(rasta_channel1_port), _rasta_channel2_address(rasta_channel2_address), _rasta_channel2_port(rasta_channel2_port), _rasta_local_id(rasta_local_id), _rasta_target_id(rasta_target_id) {}
 
     grpc::Status Stream(grpc::ServerContext *context, grpc::ServerReaderWriter<sci::SciPacket, sci::SciPacket> *stream) override {
+        std::lock_guard<std::mutex> guard(s_rasta_busy);
+
         {
             std::lock_guard<std::mutex> guard(s_busy);
             s_currentServerContext = context;
@@ -268,12 +278,16 @@ class RastaService final : public sci::Rasta::Service {
             });
         };
 
-        processRasta(_config, _rasta_channel1_address, _rasta_channel1_port, _rasta_channel2_address, _rasta_channel2_port, _rasta_local_id, _rasta_target_id, forwardGrpc);
+        bool success = processRasta(_config, _rasta_channel1_address, _rasta_channel1_port, _rasta_channel2_address, _rasta_channel2_port, _rasta_local_id, _rasta_target_id, forwardGrpc, false);
 
         {
             std::lock_guard<std::mutex> guard(s_busy);
             s_currentServerContext = nullptr;
             s_currentServerStream = nullptr;
+        }
+
+        if (!success) {
+            return grpc::Status::CANCELLED;
         }
 
         return grpc::Status::OK;
