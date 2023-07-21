@@ -69,7 +69,7 @@ typedef struct
 /**
  * initialize the event handling channel timeouts and the corresponding carry data
  * @param event the event to initialize
- * @param mux the redundancy_mux that will contain channels
+ * @param channel_timeout_ms the timeout (in ms) to initialize the event with
  */
 void init_handshake_timeout_event(timed_event *event, int channel_timeout_ms);
 
@@ -143,19 +143,17 @@ redundancy_mux redundancy_mux_init(struct logger_t *logger, uint16_t *listen_por
 
 /**
  * initializes an redundancy layer multiplexer. The ports and interfaces to listen on are read from the config.
+ * @param mux the redundancy layer multiplexer to initialize
  * @param logger the logger that is used to log information
  * @param config configuration for redundancy channels
- * @return an initialized redundancy layer multiplexer
  */
 void redundancy_mux_init_config(redundancy_mux *mux, struct logger_t *logger, rasta_config_info *config);
 
-void redundancy_mux_bind(struct rasta_handle *h);
-
 /**
- * starts the redundancy layer multiplexer and opens (if specified) all redundancy channels
- * @param mux the multiplexer that will be opened
- */
-void redundancy_mux_open(redundancy_mux *mux);
+ * binds all transport sockets of a redundancy layer multiplexer to their respective IP/port
+ * @param h the RaSTA handle containing the multiplexer
+*/
+bool redundancy_mux_bind(struct rasta_handle *h);
 
 /**
  * stops the redundancy layer multiplexer and closes all redundancy channels before cleaning up memory
@@ -171,17 +169,13 @@ void redundancy_mux_close(redundancy_mux *mux);
  */
 rasta_redundancy_channel *redundancy_mux_get_channel(redundancy_mux *mux, unsigned long id);
 
-void redundancy_mux_send(rasta_redundancy_channel *channel, struct RastaPacket *data, rasta_role role);
-
 /**
- * retrieves a message from the queue of the redundancy channel to entity with RaSTA ID @p id.
- * If the queue is empty, this call will block until a message is available.
- * If the id is unknown, this call will block until a redundancy connection to the entity is known
- * @param mux the multiplexer that is used
- * @param id the RaSTA ID of the entity whose message is retrieved
- * @return the oldest (i.e. the PDU that arrived first) SR layer PDU in the receive buffer of the redundacy channel
- */
-int redundancy_try_mux_retrieve(redundancy_mux *mux, unsigned long id, struct RastaPacket *out);
+ * send a RaSTA packet on a given redundancy channel
+ * @param channel the redundancy channel to send on
+ * @param data the packet to send
+ * @param role whether to send as a client or server
+*/
+void redundancy_mux_send(rasta_redundancy_channel *channel, struct RastaPacket *data, rasta_role role);
 
 /**
  * blocks until all notification threads are finished
@@ -196,36 +190,31 @@ void redundancy_mux_wait_for_notifications(redundancy_mux *mux);
  */
 void redundancy_mux_wait_for_entity(redundancy_mux *mux, unsigned long id);
 
-void redundancy_mux_listen_channels(struct rasta_handle *h, redundancy_mux *mux, rasta_config_tls *tls_config);
+/**
+ * listen on all transport sockets of the given multiplexer
+ * @param h the RaSTA handle
+ * @param mux the mux used for listening
+*/
+void redundancy_mux_listen_channels(struct rasta_handle *h, redundancy_mux *mux);
 
 /**
- * adds a new redundancy channel to the multiplexer id and given transport channels.
- * The size of the transport channel array hast to be mux#port_count
- * @param id the RaSTA ID that will identify the new redundancy channel (ID of remote partner)
- * @param mux the multiplexer where the new redundancy channel is added
- * @param transport_channels the transport channels of the new redundancy channel
+ * connects a given redundancy channel on a given connection and multiplexer.
+ * @param h the connection on which to connect the redundancy channel
+ * @param mux the multiplexer to which the redundancy channel belongs
+ * @param channel the redundancy channel to connect
  */
 int redundancy_mux_connect_channel(rasta_connection *h, redundancy_mux *mux, rasta_redundancy_channel *channel);
 
 /**
- * removes an existing redundancy channel from the multiplexer if the channels exists. If the channel with the given
- * ID does not exist in the mux, nothing happens
- * @param mux the multiplexer where the new redundancy channel is removed
- * @param channel_id the RaSTA ID that identifies the redundancy channel (ID of remote partner)
+ * close an existing redundancy channel by closing all its transport channels
+ * @param c the RaSTA redundancy channel to close
  */
 void redundancy_mux_close_channel(rasta_redundancy_channel *c);
 
-/**
- * block until a PDU is available in any of the connected redundancy channels
- * @param mux the multiplexer that is used
- * @return a packet that was received in any of the connected redundancy channels
- */
-int redundancy_mux_try_retrieve_all(redundancy_mux *mux, struct RastaPacket *out);
-
+// handlers
 int receive_packet(redundancy_mux *mux, rasta_transport_channel *channel, unsigned char *buffer, size_t len);
-int handle_closed_transport(rasta_connection *h, rasta_redundancy_channel *channel);
-
 void handle_received_data(redundancy_mux *mux, unsigned char *buffer, ssize_t len, struct RastaRedundancyPacket *receivedPacket);
+int handle_closed_transport(rasta_connection *h, rasta_redundancy_channel *channel);
 
 #ifdef __cplusplus
 }

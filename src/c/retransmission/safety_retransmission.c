@@ -363,7 +363,7 @@ unsigned int sr_recv_queue_item_count(struct rasta_connection *connection) {
 }
 
 void sr_listen(struct rasta_handle *h) {
-    redundancy_mux_listen_channels(h, &h->mux, &h->config->tls);
+    redundancy_mux_listen_channels(h, &h->mux);
 }
 
 int sr_send(struct rasta_handle *h, struct rasta_connection *con, struct RastaMessageData app_messages) {

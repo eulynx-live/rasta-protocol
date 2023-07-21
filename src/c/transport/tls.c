@@ -137,12 +137,8 @@ static void handle_tls_mode_client(rasta_transport_channel *transport_channel) {
     }
 }
 
-void tcp_bind(rasta_transport_socket *transport_socket, uint16_t port) {
-    bsd_bind_port(transport_socket->file_descriptor, port);
-}
-
-void tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
-    bsd_bind_device(transport_socket->file_descriptor, port, ip);
+bool tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
+    return bsd_bind_device(transport_socket->file_descriptor, port, ip);
 }
 
 void tcp_listen(rasta_transport_socket *transport_socket) {
@@ -343,13 +339,14 @@ int transport_redial(rasta_transport_channel* channel, rasta_transport_socket *s
 
     socket->receive_event.fd = socket->file_descriptor;
     socket->accept_event.fd = socket->file_descriptor;
-    
+
     return 0;
 }
 
 void transport_close(rasta_transport_channel *channel) {
     if (channel->connected) {
         bsd_close(channel->file_descriptor);
+        channel->file_descriptor = -1;
         if (channel->ssl) {
             wolfSSL_shutdown(channel->ssl);
             wolfSSL_free(channel->ssl);
@@ -391,9 +388,9 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
     add_fd_event(h->ev_sys, &socket->accept_event, EV_READABLE);
 }
 
-void transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port) {
+bool transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port) {
     UNUSED(h);
-    tcp_bind_device(socket, ip, port);
+    return tcp_bind_device(socket, ip, port);
 }
 
 void transport_init(struct rasta_handle *h, rasta_transport_channel* channel, unsigned id, const char *host, uint16_t port, const rasta_config_tls *tls_config) {

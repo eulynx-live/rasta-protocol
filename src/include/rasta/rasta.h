@@ -22,7 +22,7 @@ void log_main_loop_state(struct rasta_handle *h, event_system *ev_sys, const cha
  * binds a RaSTA instance to the configured IP addresses and ports for the transport channels
  * @param user_configuration the user configuration to be used
  */
-void rasta_bind(rasta_lib_configuration_t user_configuration);
+bool rasta_bind(rasta_lib_configuration_t user_configuration);
 
 /**
  * Listen on all sockets specified by the given RaSTA handle.

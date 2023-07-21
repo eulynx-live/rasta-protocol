@@ -10,10 +10,7 @@ extern "C" { // only need to export C interface if
 
 #define DIAGNOSTIC_INTERVAL_SIZE 500
 
-typedef struct rasta_connection rasta_lib_connection_t[1];
-
 struct user_callbacks {
-
     /**
      * This handler is called in case RaSTA cleanup is called.
      */
@@ -25,6 +22,8 @@ typedef struct rasta_lib_configuration_s {
     event_system rasta_lib_event_system;
     struct user_callbacks callback;
 } rasta_lib_configuration_t[1];
+
+typedef struct rasta_connection rasta_lib_connection_t[1];
 
 void init_send_key_exchange_event(timed_event *ev, struct timed_event_data *carry_data,
                                   struct rasta_connection *connection);

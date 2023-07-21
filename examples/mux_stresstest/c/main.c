@@ -69,8 +69,6 @@ int main(int argc, char *argv[]) {
         redundancy_mux_set_config_id(&mux, SERVER_ID);
 
         printf("Init Client done\n");
-
-        redundancy_mux_open(&mux);
         printf("Connection open\n");
 
         unsigned long current_seq = 0;
@@ -102,8 +100,6 @@ int main(int argc, char *argv[]) {
         mux.notifications.on_new_connection = on_new_connection;
 
         printf("Init Server done\n");
-
-        redundancy_mux_open(&mux);
         printf("Connection open\n");
         printf("Waiting for message from Client 1\n");
 

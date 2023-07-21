@@ -150,13 +150,10 @@ typedef struct rasta_heartbeat_handle {
 
     struct redundancy_mux *mux;
 
-    /**
-     * handle for notification only
-     */
-    // struct rasta_handle *handle;
+    // struct rasta_handle *handle; // handle for notification only
 
     /**
-     * The paramenters that are used for SR checksums
+     * The parameters that are used for SR checksums
      */
     rasta_hashing_context_t *hashing_context;
 } rasta_heartbeat_handle;

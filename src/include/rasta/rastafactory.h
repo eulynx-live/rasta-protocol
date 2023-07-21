@@ -57,14 +57,15 @@ void allocateRastaMessageData(struct RastaMessageData *data, unsigned int count)
 void freeRastaMessageData(struct RastaMessageData *data);
 
 /**
- * Creates aa connection request package
+ * Creates a connection request package
  * @param receiver_id
  * @param sender_id
  * @param initial_sequence_number
  * @param timestamp
  * @param send_max
  * @param version The protocol version. Should be set to "0303"
- * @return
+ * @param hashing_context configuration of the hashing algorithm used by RaSTA
+ * @return the created connection request package
  */
 struct RastaPacket createConnectionRequest(uint32_t receiver_id, uint32_t sender_id, uint32_t initial_sequence_number,
                                            uint32_t timestamp, uint16_t send_max,
@@ -80,7 +81,8 @@ struct RastaPacket createConnectionRequest(uint32_t receiver_id, uint32_t sender
  * @param confirmed_timestamp
  * @param send_max
  * @param version The protocol version. Should be set to "0303"
- * @return
+ * @param hashing_context configuration of the hashing algorithm used by RaSTA
+ * @return the created connection response package
  */
 struct RastaPacket createConnectionResponse(uint32_t receiver_id, uint32_t sender_id, uint32_t initial_sequence_number, uint32_t confirmed_sequence_number,
                                             uint32_t timestamp, uint32_t confirmed_timestamp, uint16_t send_max,
@@ -93,11 +95,11 @@ struct RastaPacket createConnectionResponse(uint32_t receiver_id, uint32_t sende
  * @param confirmed_sequence_number
  * @param timestamp
  * @param confirmed_timestamp
- * @param hashing_context
+ * @param hashing_context configuration of the hashing algorithm used by RaSTA
  * @param psk
  * @param kex_state
  * @param logger
- * @return
+ * @return the created connection request package
  */
 struct RastaPacket createKexRequest(uint32_t receiver_id, uint32_t sender_id, uint32_t sequence_number, uint32_t confirmed_sequence_number,
                                     uint32_t timestamp, uint32_t confirmed_timestamp, rasta_hashing_context_t *hashing_context, const char *psk, struct key_exchange_state *kex_state, struct logger_t *logger);
@@ -152,7 +154,8 @@ struct RastaConnectionData extractRastaConnectionData(struct RastaPacket *p);
  * @param confirmed_sequence_number
  * @param timestamp
  * @param confirmed_timestamp
- * @return
+ * @param hashing_context configuration of the hashing algorithm used by RaSTA
+ * @return the created retransmission request package
  */
 struct RastaPacket createRetransmissionRequest(uint32_t receiver_id, uint32_t sender_id, uint32_t sequence_number, uint32_t confirmed_sequence_number,
                                                uint32_t timestamp, uint32_t confirmed_timestamp, rasta_hashing_context_t *hashing_context);
@@ -165,7 +168,8 @@ struct RastaPacket createRetransmissionRequest(uint32_t receiver_id, uint32_t se
  * @param confirmed_sequence_number
  * @param timestamp
  * @param confirmed_timestamp
- * @return
+ * @param hashing_context configuration of the hashing algorithm used by RaSTA
+ * @return the created retransmission response package
  */
 struct RastaPacket createRetransmissionResponse(uint32_t receiver_id, uint32_t sender_id, uint32_t sequence_number, uint32_t confirmed_sequence_number,
                                                 uint32_t timestamp, uint32_t confirmed_timestamp, rasta_hashing_context_t *hashing_context);
@@ -179,7 +183,8 @@ struct RastaPacket createRetransmissionResponse(uint32_t receiver_id, uint32_t s
  * @param timestamp
  * @param confirmed_timestamp
  * @param data defined in 5.4.6
- * @return
+ * @param hashing_context configuration of the hashing algorithm used by RaSTA
+ * @return the created disconnection request packet
  */
 struct RastaPacket createDisconnectionRequest(uint32_t receiver_id, uint32_t sender_id, uint32_t sequence_number, uint32_t confirmed_sequence_number,
                                               uint32_t timestamp, uint32_t confirmed_timestamp, struct RastaDisconnectionData data, rasta_hashing_context_t *hashing_context);
@@ -199,7 +204,8 @@ struct RastaDisconnectionData extractRastaDisconnectionData(struct RastaPacket *
  * @param confirmed_sequence_number
  * @param timestamp
  * @param confirmed_timestamp
- * @return
+ * @param hashing_context configuration of the hashing algorithm used by RaSTA
+ * @return the created heartbeat package
  */
 struct RastaPacket createHeartbeat(uint32_t receiver_id, uint32_t sender_id, uint32_t sequence_number, uint32_t confirmed_sequence_number,
                                    uint32_t timestamp, uint32_t confirmed_timestamp, rasta_hashing_context_t *hashing_context);
@@ -213,7 +219,8 @@ struct RastaPacket createHeartbeat(uint32_t receiver_id, uint32_t sender_id, uin
  * @param timestamp
  * @param confirmed_timestamp
  * @param data
- * @return
+ * @param hashing_context configuration of the hashing algorithm used by RaSTA
+ * @return the created data message packet
  */
 struct RastaPacket createDataMessage(uint32_t receiver_id, uint32_t sender_id, uint32_t sequence_number, uint32_t confirmed_sequence_number,
                                      uint32_t timestamp, uint32_t confirmed_timestamp, struct RastaMessageData data, rasta_hashing_context_t *hashing_context);
@@ -227,15 +234,16 @@ struct RastaPacket createDataMessage(uint32_t receiver_id, uint32_t sender_id, u
  * @param timestamp
  * @param confirmed_timestamp
  * @param data
- * @return
+ * @param hashing_context configuration of the hashing algorithm used by RaSTA
+ * @return the created retransmitted data message packet
  */
 struct RastaPacket createRetransmittedDataMessage(uint32_t receiver_id, uint32_t sender_id, uint32_t sequence_number, uint32_t confirmed_sequence_number,
                                                   uint32_t timestamp, uint32_t confirmed_timestamp, struct RastaMessageData data, rasta_hashing_context_t *hashing_context);
 
 /**
  * extracts the additional data for data message and retransmitted data message
- * @param p
- * @return
+ * @param p the received RaSTA packet
+ * @return the extracted message data
  */
 struct RastaMessageData extractMessageData(struct RastaPacket *p);
 
@@ -244,7 +252,7 @@ struct RastaMessageData extractMessageData(struct RastaPacket *p);
  * @param sequence_number the sequence number of the PDU
  * @param inner_data the SR-layer packet that is contained in the PDU
  * @param checksum_type the options for the CRC algorithm that will be used to calculate the checksum
- * @return a RaSTA redundancy layer PDU
+ * @param packet the RaSTA redundancy layer PDU to create
  */
 void createRedundancyPacket(uint32_t sequence_number, struct RastaPacket *inner_data, struct crc_options checksum_type, struct RastaRedundancyPacket *packet);
 

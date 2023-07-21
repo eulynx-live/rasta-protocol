@@ -37,11 +37,6 @@ typedef struct rasta_handle {
     rasta_config_info *config;
 
     /**
-     * versions that this RaSTA entity will accept during the handshake
-     */
-    // struct DictionaryArray accepted_version;
-
-    /**
      * provides access to the redundancy layer
      */
     struct redundancy_mux mux;
@@ -64,9 +59,10 @@ typedef struct rasta_handle {
 
 /**
  * initializes the rasta handle
- * configurates itself with the given config file automatically
+ * configures itself with the given config and logger automatically
  * @param h
- * @param config_file_path
+ * @param config
+ * @param logger
  */
 void rasta_handle_init(struct rasta_handle *h, rasta_config_info *config, struct logger_t *logger);
 

@@ -42,13 +42,14 @@ int bsd_create_socket(int family, int type, int protocol_type) {
     }
 
     // Make socket reusable
-    if (setsockopt(file_desc, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0) {
+    int one = 1;
+    if (setsockopt(file_desc, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(int)) < 0) {
         perror("setsockopt(SO_REUSEADDR) failed");
         abort();
     }
 
 #ifdef SO_REUSEPORT
-    if (setsockopt(file_desc, SOL_SOCKET, SO_REUSEPORT, &(int){1}, sizeof(int)) < 0) {
+    if (setsockopt(file_desc, SOL_SOCKET, SO_REUSEPORT, &one, sizeof(int)) < 0) {
         perror("setsockopt(SO_REUSEPORT) failed");
         abort();
     }
@@ -57,25 +58,7 @@ int bsd_create_socket(int family, int type, int protocol_type) {
     return file_desc;
 }
 
-void bsd_bind_port(int file_descriptor, uint16_t port) {
-    struct sockaddr_in local;
-
-    // set struct to 0s
-    rmemset((char *)&local, 0, sizeof(local));
-
-    local.sin_family = AF_INET;
-    local.sin_port = htons(port);
-    local.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    // bind socket to port
-    if (bind(file_descriptor, (struct sockaddr *)&local, sizeof(local)) < 0) {
-        // bind failed
-        fprintf(stderr, "could not bind the socket to port %d", port);
-        abort();
-    }
-}
-
-void bsd_bind_device(int file_descriptor, uint16_t port, const char *ip) {
+bool bsd_bind_device(int file_descriptor, uint16_t port, const char *ip) {
     struct sockaddr_in local = {0};
 
     local.sin_family = AF_INET;
@@ -85,9 +68,11 @@ void bsd_bind_device(int file_descriptor, uint16_t port, const char *ip) {
     // bind socket to port
     if (bind(file_descriptor, (struct sockaddr *)&local, sizeof(struct sockaddr_in)) < 0) {
         // bind failed
-        perror("could not bind the socket to port");
-        abort();
+        perror("bind");
+        return false;
     }
+
+    return true;
 }
 
 void bsd_send(int file_descriptor, unsigned char *message, size_t message_len, char *host, uint16_t port) {
@@ -105,15 +90,8 @@ void bsd_send_sockaddr(int file_descriptor, unsigned char *message, size_t messa
 }
 
 void bsd_close(int file_descriptor) {
-    // close(file_descriptor);
     if (file_descriptor >= 0) {
-        getSO_ERROR(file_descriptor);                   // first clear any errors, which can cause close to fail
-        if (shutdown(file_descriptor, SHUT_RDWR) < 0)   // secondly, terminate the 'reliable' delivery
-            if (errno != ENOTCONN && errno != EINVAL) { // SGI causes EINVAL
-                perror("shutdown");
-                abort();
-            }
-        if (close(file_descriptor) < 0) // finally call close()
+        if (close(file_descriptor) < 0)
         {
             perror("close");
             abort();

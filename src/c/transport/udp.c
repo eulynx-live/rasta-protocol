@@ -15,16 +15,6 @@
 
 #define MAX_WARNING_LENGTH_BYTES 128
 
-static void handle_port_unavailable(const uint16_t port) {
-    const char *warning_format = "could not bind the socket to port %d";
-    char warning_mbuf[MAX_WARNING_LENGTH_BYTES + 1];
-    snprintf(warning_mbuf, MAX_WARNING_LENGTH_BYTES, warning_format, port);
-
-    // bind failed
-    perror("warning_mbuf");
-    abort();
-}
-
 static void handle_tls_mode(rasta_transport_socket *transport_socket) {
     const rasta_config_tls *tls_config = transport_socket->tls_config;
     switch (tls_config->mode) {
@@ -39,22 +29,7 @@ static void handle_tls_mode(rasta_transport_socket *transport_socket) {
     }
 }
 
-void udp_bind(rasta_transport_socket *transport_socket, uint16_t port) {
-    struct sockaddr_in local;
-    rmemset((char *)&local, 0, sizeof(local));
-
-    local.sin_family = AF_INET;
-    local.sin_port = htons(port);
-    local.sin_addr.s_addr = htonl(INADDR_ANY);
-
-    // bind socket to port
-    if (bind(transport_socket->file_descriptor, (struct sockaddr *)&local, sizeof(local)) == -1) {
-        handle_port_unavailable(port);
-    }
-    handle_tls_mode(transport_socket);
-}
-
-void udp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
+bool udp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
     struct sockaddr_in local = {0};
 
     local.sin_family = AF_INET;
@@ -64,11 +39,12 @@ void udp_bind_device(rasta_transport_socket *transport_socket, const char *ip, u
     // bind socket to port
     if (bind(transport_socket->file_descriptor, (struct sockaddr *)&local, sizeof(struct sockaddr_in)) == -1) {
         // bind failed
-        handle_port_unavailable(port);
-        abort();
+        perror("bind");
+        return false;
     }
 
     handle_tls_mode(transport_socket);
+    return true;
 }
 
 void udp_close(rasta_transport_socket *transport_socket) {
@@ -197,9 +173,9 @@ void transport_listen(struct rasta_handle *h, rasta_transport_socket *socket) {
     enable_fd_event(&socket->receive_event);
 }
 
-void transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port) {
+bool transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port) {
     UNUSED(h);
-    udp_bind_device(socket, ip, port);
+    return udp_bind_device(socket, ip, port);
 }
 
 int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr) {

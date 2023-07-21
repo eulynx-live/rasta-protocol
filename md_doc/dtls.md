@@ -15,5 +15,5 @@ Also, you need to specify the host name of the server certificate.
 The client will validate that the server posesses a certificate that was signed by the given Root CA (and the corresponding private key) and that the hostname matches what was expected, while there is no server-side validation of the client.
 
 ## How to test
-The *example_local_dtls* binary will generate suitable certificates, start a server and connect a client to the server.
+The *rcat_dtls* binary will generate suitable certificates, start a server and connect a client to the server.
 Use the *examples/example_scripts/example_dtls.sh* script to test whether the connection succeeds.

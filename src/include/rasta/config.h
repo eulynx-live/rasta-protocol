@@ -34,10 +34,16 @@ typedef struct rasta_config_sending {
     rasta_hash_algorithm sr_hash_algorithm;
 } rasta_config_sending;
 
+/**
+ * Non-standard extension
+ */
 typedef struct rasta_config_receive {
     unsigned int max_recvqueue_size;
 } rasta_config_receive;
 
+/**
+ * Non-standard extension
+ */
 typedef struct rasta_config_retransmission {
     unsigned int max_retransmission_queue_size;
 } rasta_config_retransmission;
@@ -159,9 +165,18 @@ typedef struct rasta_config_info {
 } rasta_config_info;
 
 typedef struct rasta_connection_config {
+    /**
+     * the RaSTA configuration
+     */
     rasta_config_info *config;
+    /**
+     * the sockets (IP address + port) used by the other connection endpoint 
+     */
     rasta_ip_data *transport_sockets;
     size_t transport_sockets_count;
+    /**
+     * the RaSTA ID of the other connection endpoint
+     */
     unsigned long rasta_id;
 } rasta_connection_config;
 
