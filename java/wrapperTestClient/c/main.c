@@ -98,6 +98,6 @@ int main(int argc, char *argv[]){
     printf("->   Connection request sent to 0x%lX\n", (unsigned long)ID_R);
 
     getchar();
-    sr_cleanup(&h);
+    rasta_cleanup(&h);
 }
 

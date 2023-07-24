@@ -6,7 +6,7 @@
 
 #include <rasta/fifo.h>
 #include <rasta/logging.h>
-#include <rasta/rasta_lib.h>
+#include <rasta/rasta.h>
 #include <rasta/rmemory.h>
 
 #include "configfile.h"
@@ -43,7 +43,7 @@ int send_input_data(void *carry_data) {
                 if (read_len > 0) {
                     rasta_send(data->rc, data->connection, buf, read_len);
                 }
-                sr_disconnect(data->connection);
+                rasta_disconnect(data->connection);
                 return 1;
             }
 
@@ -114,9 +114,9 @@ int main(int argc, char *argv[]) {
             rc->h.config->kex.rekeying_interval_ms = 0;
         }
 
-        rasta_bind(&rc->h);
+        rasta_bind(rc);
 
-        sr_listen(&rc->h);
+        rasta_listen(rc);
 
         struct rasta_connection *c = rasta_accept(rc);
         if (c == NULL) {
@@ -162,9 +162,9 @@ int main(int argc, char *argv[]) {
             rc->h.config->kex.rekeying_interval_ms = 0;
         }
 
-        rasta_bind(&rc->h);
+        rasta_bind(rc);
 
-        struct rasta_connection *c = sr_connect(&rc->h, ID_R);
+        struct rasta_connection *c = rasta_connect(rc, ID_R);
 
         if (c == NULL) {
             printf("->   Failed to connect any channel.\n");
@@ -186,6 +186,6 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    sr_cleanup(&rc->h);
+    rasta_cleanup(rc);
     return 0;
 }

@@ -166,7 +166,7 @@ void scils_cleanup(scils_t *ls);
 
 /**
  * Sends a version request to the specified receiver.
- * @param p the used SCI-LS instance
+ * @param ls the used SCI-LS instance
  * @param receiver the SCI name of the receiver
  * @param estw_version the ESTW version
  * @return 0 if the operation was successful, error code otherwise
@@ -250,6 +250,7 @@ sci_return_code scils_send_brightness_status(scils_t *ls, char *receiver, scils_
 /**
  * Handles received messages from the underlying RaSTA instance.
  * You need to call this function inside RaSTA's onReceiver Notification in order to receive SCI-LS telegrams!
+ * @param ls the SCI-LS instance handle
  * @param message the received RaSTA application message
  */
 void scils_on_rasta_receive(scils_t *ls, rastaApplicationMessage message);

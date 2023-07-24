@@ -4,8 +4,8 @@ C library implementation of the Rail Safe Transport Application (RaSTA) protocol
 
 This implementation of the RaSTA protocol supports Datagram TLS (DTLS), see [TLS HowTo](md_doc/dtls.md). 
 
-The project is built with cmake. 
-It provides different variants of librasta as an output, depending on which transport layer is required:
+The project is built with CMake. 
+It provides different variants of `librasta` as an output, depending on which transport layer is required:
 
 - librasta_udp
 - librasta_tcp
@@ -13,27 +13,21 @@ It provides different variants of librasta as an output, depending on which tran
 - librasta_tls (if `ENABLE_RASTA_TLS` is enabled)
 
 ## Deployment
+
 ### Unit tests
+
 see [CUnit HowTo](md_doc/cunit.md)  
 
 ### How to use the RaSTA library
 
-see [Getting started](md_doc/getting_started.md)  
-
-### Raspberry Pi / ARM architecture
-
-see [Building on Raspberry Pi](md_doc/raspberry_pi.md) 
-
-### Docker
-
-see [Docker HowTo](md_doc/docker.md) 
+see [Getting started](md_doc/getting_started.md)
 
 ## Built With
 
 * [CUnit](http://cunit.sourceforge.net/) - For Unit tests
 * [CppCheck](http://cppcheck.sourceforge.net/) - For static code analysis
 * [Doxygen](http://www.stack.nl/~dimitri/doxygen/) - Documentation generation
-* [CMake](https://cmake.org/)  - Compilation on Raspberry Pi / ARM
+* [CMake](https://cmake.org/)  - Compilation
 
 
 ## Extensions 

@@ -9,6 +9,10 @@ extern "C" { // only need to export C interface if
              // used by C++ source code
 #endif
 
+#define EV_READABLE (1 << 0)
+#define EV_WRITABLE (1 << 1)
+#define EV_EXCEPTIONAL (1 << 2)
+
 // event callback pointer, return 0 to keep the loop running, everything else stops the loop
 typedef int (*event_ptr)(void *h);
 
@@ -48,6 +52,9 @@ struct fd_event_linked_list_s {
     fd_event *last;
 };
 
+/**
+ * an event system contains timed events (firing in a given interval) and fd events (firing when a fd becomes readable/writable/exceptional)
+*/
 typedef struct event_system {
     struct timed_event_linked_list_s timed_events;
     struct fd_event_linked_list_s fd_events;
@@ -56,7 +63,7 @@ typedef struct event_system {
 /**
  * starts an event loop with the given events
  * the events may not be removed while the loop is running, but can be modified
- * @param ev_sys contains all the events the loop should handel.
+ * @param ev_sys contains all the events the loop should handle.
  * Can be modified from the calling thread while running.
  */
 void event_system_start(event_system *ev_sys);
@@ -108,10 +115,6 @@ void add_timed_event(event_system *ev_sys, timed_event *event);
  * @param event the event to add
  */
 void remove_timed_event(event_system *ev_sys, timed_event *event);
-
-#define EV_READABLE (1 << 0)
-#define EV_WRITABLE (1 << 1)
-#define EV_EXCEPTIONAL (1 << 2)
 
 /**
  * Add a fd event to an event system.

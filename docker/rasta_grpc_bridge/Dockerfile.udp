@@ -1,0 +1,10 @@
+# syntax = edrevo/dockerfile-plus
+
+FROM ubuntu:22.04
+
+INCLUDE+ docker/rasta_grpc_bridge/Dockerfile.common
+
+WORKDIR /app
+COPY build/librasta_udp.so build/rasta_grpc_bridge_udp ./
+
+ENTRYPOINT ["/app/rasta_grpc_bridge_udp"]

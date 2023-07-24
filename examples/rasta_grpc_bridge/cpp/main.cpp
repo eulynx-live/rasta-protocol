@@ -7,7 +7,6 @@
 #include <string>
 #include <thread>
 
-#include <sys/eventfd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -16,7 +15,6 @@
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/health_check_service_interface.h>
 
-#include <rasta/rasta_lib.h>
 #include <rasta/rasta.h>
 #include <rasta/rmemory.h>
 
@@ -28,6 +26,7 @@
 using namespace std::chrono_literals;
 
 static std::mutex s_busy;
+static std::mutex s_rasta_busy;
 
 #define BUF_SIZE 500
 
@@ -43,8 +42,8 @@ static uint32_t s_remote_id = 0;
 rasta_connection *s_connection = NULL;
 static rasta_lib_configuration_t s_rc;
 
-static int s_terminator_fd;
-static int s_data_fd;
+static int s_terminator_fd[2] = {-1, -1};
+static int s_data_fd[2] = {-1, -1};
 
 static std::mutex s_fifo_mutex;
 static fifo_t *s_message_fifo;
@@ -53,51 +52,59 @@ void processConnection(std::function<std::thread()> run_thread) {
     s_message_fifo = fifo_init(128);
 
     // Data event
-    s_data_fd = eventfd(0, 0);
+    if (pipe(s_data_fd) < 0){
+        perror("Failed to create pipe");
+        abort();
+    }
     fd_event data_event;
     memset(&data_event, 0, sizeof(fd_event));
     data_event.callback = [](void *) {
         // Invalidate the event
         uint64_t u;
-        ssize_t ignored = read(s_data_fd, &u, sizeof(u));
+        ssize_t ignored = read(s_data_fd[0], &u, sizeof(u));
         UNUSED(ignored);
 
         RastaByteArray *msg = nullptr;
 
-        {
-            std::lock_guard<std::mutex> guard(s_fifo_mutex);
-            msg = reinterpret_cast<RastaByteArray *>(fifo_pop(s_message_fifo));
-        }
+        do {
+            {
+                std::lock_guard<std::mutex> guard(s_fifo_mutex);
+                msg = reinterpret_cast<RastaByteArray *>(fifo_pop(s_message_fifo));
+            }
 
-        if (msg != nullptr) {
-            rasta_send(s_rc, s_connection,  msg->bytes, msg->length);
+            if (msg != nullptr) {
+                rasta_send(s_rc, s_connection,  msg->bytes, msg->length);
 
-            freeRastaByteArray(msg);
-        }
+                freeRastaByteArray(msg);
+            }
+        } while (msg != nullptr);
 
         return 0;
     };
     data_event.carry_data = &s_rc->h;
-    data_event.fd = s_data_fd;
+    data_event.fd = s_data_fd[0];
     enable_fd_event(&data_event);
     add_fd_event(&s_rc->rasta_lib_event_system, &data_event, EV_READABLE);
 
     // Terminator event
-    s_terminator_fd = eventfd(0, 0);
+    if (pipe(s_terminator_fd) < 0){
+        perror("Failed to create pipe");
+        abort();
+    }
     fd_event terminator_event;
     memset(&terminator_event, 0, sizeof(fd_event));
     terminator_event.callback = [](void *carry) {
         // Invalidate the event
         uint64_t u;
-        ssize_t ignored = read(s_terminator_fd, &u, sizeof(u));
+        ssize_t ignored = read(s_terminator_fd[0], &u, sizeof(u));
         UNUSED(ignored);
 
-        rasta_connection *h = reinterpret_cast<rasta_connection *>(carry);
-        sr_disconnect(h);
+        rasta_connection *con = reinterpret_cast<rasta_connection *>(carry);
+        rasta_disconnect(con);
         return 1;
     };
     terminator_event.carry_data = s_connection;
-    terminator_event.fd = s_terminator_fd;
+    terminator_event.fd = s_terminator_fd[0];
     enable_fd_event(&terminator_event);
     add_fd_event(&s_rc->rasta_lib_event_system, &terminator_event, EV_READABLE);
 
@@ -137,23 +144,28 @@ void processConnection(std::function<std::thread()> run_thread) {
 
     forwarderThread.join();
 
-    sr_disconnect(s_connection);
+    rasta_disconnect(s_connection);
     s_connection = NULL;
 
     remove_fd_event(&s_rc->rasta_lib_event_system, &data_event);
     remove_fd_event(&s_rc->rasta_lib_event_system, &terminator_event);
 
-    close(s_data_fd);
-    close(s_terminator_fd);
+    close(s_data_fd[0]);
+    close(s_data_fd[1]);
+    s_data_fd[0] = s_data_fd[1] = -1;
+
+    close(s_terminator_fd[0]);
+    close(s_terminator_fd[1]);
+    s_terminator_fd[0] = s_terminator_fd[1] = -1;
 
     fifo_destroy(&s_message_fifo);
 }
 
-void processRasta(std::string config_path,
+bool processRasta(std::string config_path,
                   std::string rasta_channel1_address, std::string rasta_channel1_port,
                   std::string rasta_channel2_address, std::string rasta_channel2_port,
                   std::string rasta_local_id, std::string rasta_target_id,
-                  std::function<std::thread()> run_thread) {
+                  std::function<std::thread()> run_thread, bool retry_connect = true) {
 
     unsigned long local_id = std::stoul(rasta_local_id);
     s_remote_id = std::stoul(rasta_target_id);
@@ -180,8 +192,13 @@ void processRasta(std::string config_path,
     if (server) {
         memset(&s_rc, 0, sizeof(rasta_lib_configuration_t));
         rasta_lib_init_configuration(s_rc, &config, &logger, &connection, 1);
-        rasta_bind(&s_rc->h);
-        sr_listen(&s_rc->h);
+
+        if (!rasta_bind(s_rc)) {
+            rasta_cleanup(s_rc);
+            return false;
+        }
+
+        rasta_listen(s_rc);
         while (true) {
             s_connection = rasta_accept(s_rc);
             if (s_connection) {
@@ -189,21 +206,31 @@ void processRasta(std::string config_path,
             }
         }
         rasta_cleanup(s_rc);
+
+        return true;
     } else {
-        while (true) {
+        bool success = false;
+        do {
             memset(&s_rc, 0, sizeof(rasta_lib_configuration_t));
             rasta_lib_init_configuration(s_rc, &config, &logger, &connection, 1);
-            rasta_bind(&s_rc->h);
-            s_connection = sr_connect(&s_rc->h, s_remote_id);
+
+            if (!rasta_bind(s_rc)) {
+                rasta_cleanup(s_rc);
+                return false;
+            }
+
+            s_connection = rasta_connect(s_rc, s_remote_id);
             if (s_connection) {
+                success = true;
                 processConnection(run_thread);
             }
+            rasta_cleanup(s_rc);
+
             // If the transport layer cannot connect, we don't have a
             // delay between connection attempts without this
             sleep(1);
-
-            rasta_cleanup(s_rc);
-        }
+        } while(retry_connect && !success);
+        return success;
     }
 }
 
@@ -216,6 +243,8 @@ class RastaService final : public sci::Rasta::Service {
         : _config(config), _rasta_channel1_address(rasta_channel1_address), _rasta_channel1_port(rasta_channel1_port), _rasta_channel2_address(rasta_channel2_address), _rasta_channel2_port(rasta_channel2_port), _rasta_local_id(rasta_local_id), _rasta_target_id(rasta_target_id) {}
 
     grpc::Status Stream(grpc::ServerContext *context, grpc::ServerReaderWriter<sci::SciPacket, sci::SciPacket> *stream) override {
+        std::lock_guard<std::mutex> guard(s_rasta_busy);
+
         {
             std::lock_guard<std::mutex> guard(s_busy);
             s_currentServerContext = context;
@@ -237,17 +266,17 @@ class RastaService final : public sci::Rasta::Service {
                     }
 
                     uint64_t notify_data = 1;
-                    uint64_t ignore = write(s_data_fd, &notify_data, sizeof(uint64_t));
+                    uint64_t ignore = write(s_data_fd[1], &notify_data, sizeof(uint64_t));
                     (void)ignore;
                 }
 
                 uint64_t terminate = 1;
-                uint64_t ignore = write(s_terminator_fd, &terminate, sizeof(uint64_t));
+                uint64_t ignore = write(s_terminator_fd[1], &terminate, sizeof(uint64_t));
                 (void)ignore;
             });
         };
 
-        processRasta(_config, _rasta_channel1_address, _rasta_channel1_port, _rasta_channel2_address, _rasta_channel2_port, _rasta_local_id, _rasta_target_id, forwardGrpc);
+        bool success = processRasta(_config, _rasta_channel1_address, _rasta_channel1_port, _rasta_channel2_address, _rasta_channel2_port, _rasta_local_id, _rasta_target_id, forwardGrpc, false);
 
         {
             std::lock_guard<std::mutex> guard(s_busy);
@@ -255,7 +284,7 @@ class RastaService final : public sci::Rasta::Service {
             s_currentServerStream = nullptr;
         }
 
-        return grpc::Status::OK;
+        return success ? grpc::Status::OK : grpc::Status::CANCELLED;
     }
 
   protected:
@@ -348,7 +377,7 @@ int main(int argc, char *argv[]) {
                     }
 
                     uint64_t notify_data = 1;
-                    uint64_t ignore = write(s_data_fd, &notify_data, sizeof(uint64_t));
+                    uint64_t ignore = write(s_data_fd[1], &notify_data, sizeof(uint64_t));
                     (void)ignore;
                 }
 
@@ -359,7 +388,7 @@ int main(int argc, char *argv[]) {
                 }
 
                 uint64_t terminate = 1;
-                uint64_t ignore = write(s_terminator_fd, &terminate, sizeof(uint64_t));
+                uint64_t ignore = write(s_terminator_fd[1], &terminate, sizeof(uint64_t));
                 (void)ignore;
             });
         };

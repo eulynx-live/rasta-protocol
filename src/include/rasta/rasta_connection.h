@@ -3,9 +3,11 @@
 #include <stdbool.h>
 
 #include "config.h"
+#include "event_system.h"
 #include "logging.h"
 #include "rastafactory.h"
 #include "rastahashing.h"
+#include "rastaredundancy.h"
 #include "rastarole.h"
 
 /**
@@ -148,13 +150,10 @@ typedef struct rasta_heartbeat_handle {
 
     struct redundancy_mux *mux;
 
-    /**
-     * handle for notification only
-     */
-    // struct rasta_handle *handle;
+    // struct rasta_handle *handle; // handle for notification only
 
     /**
-     * The paramenters that are used for SR checksums
+     * The parameters that are used for SR checksums
      */
     rasta_hashing_context_t *hashing_context;
 } rasta_heartbeat_handle;
@@ -219,6 +218,11 @@ typedef struct rasta_connection {
      * the name of the sending message queue
      */
     fifo_t *fifo_send;
+
+    /**
+     * queue for received messages that have not yet been rasta_recv()'d
+    */
+    fifo_t *fifo_receive;
 
     /**
      * the N_SENDMAX of the connection partner,  -1 if not connected

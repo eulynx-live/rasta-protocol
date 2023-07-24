@@ -1,6 +1,9 @@
 #include "scip.h"
 #include "sci.h"
 #include "sci_telegram_factory.h"
+
+#include "../../src/c/retransmission/safety_retransmission.h"
+
 #include <memory.h>
 #include <rasta/rasta.h>
 #include <rasta/rmemory.h>
@@ -29,11 +32,23 @@ sci_return_code send_telegram(scip_t *p, sci_telegram *telegram) {
     allocateRastaMessageData(&messageData, 1);
     messageData.data_array[0] = data;
 
-    sr_send(p->rasta_handle, rastaId, messageData);
+    rasta_connection *connection = NULL;
+    for(size_t i = 0; i < p->rasta_handle->rasta_connections_length; i++){
+        if(p->rasta_handle->rasta_connections[i].remote_id == rastaId){
+            connection = &p->rasta_handle->rasta_connections[i];
+        }
+    }
+
+    if(connection == NULL) {
+        return UNKNOWN_SCI_NAME;
+    }
+
+    sr_send(p->rasta_handle, connection, messageData);
 
     freeRastaMessageData(&messageData);
     return SUCCESS;
 }
+
 scip_t *scip_init(struct rasta_handle *handle, char *sciName) {
     scip_t *scip = rmalloc(sizeof(scip_t));
 

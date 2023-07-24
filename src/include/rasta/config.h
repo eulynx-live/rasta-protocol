@@ -35,6 +35,20 @@ typedef struct rasta_config_sending {
 } rasta_config_sending;
 
 /**
+ * Non-standard extension
+ */
+typedef struct rasta_config_receive {
+    unsigned int max_recvqueue_size;
+} rasta_config_receive;
+
+/**
+ * Non-standard extension
+ */
+typedef struct rasta_config_retransmission {
+    unsigned int max_retransmission_queue_size;
+} rasta_config_retransmission;
+
+/**
  * represents an IP and Port
  */
 typedef struct rasta_ip_data {
@@ -115,12 +129,20 @@ typedef struct rasta_config_info {
     uint32_t initial_sequence_number;
 
     size_t accepted_version_count;
-    char (*accepted_versions)[4];
+    char (*accepted_versions)[5];
 
     /**
      * all values for the sending part
      */
     rasta_config_sending sending;
+    /**
+     * all values for the receive part
+     */
+    rasta_config_receive receive;
+    /**
+     * all values for the retransmission part
+     */
+    rasta_config_retransmission retransmission;
     /**
      * all values for the redundancy part
      */
@@ -143,9 +165,18 @@ typedef struct rasta_config_info {
 } rasta_config_info;
 
 typedef struct rasta_connection_config {
+    /**
+     * the RaSTA configuration
+     */
     rasta_config_info *config;
+    /**
+     * the sockets (IP address + port) used by the other connection endpoint 
+     */
     rasta_ip_data *transport_sockets;
     size_t transport_sockets_count;
+    /**
+     * the RaSTA ID of the other connection endpoint
+     */
     unsigned long rasta_id;
 } rasta_connection_config;
 

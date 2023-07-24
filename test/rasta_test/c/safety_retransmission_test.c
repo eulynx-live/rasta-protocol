@@ -39,6 +39,10 @@ void test_sr_retransmit_data_shouldSendFinalHeartbeat() {
     configInfoRedundancy.n_deferqueue_size = 2;
     info.redundancy = configInfoRedundancy;
 
+    rasta_config_retransmission configRetransmission;
+    configRetransmission.max_retransmission_queue_size = 100;
+    info.retransmission = configRetransmission;
+
     uint16_t listenPorts[1] = {1234};
     redundancy_mux mux = redundancy_mux_init(&logger, listenPorts, 1, &info);
     mux.sr_hashing_context.hash_length = RASTA_CHECKSUM_NONE;
@@ -63,6 +67,7 @@ void test_sr_retransmit_data_shouldSendFinalHeartbeat() {
     connection.remote_id = SERVER_ID;
     connection.fifo_retransmission = fifo_init(0);
     connection.redundancy_channel = &fake_channel;
+    connection.config = &info;
 
     sr_retransmit_data(&connection);
 
@@ -94,6 +99,10 @@ void test_sr_retransmit_data_shouldRetransmitPackage() {
     configInfoRedundancy.n_deferqueue_size = 2;
     info.redundancy = configInfoRedundancy;
 
+    rasta_config_retransmission configRetransmission;
+    configRetransmission.max_retransmission_queue_size = 100;
+    info.retransmission = configRetransmission;
+
     uint16_t listenPorts[1] = {1234};
     redundancy_mux mux = redundancy_mux_init(&logger, listenPorts, 1, &info);
     mux.sr_hashing_context.hash_length = RASTA_CHECKSUM_NONE;
@@ -118,6 +127,7 @@ void test_sr_retransmit_data_shouldRetransmitPackage() {
     connection.remote_id = SERVER_ID;
     connection.fifo_retransmission = fifo_init(1);
     connection.redundancy_channel = &fake_channel;
+    connection.config = &info;
 
     struct RastaMessageData app_messages;
     struct RastaByteArray message;

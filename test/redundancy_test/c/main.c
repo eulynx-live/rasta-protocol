@@ -88,8 +88,6 @@ int main(int argc, char *argv[]) {
         redundancy_mux_add_channel(&mux, SERVER_ID, serverConnection);
 
         printf("Init Client 1 done\n");
-
-        redundancy_mux_open(&mux);
         printf("Connection open\n");
 
         printf("Sending message to server\n");
@@ -118,8 +116,6 @@ int main(int argc, char *argv[]) {
         redundancy_mux_add_channel(&mux, SERVER_ID, serverConnection);
 
         printf("Init Client 2 done\n");
-
-        redundancy_mux_open(&mux);
         printf("Connection open\n");
         printf("Sending a hello message to server\n");
 
@@ -155,8 +151,6 @@ int main(int argc, char *argv[]) {
         mux.notifications.on_new_connection = on_new_connection;
 
         printf("Init Server done\n");
-
-        redundancy_mux_open(&mux);
         printf("Connection open\n");
         printf("Waiting for message from Client 1\n");
 

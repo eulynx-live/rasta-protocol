@@ -83,15 +83,6 @@ configure_file(config/rasta_client1_local_kex.cfg rasta_client1_local_kex.cfg CO
 configure_file(config/rasta_client2_local_kex.cfg rasta_client2_local_kex.cfg COPYONLY)
 endif(BUILD_LOCAL_EXAMPLES)
 
-
-if(BUILD_REMOTE_EXAMPLES)
-# Copy RaSTA configs to build directory
-configure_file(config/rasta_server.cfg rasta_server.cfg COPYONLY)
-configure_file(config/rasta_client1.cfg rasta_client1.cfg COPYONLY)
-configure_file(config/rasta_client2.cfg rasta_client2.cfg COPYONLY)
-
-endif(BUILD_REMOTE_EXAMPLES)
-
 if(BUILD_RASTA_GRPC_BRIDGE)
 add_subdirectory(rasta_grpc_bridge)
 endif(BUILD_RASTA_GRPC_BRIDGE)
@@ -115,30 +106,30 @@ set(SCI_COMMON
 )
 
 # scip_example
-# add_executable(scip_example ${SCI_COMMON} sci/scip/main.c)
-# target_include_directories(scip_example PRIVATE sci/common common/headers)
-# set_target_properties(scip_example PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
-# target_compile_options(scip_example PRIVATE ${DEFAULT_COMPILE_OPTIONS})
-# target_link_libraries(scip_example rasta_udp)
+add_executable(scip_example ${SCI_COMMON} sci/scip/main.c)
+target_include_directories(scip_example PRIVATE sci/common common/headers)
+set_target_properties(scip_example PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
+target_compile_options(scip_example PRIVATE ${DEFAULT_COMPILE_OPTIONS})
+target_link_libraries(scip_example rasta_udp)
 
 # scils_example
-# add_executable(scils_example ${SCI_COMMON} sci/scils/main.c)
-# target_include_directories(scils_example PRIVATE sci/common common/headers)
-# set_target_properties(scils_example PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
-# target_compile_options(scils_example PRIVATE ${DEFAULT_COMPILE_OPTIONS})
-# target_link_libraries(scils_example rasta_udp)
+add_executable(scils_example ${SCI_COMMON} sci/scils/main.c)
+target_include_directories(scils_example PRIVATE sci/common common/headers)
+set_target_properties(scils_example PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
+target_compile_options(scils_example PRIVATE ${DEFAULT_COMPILE_OPTIONS})
+target_link_libraries(scils_example rasta_udp)
 
-# add_executable(sciTest
-#     ${SCI_COMMON}
-#     sci/scitest/headers/registerTests.h
-#     sci/scitest/headers/scilsTests.h
-#     sci/scitest/headers/scipTests.h
-#     sci/scitest/headers/sciTests.h
-#     sci/scitest/c/registerTests.c
-#     sci/scitest/c/scilsTests.c
-#     sci/scitest/c/scipTests.c
-#     sci/scitest/c/sciTests.c)
-# target_include_directories(sciTest PRIVATE sci/common sci/scitest/headers common/headers)
-# target_link_libraries(sciTest rasta_udp PkgConfig::CUnit)
-# target_compile_definitions(sciTest PRIVATE WITH_CMAKE)
-# add_test(NAME test_sciTest COMMAND sciTest)
+add_executable(sciTest
+    ${SCI_COMMON}
+    sci/scitest/headers/registerTests.h
+    sci/scitest/headers/scilsTests.h
+    sci/scitest/headers/scipTests.h
+    sci/scitest/headers/sciTests.h
+    sci/scitest/c/registerTests.c
+    sci/scitest/c/scilsTests.c
+    sci/scitest/c/scipTests.c
+    sci/scitest/c/sciTests.c)
+target_include_directories(sciTest PRIVATE sci/common sci/scitest/headers common/headers)
+target_link_libraries(sciTest rasta_udp PkgConfig::CUnit)
+target_compile_definitions(sciTest PRIVATE WITH_CMAKE)
+add_test(NAME test_sciTest COMMAND sciTest)

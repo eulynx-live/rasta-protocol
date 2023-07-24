@@ -580,6 +580,32 @@ void config_setstd(struct RastaConfig *cfg) {
     }
 
     /*
+     * Receive part
+     */
+
+    entr = config_get(cfg, "RASTA_RECVQUEUE_SIZE");
+    if (entr.type != DICTIONARY_NUMBER || entr.value.number < 0) {
+        // set std
+        cfg->values.receive.max_recvqueue_size = 20;
+    } else {
+        // check valid format
+        cfg->values.receive.max_recvqueue_size = (unsigned int)entr.value.number;
+    }
+
+    /*
+     * Retransmission part
+     */
+
+    entr = config_get(cfg, "RASTA_RETRANSMISSION_QUEUE_SIZE");
+    if (entr.type != DICTIONARY_NUMBER || entr.value.number < 0) {
+        // set std
+        cfg->values.retransmission.max_retransmission_queue_size = 100;
+    } else {
+        // check valid format
+        cfg->values.retransmission.max_retransmission_queue_size = (unsigned int)entr.value.number;
+    }
+
+    /*
      * Redundancy part
      */
 
@@ -983,10 +1009,11 @@ void load_configfile(rasta_config_info *c, struct logger_t *logger, const char *
 
     if (config_accepted_version.type == DICTIONARY_ARRAY) {
         c->accepted_version_count = config_accepted_version.value.array.count;
-        c->accepted_versions = rmalloc(c->accepted_version_count * 4 * sizeof(char));
+        c->accepted_versions = rmalloc(c->accepted_version_count * 5 * sizeof(char));
         for (unsigned int i = 0; i < c->accepted_version_count; ++i) {
             logger_log(logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE_INIT", "Loaded accepted version: %s", config_accepted_version.value.array.data[i].c);
             rmemcpy(c->accepted_versions[i], config_accepted_version.value.array.data[i].c, 4);
+            c->accepted_versions[i][4] = '\0';
         }
     }
 }

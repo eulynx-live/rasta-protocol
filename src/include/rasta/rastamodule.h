@@ -89,21 +89,6 @@ typedef enum {
 int isBigEndian();
 
 /**
- * sets the checksumtype global
- * @param type choose between 8B, 16B or no checksum
- * @param a a part of starting vector
- * @param b b part of starting vector
- * @param c c part of starting vector
- * @param d d part of starting vector
- */
-// void setMD4checksum(rasta_checksum_type type, MD4_u32plus a, MD4_u32plus b, MD4_u32plus c, MD4_u32plus d);
-
-/**
- * function to return the stored md4 type
- * @return
- */
-// rasta_checksum_type getMD4checksumType();
-/**
  * returns the last error from a previously called rasta function
  * note: calling this function will reset the errors to none
  * @return the error
@@ -146,8 +131,8 @@ struct RastaPacket {
      * the length of the packet
      * NOTE: this field should never be set manually. Use the functions in rastafactory to create RastaPackets
      */
-
     unsigned short length;
+    
     /**
      *  the package type
      */
@@ -166,8 +151,10 @@ struct RastaPacket {
     struct RastaByteArray data;
     struct RastaByteArray checksum;
 
-    // 1 if the checksum is correct, 0 if it's not
-    // NOTE: this field is only set, if you use the "bytestoRastaPacket" function
+    /**
+     * 1 if the checksum is correct, 0 if it's not
+     * NOTE: this field is only set, if you use the "bytestoRastaPacket" function
+    */
     int checksum_correct;
 };
 
@@ -210,6 +197,7 @@ struct RastaRedundancyPacket {
 /**
  * Accepts a rasta packet and converts it into an allocated bytearray
  * @param packet the packet
+ * @param hashing_context configuration of the hashing algorithm used by RaSTA
  * @return the bytearray
  */
 struct RastaByteArray rastaModuleToBytes(struct RastaPacket *packet, rasta_hashing_context_t *hashing_context);
@@ -217,6 +205,7 @@ struct RastaByteArray rastaModuleToBytes(struct RastaPacket *packet, rasta_hashi
 /**
  * Accepts a rasta packet and converts it into an allocated bytearray without calculating the safety code
  * @param packet the packet
+ * @param hashing_context configuration of the hashing algorithm used by RaSTA
  * @return the bytearray
  */
 struct RastaByteArray rastaModuleToBytesNoChecksum(struct RastaPacket *packet, rasta_hashing_context_t *hashing_context);
@@ -224,7 +213,8 @@ struct RastaByteArray rastaModuleToBytesNoChecksum(struct RastaPacket *packet, r
 /**
  * Accepts a byte array and converts it into a rasta packet while checking the md4 checksum
  * @param data the data
- * @return if length = 0, the data packet was to short. If checksum_correct=0, the packed should be discarded
+ * @param hashing_context configuration of the hashing algorithm used by RaSTA
+ * @param result the converted rasta packet
  */
 void bytesToRastaPacket(struct RastaByteArray data, rasta_hashing_context_t *hashing_context, struct RastaPacket *result);
 
@@ -242,7 +232,7 @@ struct RastaByteArray rastaRedundancyPacketToBytes(struct RastaRedundancyPacket 
  * @param data the byte array which contains the packet
  * @param checksum_type the options that were used to generate the checksum in the @p data byte array
  * @param hashing_context the hashing parameters that are used for the SR layer hash
- * @return a RaSTA Redundancy layer packet containing all data that was in the @p data byte array
+ * @param packet a RaSTA Redundancy layer packet that will contain all data that was in the @p data byte array
  */
 void bytesToRastaRedundancyPacket(struct RastaByteArray data, struct crc_options checksum_type, rasta_hashing_context_t *hashing_context, struct RastaRedundancyPacket *packet);
 

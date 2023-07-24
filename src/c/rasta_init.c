@@ -1,13 +1,16 @@
-#include <rasta/rasta_lib.h>
+#include <rasta/rasta_init.h>
 
 #include <memory.h>
 #include <stdbool.h>
-#include <rasta/rasta.h>
 #include <rasta/rmemory.h>
 #include "transport/transport.h"
 #include "transport/events.h"
 #include "retransmission/protocol.h"
 #include "retransmission/safety_retransmission.h"
+
+// This is the time that packets are deferred for creating multi-packet messages
+// See section 5.5.10
+#define IO_INTERVAL 10000
 
 void init_connection_timeout_event(timed_event *ev, struct timed_event_data *carry_data,
                                    struct rasta_connection *connection) {
@@ -56,13 +59,17 @@ void init_connection_events(struct rasta_handle *h, struct rasta_connection *con
 #endif
 }
 
-// This is the time that packets are deferred for creating multi-packet messages
-// See section 5.5.10
-#define IO_INTERVAL 10000
+void rasta_socket(rasta_lib_configuration_t user_configuration, rasta_config_info *config, struct logger_t *logger) {
+    struct rasta_handle *handle = &user_configuration->h;
+    rasta_handle_init(handle, config, logger);
+
+    //  register redundancy layer diagnose notification handler
+    handle->mux.notifications.on_diagnostics_available = handle->notifications.on_redundancy_diagnostic_notification;
+}
 
 void rasta_lib_init_configuration(rasta_lib_configuration_t user_configuration, rasta_config_info *config, struct logger_t *logger, rasta_connection_config *connections, size_t connections_length) {
     memset(user_configuration, 0, sizeof(rasta_lib_configuration_t));
-    rasta_socket(&user_configuration->h, config, logger);
+    rasta_socket(user_configuration, config, logger);
     memset(&user_configuration->rasta_lib_event_system, 0, sizeof(user_configuration->rasta_lib_event_system));
     memset(&user_configuration->callback, 0, sizeof(user_configuration->callback));
     user_configuration->h.user_handles = &user_configuration->callback;
@@ -123,23 +130,16 @@ void rasta_lib_init_configuration(rasta_lib_configuration_t user_configuration, 
         connection->receive_handle.hashing_context = &h->mux.sr_hashing_context;
 
         // init retransmission fifo
-        connection->fifo_retransmission = fifo_init(MAX_QUEUE_SIZE);
+        connection->fifo_retransmission = fifo_init(connection->config->retransmission.max_retransmission_queue_size);
 
         // create send queue
         connection->fifo_send = fifo_init(2 * connection->config->sending.max_packet);
+
+        // init receive queue
+        connection->fifo_receive = fifo_init(connection->config->receive.max_recvqueue_size);
 
         init_connection_events(h, connection);
     }
     
     h->rasta_connections_length = connections_length;
-}
-
-void rasta_cleanup(rasta_lib_configuration_t user_configuration) {
-    sr_cleanup(&user_configuration->h);
-    for (unsigned i = 0; i < user_configuration->h.rasta_connections_length; i++) {
-        fifo_destroy(&user_configuration->h.rasta_connections[i].fifo_retransmission);
-        fifo_destroy(&user_configuration->h.rasta_connections[i].fifo_send);
-    }
-    rfree(user_configuration->h.rasta_connections);
-
 }

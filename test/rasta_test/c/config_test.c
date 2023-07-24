@@ -36,6 +36,12 @@ void check_std_config() {
     CU_ASSERT_EQUAL(cfg.values.sending.max_packet, 3);
     CU_ASSERT_EQUAL(cfg.values.sending.diag_window, 5000);
 
+    // check receive
+    CU_ASSERT_EQUAL(cfg.values.receive.max_recvqueue_size, 20);
+
+    // check retransmission
+    CU_ASSERT_EQUAL(cfg.values.retransmission.max_retransmission_queue_size, 100);
+
     // check redundancy
     CU_ASSERT_EQUAL(cfg.values.redundancy.connections.count, 0);
     CU_ASSERT_EQUAL(cfg.values.redundancy.crc_type.width, 0);
@@ -62,6 +68,10 @@ void check_var_config() {
     fprintf(f, "RASTA_MWA = 15\n");
     fprintf(f, "RASTA_MAX_PACKET = 4\n");
     fprintf(f, "RASTA_DIAG_WINDOW = 6000\n");
+
+    fprintf(f, "RASTA_RECVQUEUE_SIZE = 42\n");
+
+    fprintf(f, "RASTA_RETRANSMISSION_QUEUE_SIZE = 50\n");
 
     fprintf(f, "RASTA_REDUNDANCY_CONNECTIONS = {\"192.168.2.1:8000\"; \"83.23.1.2:40\"}\n");
     fprintf(f, "RASTA_CRC_TYPE = TYPE_C\n");
@@ -95,9 +105,14 @@ void check_var_config() {
     CU_ASSERT_EQUAL(cfg.values.sending.max_packet, 4);
     CU_ASSERT_EQUAL(cfg.values.sending.diag_window, 6000);
 
+    // check receive
+    CU_ASSERT_EQUAL(cfg.values.receive.max_recvqueue_size, 42);
+
+    // check retransmission
+    CU_ASSERT_EQUAL(cfg.values.retransmission.max_retransmission_queue_size, 50);
+
     // check redundancy
     CU_ASSERT_EQUAL(cfg.values.redundancy.connections.count, 2);
-
     CU_ASSERT_EQUAL(strcmp(cfg.values.redundancy.connections.data[0].ip, "192.168.2.1"), 0);
     CU_ASSERT_EQUAL(cfg.values.redundancy.connections.data[0].port, 8000);
     CU_ASSERT_EQUAL(strcmp(cfg.values.redundancy.connections.data[1].ip, "83.23.1.2"), 0);

@@ -10,7 +10,6 @@
  * @param data array of the data
  * @param data_length length of data
  * @param key the key for the SipHash function
- * @param key_length the length of the key
  * @param hash_type type of security code (0 means no code, 1 means first 8 bytes, 2 means first 16 bytes)
  * @param result array for the result
  */

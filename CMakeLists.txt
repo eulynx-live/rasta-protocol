@@ -10,7 +10,6 @@ SET(USE_OPENSSL false CACHE BOOL "Use OpenSSL MD4 implementation")
 
 option(BUILD_DOCUMENTATION "Generate documentation" OFF)
 option(BUILD_LOCAL_EXAMPLES "Build the RaSTA/SCI examples the run on localhost" ON)
-option(BUILD_REMOTE_EXAMPLES "Build the RaSTA/SCI examples that communicate in a network" ON)
 option(BUILD_RASTA_GRPC_BRIDGE "Build the RaSTA/gRPC bridge" OFF)
 option(ENABLE_RASTA_TLS "Enable RaSTA over TLS" OFF)
 option(ENABLE_RASTA_OPAQUE "Enable Password-Authenticated Session Key Exchange based on OPAQUE" OFF)
@@ -99,11 +98,14 @@ if(BUILD_DOCUMENTATION)
     set(DOXYGEN_GENERATE_MAN YES)
     set(DOXYGEN_MACRO_EXPANSION YES)
     set(DOXYGEN_HIDE_UNDOC_RELATIONS NO)
+    set(DOXYGEN_PREDEFINED ENABLE_RASTA_TLS ENABLE_RASTA_OPAQUE)
+    set(DOXYGEN_FILE_PATTERNS *.h *.md)
     if(DOXYGEN_FOUND)
         doxygen_add_docs(
             documentation
-            src/rasta/headers
-            src/sci/headers
+            src/include/rasta
+            examples/sci/common
+            examples/common/headers/configfile.h
             README.md
             md_doc/
             ALL

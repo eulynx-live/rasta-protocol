@@ -1,0 +1,11 @@
+# syntax = edrevo/dockerfile-plus
+
+FROM ubuntu:22.04
+
+INCLUDE+ docker/rasta_grpc_bridge/Dockerfile.common
+INCLUDE+ docker/rasta_grpc_bridge/Dockerfile.common.tls
+
+WORKDIR /app
+COPY build/librasta_tls.so build/rasta_grpc_bridge_tls ./
+
+ENTRYPOINT ["/app/rasta_grpc_bridge_tls"]
