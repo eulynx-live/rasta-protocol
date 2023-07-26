@@ -46,6 +46,9 @@ void cunit_register() {
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event", test_transport_create_socket_should_initialize_accept_event);
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event_data", test_transport_create_socket_should_initialize_accept_event_data);
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_add_accept_event_to_event_system", test_transport_create_socket_should_add_accept_event_to_event_system);
+    
+    // Tests for transport_listen
+    CU_add_test(pSuiteMath, "test_transport_listen_should_enable_socket_accept_event", test_transport_listen_should_enable_socket_accept_event);
     #endif
 
     #ifdef TEST_UDP
@@ -53,6 +56,9 @@ void cunit_register() {
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_receive_event", test_transport_create_socket_should_initialize_receive_event);
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_receive_event_data", test_transport_create_socket_should_initialize_receive_event_data);
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_add_receive_event_to_event_system", test_transport_create_socket_should_add_receive_event_to_event_system);
+    
+    // Tests for transport_listen
+    CU_add_test(pSuiteMath, "test_transport_listen_should_enable_socket_receive_event", test_transport_listen_should_enable_socket_receive_event);
     #endif
 
     #ifdef TEST_TLS
@@ -60,13 +66,19 @@ void cunit_register() {
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event", test_transport_create_socket_should_initialize_accept_event);
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event_data", test_transport_create_socket_should_initialize_accept_event_data);
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_add_accept_event_to_event_system", test_transport_create_socket_should_add_accept_event_to_event_system);
+    
+    // Tests for transport_listen
+    CU_add_test(pSuiteMath, "test_transport_listen_should_enable_socket_accept_event", test_transport_listen_should_enable_socket_accept_event);
     #endif
 
     #ifdef TEST_DTLS
     // Tests for transport_create_socket
-    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event", test_transport_create_socket_should_initialize_accept_event);
-    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event_data", test_transport_create_socket_should_initialize_accept_event_data);
-    CU_add_test(pSuiteMath, "test_transport_create_socket_should_add_accept_event_to_event_system", test_transport_create_socket_should_add_accept_event_to_event_system);
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_receive_event", test_transport_create_socket_should_initialize_receive_event);
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_receive_event_data", test_transport_create_socket_should_initialize_receive_event_data);
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_add_receive_event_to_event_system", test_transport_create_socket_should_add_receive_event_to_event_system);
+    
+    // Tests for transport_listen
+    CU_add_test(pSuiteMath, "test_transport_listen_should_enable_socket_receive_event", test_transport_listen_should_enable_socket_receive_event);
     #endif
 }
 
