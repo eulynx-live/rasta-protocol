@@ -37,20 +37,36 @@ void cunit_register() {
     CU_add_test(pSuiteMath, "test_transport_init_should_initialize_receive_event_data", test_transport_init_should_initialize_receive_event_data);
     CU_add_test(pSuiteMath, "test_transport_init_should_add_receive_event_to_event_system", test_transport_init_should_add_receive_event_to_event_system);
 
+    // Tests for transport_create_socket
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_socket", test_transport_create_socket_should_initialize_socket);
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_create_fd", test_transport_create_socket_should_create_fd);
+
     #ifdef TEST_TCP
-    // add TCP tests
+    // Tests for transport_create_socket
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event", test_transport_create_socket_should_initialize_accept_event);
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event_data", test_transport_create_socket_should_initialize_accept_event_data);
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_add_accept_event_to_event_system", test_transport_create_socket_should_add_accept_event_to_event_system);
     #endif
 
     #ifdef TEST_UDP
-    // add UDP tests
+    // Tests for transport_create_socket
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_receive_event", test_transport_create_socket_should_initialize_receive_event);
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_receive_event_data", test_transport_create_socket_should_initialize_receive_event_data);
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_add_receive_event_to_event_system", test_transport_create_socket_should_add_receive_event_to_event_system);
     #endif
 
     #ifdef TEST_TLS
-    // add TLS tests
+    // Tests for transport_create_socket
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event", test_transport_create_socket_should_initialize_accept_event);
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event_data", test_transport_create_socket_should_initialize_accept_event_data);
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_add_accept_event_to_event_system", test_transport_create_socket_should_add_accept_event_to_event_system);
     #endif
 
     #ifdef TEST_DTLS
-    // add DTLS tests
+    // Tests for transport_create_socket
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event", test_transport_create_socket_should_initialize_accept_event);
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event_data", test_transport_create_socket_should_initialize_accept_event_data);
+    CU_add_test(pSuiteMath, "test_transport_create_socket_should_add_accept_event_to_event_system", test_transport_create_socket_should_add_accept_event_to_event_system);
     #endif
 }
 
