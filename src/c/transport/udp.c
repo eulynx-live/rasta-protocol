@@ -120,16 +120,16 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
     udp_init(socket, tls_config);
 
     memset(&socket->receive_event, 0, sizeof(fd_event));
-
     socket->receive_event.callback = channel_receive_event;
     socket->receive_event.carry_data = &socket->receive_event_data;
     socket->receive_event.fd = socket->file_descriptor;
-
+    
+    memset(&socket->receive_event_data, 0, sizeof(struct receive_event_data));
     socket->receive_event_data.h = h;
-    socket->receive_event_data.connection = NULL;
     socket->receive_event_data.socket = socket;
     // Iff channel == NULL the receive event operates in 'UDP/DTLS mode'
     socket->receive_event_data.channel = NULL;
+    socket->receive_event_data.connection = NULL;
 
     add_fd_event(h->ev_sys, &socket->receive_event, EV_READABLE);
 }

@@ -250,21 +250,25 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
     socket->id = id;
     udp_init(socket, tls_config);
 
-    memset(&socket->accept_event, 0, sizeof(fd_event));
+    memset(&socket->receive_event, 0, sizeof(fd_event));
+    socket->receive_event.carry_data = &socket->receive_event_data;
+    socket->receive_event.callback = channel_receive_event;
+    socket->receive_event.fd = socket->file_descriptor;
 
-    socket->accept_event.callback = channel_accept_event;
-    socket->accept_event.carry_data = &socket->accept_event_data;
-    socket->accept_event.fd = socket->file_descriptor;
+    memset(&socket->receive_event_data, 0, sizeof(struct receive_event_data));
+    socket->receive_event_data.socket = socket;
+    socket->receive_event_data.h = h;
+    // Iff channel == NULL the receive event operates in 'UDP/DTLS mode'
+    socket->receive_event_data.channel = NULL;
+    socket->receive_event_data.connection = NULL;
 
-    socket->accept_event_data.event = &socket->accept_event;
-    socket->accept_event_data.socket = socket;
-    socket->accept_event_data.h = h;
-
-    add_fd_event(h->ev_sys, &socket->accept_event, EV_READABLE);
+    add_fd_event(h->ev_sys, &socket->receive_event, EV_READABLE);
 }
 
 int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel, rasta_config_tls tls_config) {
     UNUSED(tls_config);
+
+    enable_fd_event(&socket->receive_event);
 
     channel->tls_mode = socket->tls_mode;
     channel->tls_state = RASTA_TLS_CONNECTION_READY;
@@ -300,26 +304,12 @@ ssize_t receive_callback(struct receive_event_data *data, unsigned char *buffer,
 
 void transport_listen(struct rasta_handle *h, rasta_transport_socket *socket) {
     UNUSED(h);
-    UNUSED(socket);
+    enable_fd_event(&socket->receive_event);
 }
 
 bool transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port) {
-    if (!udp_bind_device(socket, ip, port)) {
-        return false;
-    }
-
-    memset(&socket->receive_event, 0, sizeof(fd_event));
-    socket->receive_event.enabled = 1;
-    socket->receive_event.carry_data = &socket->receive_event_data;
-    socket->receive_event.callback = channel_receive_event;
-    socket->receive_event.fd = socket->file_descriptor;
-
-    memset(&socket->receive_event_data, 0, sizeof(socket->receive_event_data));
-    socket->receive_event_data.socket = socket;
-    socket->receive_event_data.h = h;
-
-    add_fd_event(h->ev_sys, &socket->receive_event, EV_READABLE);
-    return true;
+    UNUSED(h);
+    return udp_bind_device(socket, ip, port);
 }
 
 int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr) {
