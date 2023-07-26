@@ -4,6 +4,22 @@
 // INCLUDE TESTS
 #include "transport_test.h"
 
+#ifdef TEST_TCP
+#include "transport_test_tcp.h"
+#endif
+
+#ifdef TEST_UDP
+#include "transport_test_udp.h"
+#endif
+
+#ifdef TEST_TLS
+#include "transport_test_tls.h"
+#endif
+
+#ifdef TEST_DTLS
+#include "transport_test_dtls.h"
+#endif
+
 int suite_init(void) {
     return 0;
 }
@@ -20,6 +36,22 @@ void cunit_register() {
     CU_add_test(pSuiteMath, "test_transport_init_should_initialize_receive_event", test_transport_init_should_initialize_receive_event);
     CU_add_test(pSuiteMath, "test_transport_init_should_initialize_receive_event_data", test_transport_init_should_initialize_receive_event_data);
     CU_add_test(pSuiteMath, "test_transport_init_should_add_receive_event_to_event_system", test_transport_init_should_add_receive_event_to_event_system);
+
+    #ifdef TEST_TCP
+    // add TCP tests
+    #endif
+
+    #ifdef TEST_UDP
+    // add UDP tests
+    #endif
+
+    #ifdef TEST_TLS
+    // add TLS tests
+    #endif
+
+    #ifdef TEST_DTLS
+    // add DTLS tests
+    #endif
 }
 
 int main() {
