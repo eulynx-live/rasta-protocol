@@ -59,9 +59,11 @@ foreach(RASTA_VARIANT ${RASTA_VARIANTS})
     endif()
     add_executable(rasta_transport_test_${RASTA_VARIANT}
         rasta_transport_test/headers/register_tests.h
+        rasta_transport_test/headers/mock_socket.h
         rasta_transport_test/headers/transport_test.h
         rasta_transport_test/headers/transport_test_${TEST_VARIANT}.h
         rasta_transport_test/c/register_tests.c
+        rasta_transport_test/c/mock_socket.c
         rasta_transport_test/c/transport_test.c
         rasta_transport_test/c/transport_test_${TEST_VARIANT}.c
     )

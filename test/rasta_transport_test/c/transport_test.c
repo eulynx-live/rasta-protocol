@@ -1,4 +1,5 @@
 #include "transport_test.h"
+#include "mock_socket.h"
 #include <CUnit/Basic.h>
 #include "../../src/c/transport/transport.h"
 
@@ -13,13 +14,13 @@ void test_transport_init_should_initialize_channel_props() {
     rasta_transport_channel channel;
 
     // Act
-    transport_init(&h, &channel, 100, "localhost", 4711, NULL);
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, NULL);
 
     // Assert
 
     CU_ASSERT_EQUAL(channel.id, 100);
     CU_ASSERT_EQUAL(channel.remote_port, 4711);
-    CU_ASSERT_STRING_EQUAL(channel.remote_ip_address, "localhost");
+    CU_ASSERT_STRING_EQUAL(channel.remote_ip_address, "127.0.0.1");
 }
 
 void test_transport_init_should_initialize_receive_event() {
@@ -33,7 +34,7 @@ void test_transport_init_should_initialize_receive_event() {
     rasta_transport_channel channel;
 
     // Act
-    transport_init(&h, &channel, 100, "localhost", 4711, NULL);
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, NULL);
 
     // Assert
 
@@ -54,7 +55,7 @@ void test_transport_init_should_initialize_receive_event_data() {
     rasta_transport_channel channel;
 
     // Act
-    transport_init(&h, &channel, 100, "localhost", 4711, NULL);
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, NULL);
 
     // Assert
 
@@ -75,7 +76,7 @@ void test_transport_init_should_add_receive_event_to_event_system() {
     rasta_transport_channel channel;
 
     // Act
-    transport_init(&h, &channel, 100, "localhost", 4711, NULL);
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, NULL);
 
     // Assert
 
@@ -117,5 +118,51 @@ void test_transport_create_socket_should_create_fd() {
     CU_ASSERT(socket.file_descriptor >= 0);
 }
 
-// TODO Test accept/receive event initialization but it's different everywhere??
-// why does DTLS have an accept event, but UDP has a receive event? does that make sense?
+void test_transport_connect_should_set_connected() {
+    // Arrange
+    event_system event_system = {0};
+    struct rasta_handle h;
+    h.ev_sys = &event_system;
+    rasta_handle_init(&h, NULL, NULL);
+
+    rasta_transport_socket socket;
+    rasta_transport_channel channel;
+    rasta_config_tls tls_config = {
+        .mode = TLS_MODE_DISABLED
+    };
+
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 42, &tls_config);
+
+    // Assert
+    CU_ASSERT_FALSE(channel.connected);
+
+    // Act
+    CU_ASSERT_EQUAL(transport_connect(&socket, &channel, tls_config), 0);
+
+    // Assert
+    CU_ASSERT(channel.connected);
+}
+
+void test_transport_connect_should_set_equal_fds() {
+    // Arrange
+    event_system event_system = {0};
+    struct rasta_handle h;
+    h.ev_sys = &event_system;
+    rasta_handle_init(&h, NULL, NULL);
+
+    rasta_transport_socket socket;
+    rasta_transport_channel channel;
+    rasta_config_tls tls_config = {
+        .mode = TLS_MODE_DISABLED
+    };
+
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 42, &tls_config);
+
+    // Act
+    CU_ASSERT_EQUAL(transport_connect(&socket, &channel, tls_config), 0);
+
+    // Assert
+    CU_ASSERT_EQUAL(channel.file_descriptor, socket.file_descriptor);
+}

@@ -35,6 +35,10 @@ void cunit_register() {
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_socket", test_transport_create_socket_should_initialize_socket);
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_create_fd", test_transport_create_socket_should_create_fd);
 
+    // Tests for transport_connect
+    CU_add_test(pSuiteMath, "test_transport_connect_should_set_connected", test_transport_connect_should_set_connected);
+    CU_add_test(pSuiteMath, "test_transport_connect_should_set_equal_fds", test_transport_connect_should_set_equal_fds);
+
     #ifdef TEST_TCP
     // Tests for transport_create_socket
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event", test_transport_create_socket_should_initialize_accept_event);
@@ -43,6 +47,19 @@ void cunit_register() {
     
     // Tests for transport_listen
     CU_add_test(pSuiteMath, "test_transport_listen_should_enable_socket_accept_event", test_transport_listen_should_enable_socket_accept_event);
+    
+    // Tests for transport_connect
+    CU_add_test(pSuiteMath, "test_transport_connect_should_enable_channel_receive_event", test_transport_connect_should_enable_channel_receive_event);
+    
+    // Tests for transport_close
+    CU_add_test(pSuiteMath, "test_transport_close_should_set_unconnected", test_transport_close_should_set_unconnected);
+    CU_add_test(pSuiteMath, "test_transport_close_should_invalidate_fd", test_transport_close_should_invalidate_fd);
+    CU_add_test(pSuiteMath, "test_transport_close_should_disable_channel_receive_event", test_transport_close_should_disable_channel_receive_event);
+    
+    // Tests for transport_redial
+    CU_add_test(pSuiteMath, "test_transport_redial_should_reconnect", test_transport_redial_should_reconnect);
+    CU_add_test(pSuiteMath, "test_transport_redial_should_assign_new_fds", test_transport_redial_should_assign_new_fds);
+    CU_add_test(pSuiteMath, "test_transport_redial_should_update_event_fds", test_transport_redial_should_update_event_fds);
     #endif
 
     #ifdef TEST_UDP
@@ -53,6 +70,9 @@ void cunit_register() {
     
     // Tests for transport_listen
     CU_add_test(pSuiteMath, "test_transport_listen_should_enable_socket_receive_event", test_transport_listen_should_enable_socket_receive_event);
+    
+    // Tests for transport_connect
+    CU_add_test(pSuiteMath, "test_transport_connect_should_enable_socket_receive_event", test_transport_connect_should_enable_socket_receive_event);
     #endif
 }
 

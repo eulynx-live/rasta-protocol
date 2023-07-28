@@ -7,3 +7,6 @@ void test_transport_init_should_add_receive_event_to_event_system();
 
 void test_transport_create_socket_should_initialize_socket();
 void test_transport_create_socket_should_create_fd();
+
+void test_transport_connect_should_set_connected();
+void test_transport_connect_should_set_equal_fds();
