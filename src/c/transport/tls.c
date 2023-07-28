@@ -265,54 +265,56 @@ int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *c
 
     channel->connected = false;
 
-    if (channel->ctx == NULL) {
-        handle_tls_mode_client(channel);
-    }
+    if(channel->tls_config->mode == TLS_MODE_TLS_1_3) {
+        if (channel->ctx == NULL) {
+            handle_tls_mode_client(channel);
+        }
 
-    channel->ssl = wolfSSL_new(channel->ctx);
-    if (!channel->ssl) {
-        const char *error_str = wolfSSL_ERR_reason_error_string(wolfSSL_get_error(channel->ssl, 0));
-        fprintf(stderr, "Error allocating WolfSSL session: %s.\n", error_str);
-        return -1;
-    }
-
-    if (tls_config.tls_hostname[0]) {
-        int ret = wolfSSL_check_domain_name(channel->ssl, tls_config.tls_hostname);
-        if (ret != SSL_SUCCESS) {
-            fprintf(stderr, "Could not add domain name check for domain %s: %d", tls_config.tls_hostname, ret);
+        channel->ssl = wolfSSL_new(channel->ctx);
+        if (!channel->ssl) {
+            const char *error_str = wolfSSL_ERR_reason_error_string(wolfSSL_get_error(channel->ssl, 0));
+            fprintf(stderr, "Error allocating WolfSSL session: %s.\n", error_str);
             return -1;
         }
-    } else {
-        fprintf(stderr, "No TLS hostname specified. Will accept ANY valid TLS certificate. Double-check configuration file.\n");
-    }
-    /* Attach wolfSSL to the socket */
-    if (wolfSSL_set_fd(channel->ssl, channel->file_descriptor) != WOLFSSL_SUCCESS) {
-        fprintf(stderr, "ERROR: Failed to set the file descriptor\n");
-        return -1;
-    }
 
-    /* required for getting random used */
-    wolfSSL_KeepArrays(channel->ssl);
-#ifdef WOLFSSL_SET_TLS13_SECRET_CB_EXISTS
-    /* optional logging for wireshark */
-    char* sslkeylogfile_path = getenv("TLS_SECRET_LOGFILE_PATH");
-    if (sslkeylogfile_path != NULL) {
-        wolfSSL_set_tls13_secret_cb(channel->ssl, Tls13SecretCallback,
-                                    sslkeylogfile_path);
+        if (tls_config.tls_hostname[0]) {
+            int ret = wolfSSL_check_domain_name(channel->ssl, tls_config.tls_hostname);
+            if (ret != SSL_SUCCESS) {
+                fprintf(stderr, "Could not add domain name check for domain %s: %d", tls_config.tls_hostname, ret);
+                return -1;
+            }
+        } else {
+            fprintf(stderr, "No TLS hostname specified. Will accept ANY valid TLS certificate. Double-check configuration file.\n");
+        }
+        /* Attach wolfSSL to the socket */
+        if (wolfSSL_set_fd(channel->ssl, channel->file_descriptor) != WOLFSSL_SUCCESS) {
+            fprintf(stderr, "ERROR: Failed to set the file descriptor\n");
+            return -1;
+        }
+
+        /* required for getting random used */
+        wolfSSL_KeepArrays(channel->ssl);
+    #ifdef WOLFSSL_SET_TLS13_SECRET_CB_EXISTS
+        /* optional logging for wireshark */
+        char* sslkeylogfile_path = getenv("TLS_SECRET_LOGFILE_PATH");
+        if (sslkeylogfile_path != NULL) {
+            wolfSSL_set_tls13_secret_cb(channel->ssl, Tls13SecretCallback,
+                                        sslkeylogfile_path);
+        }
+    #endif
+
+        /* Connect to wolfSSL on the server side */
+        if (wolfSSL_connect(channel->ssl) != WOLFSSL_SUCCESS) {
+            const char *error_str = wolfSSL_ERR_reason_error_string(wolfSSL_get_error(channel->ssl, 0));
+            fprintf(stderr, "ERROR: failed to connect to wolfSSL %s.\n", error_str);
+            return -1;
+        }
+
+        tls_pin_certificate(channel->ssl, tls_config.peer_tls_cert_path);
+
+        wolfSSL_FreeArrays(channel->ssl);
+        set_tls_async(channel->file_descriptor, channel->ssl);
     }
-#endif
-
-    /* Connect to wolfSSL on the server side */
-    if (wolfSSL_connect(channel->ssl) != WOLFSSL_SUCCESS) {
-        const char *error_str = wolfSSL_ERR_reason_error_string(wolfSSL_get_error(channel->ssl, 0));
-        fprintf(stderr, "ERROR: failed to connect to wolfSSL %s.\n", error_str);
-        return -1;
-    }
-
-    tls_pin_certificate(channel->ssl, tls_config.peer_tls_cert_path);
-
-    wolfSSL_FreeArrays(channel->ssl);
-    set_tls_async(channel->file_descriptor, channel->ssl);
 
     channel->receive_event.fd = channel->file_descriptor;
     channel->receive_event_data.channel = channel;
