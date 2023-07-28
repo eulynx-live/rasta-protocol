@@ -5,19 +5,13 @@
 #include "transport_test.h"
 
 #ifdef TEST_TCP
+// TCP and TLS tests
 #include "transport_test_tcp.h"
 #endif
 
 #ifdef TEST_UDP
+// UDP and DTLS tests
 #include "transport_test_udp.h"
-#endif
-
-#ifdef TEST_TLS
-#include "transport_test_tls.h"
-#endif
-
-#ifdef TEST_DTLS
-#include "transport_test_dtls.h"
 #endif
 
 int suite_init(void) {
@@ -52,26 +46,6 @@ void cunit_register() {
     #endif
 
     #ifdef TEST_UDP
-    // Tests for transport_create_socket
-    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_receive_event", test_transport_create_socket_should_initialize_receive_event);
-    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_receive_event_data", test_transport_create_socket_should_initialize_receive_event_data);
-    CU_add_test(pSuiteMath, "test_transport_create_socket_should_add_receive_event_to_event_system", test_transport_create_socket_should_add_receive_event_to_event_system);
-    
-    // Tests for transport_listen
-    CU_add_test(pSuiteMath, "test_transport_listen_should_enable_socket_receive_event", test_transport_listen_should_enable_socket_receive_event);
-    #endif
-
-    #ifdef TEST_TLS
-    // Tests for transport_create_socket
-    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event", test_transport_create_socket_should_initialize_accept_event);
-    CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_accept_event_data", test_transport_create_socket_should_initialize_accept_event_data);
-    CU_add_test(pSuiteMath, "test_transport_create_socket_should_add_accept_event_to_event_system", test_transport_create_socket_should_add_accept_event_to_event_system);
-    
-    // Tests for transport_listen
-    CU_add_test(pSuiteMath, "test_transport_listen_should_enable_socket_accept_event", test_transport_listen_should_enable_socket_accept_event);
-    #endif
-
-    #ifdef TEST_DTLS
     // Tests for transport_create_socket
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_receive_event", test_transport_create_socket_should_initialize_receive_event);
     CU_add_test(pSuiteMath, "test_transport_create_socket_should_initialize_receive_event_data", test_transport_create_socket_should_initialize_receive_event_data);
