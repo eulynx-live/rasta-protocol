@@ -214,8 +214,7 @@ void test_transport_redial_should_reconnect() {
     };
     struct RastaConfigRedundancyConnections connections;
     connections.count = 1;
-    connections.data = malloc(sizeof(rasta_ip_data));
-    connections.data[0] = ip_data;
+    connections.data = &ip_data;
     rasta_config_redundancy red_config;
     red_config.connections = connections;
     rasta_config_info config;
@@ -253,8 +252,7 @@ void test_transport_redial_should_assign_new_fds() {
     };
     struct RastaConfigRedundancyConnections connections;
     connections.count = 1;
-    connections.data = malloc(sizeof(rasta_ip_data));
-    connections.data[0] = ip_data;
+    connections.data = &ip_data;
     rasta_config_redundancy red_config;
     red_config.connections = connections;
     rasta_config_info config;
@@ -293,8 +291,7 @@ void test_transport_redial_should_update_event_fds() {
     };
     struct RastaConfigRedundancyConnections connections;
     connections.count = 1;
-    connections.data = malloc(sizeof(rasta_ip_data));
-    connections.data[0] = ip_data;
+    connections.data = &ip_data;
     rasta_config_redundancy red_config;
     red_config.connections = connections;
     rasta_config_info config;
