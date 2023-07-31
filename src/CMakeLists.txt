@@ -91,6 +91,14 @@ foreach(RASTA_VARIANT ${RASTA_VARIANTS})
 
     set(variant_sources ${sources} c/transport/${RASTA_VARIANT}.c)
 
+    if(RASTA_VARIANT STREQUAL "tcp" OR RASTA_VARIANT STREQUAL "tls")
+        set(variant_sources ${variant_sources} c/transport/tcp_base.c)
+    endif()
+
+    if(RASTA_VARIANT STREQUAL "udp" OR RASTA_VARIANT STREQUAL "dtls")
+        set(variant_sources ${variant_sources} c/transport/udp_base.c)
+    endif()
+
     # TODO: Remove ssl_utils
     if(RASTA_VARIANT STREQUAL "dtls" OR RASTA_VARIANT STREQUAL "tls")
         set(variant_sources ${variant_sources} c/transport/ssl_utils.h c/transport/ssl_utils.c)

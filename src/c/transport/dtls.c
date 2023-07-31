@@ -7,9 +7,9 @@
 #include <string.h> //memset
 #include <unistd.h>
 
+#include "udp.h"
 #include <rasta/bsd_utils.h>
 #include <rasta/rmemory.h>
-#include "udp.h"
 
 #include "ssl_utils.h"
 
@@ -67,7 +67,7 @@ static size_t wolfssl_receive_dtls(rasta_transport_socket *transport_socket, uns
 
     // find the transport channel corresponding to this socket
     find_channel_by_ip_address(data->h, *sender, &red_channel_idx, &transport_channel_idx);
-    if(red_channel_idx != -1 && transport_channel_idx != -1){
+    if (red_channel_idx != -1 && transport_channel_idx != -1) {
         channel = &data->h->mux.redundancy_channels[red_channel_idx].transport_channels[transport_channel_idx];
     }
 
@@ -198,8 +198,7 @@ size_t udp_receive(rasta_transport_socket *transport_socket, unsigned char *rece
         }
 
         return (size_t)recv_len;
-    }
-    else if (transport_socket->tls_mode == TLS_MODE_DTLS_1_2) {
+    } else if (transport_socket->tls_mode == TLS_MODE_DTLS_1_2) {
         return wolfssl_receive_dtls(transport_socket, received_message, max_buffer_len, sender);
     }
     return 0;
@@ -211,8 +210,7 @@ void udp_send(rasta_transport_channel *transport_channel, unsigned char *message
 
         // send the message using the other send function
         udp_send_sockaddr(transport_channel, message, message_len, receiver);
-    }
-    else if (transport_channel->tls_mode == TLS_MODE_DTLS_1_2) {
+    } else if (transport_channel->tls_mode == TLS_MODE_DTLS_1_2) {
         wolfssl_send_dtls(transport_channel, message, message_len, &receiver);
     }
 }
@@ -224,8 +222,7 @@ void udp_send_sockaddr(rasta_transport_channel *transport_channel, unsigned char
             perror("failed to send data");
             abort();
         }
-    }
-    else {
+    } else {
         wolfssl_send_dtls(transport_channel, message, message_len, &receiver);
     }
 }
@@ -243,81 +240,4 @@ void udp_init(rasta_transport_socket *transport_socket, const rasta_config_tls *
         abort();
     }
     transport_socket->file_descriptor = file_desc;
-}
-
-void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *socket, int id, const rasta_config_tls *tls_config) {
-    // init and bind sockets
-    socket->id = id;
-    udp_init(socket, tls_config);
-
-    memset(&socket->receive_event, 0, sizeof(fd_event));
-    socket->receive_event.carry_data = &socket->receive_event_data;
-    socket->receive_event.callback = channel_receive_event;
-    socket->receive_event.fd = socket->file_descriptor;
-
-    memset(&socket->receive_event_data, 0, sizeof(struct receive_event_data));
-    socket->receive_event_data.socket = socket;
-    socket->receive_event_data.h = h;
-    // Iff channel == NULL the receive event operates in 'UDP/DTLS mode'
-    socket->receive_event_data.channel = NULL;
-    socket->receive_event_data.connection = NULL;
-
-    add_fd_event(h->ev_sys, &socket->receive_event, EV_READABLE);
-}
-
-int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel, rasta_config_tls tls_config) {
-    UNUSED(tls_config);
-
-    enable_fd_event(&socket->receive_event);
-
-    channel->tls_mode = socket->tls_mode;
-    channel->tls_state = RASTA_TLS_CONNECTION_READY;
-    channel->ctx = socket->ctx;
-    channel->ssl = socket->ssl;
-    channel->file_descriptor = socket->file_descriptor;
-
-    // We can regard UDP channels as 'always connected' (no re-dial possible)
-    channel->connected = true;
-
-    return 0;
-}
-
-int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *socket) {
-    // We can't reconnect when using DTLS
-    UNUSED(channel); UNUSED(socket);
-    return -1;
-}
-
-void transport_close(rasta_transport_channel *channel) {
-    UNUSED(channel);
-}
-
-void send_callback(redundancy_mux *mux, struct RastaByteArray data_to_send, rasta_transport_channel *channel, unsigned int channel_index) {
-    UNUSED(mux); UNUSED(channel_index);
-    udp_send(channel, data_to_send.bytes, data_to_send.length, channel->remote_ip_address, channel->remote_port);
-}
-
-ssize_t receive_callback(struct receive_event_data *data, unsigned char *buffer, struct sockaddr_in *sender) {
-    return udp_receive(data->socket, buffer, MAX_DEFER_QUEUE_MSG_SIZE, sender);
-}
-
-
-void transport_listen(struct rasta_handle *h, rasta_transport_socket *socket) {
-    UNUSED(h);
-    enable_fd_event(&socket->receive_event);
-}
-
-bool transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port) {
-    UNUSED(h);
-    return udp_bind_device(socket, ip, port);
-}
-
-int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr) {
-    UNUSED(socket);
-    UNUSED(addr);
-    return 0;
-}
-
-void transport_init(struct rasta_handle *h, rasta_transport_channel* channel, unsigned id, const char *host, uint16_t port, const rasta_config_tls *tls_config) {
-    transport_init_base(h, channel, id, host, port, tls_config);
 }
