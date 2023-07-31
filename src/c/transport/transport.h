@@ -64,7 +64,7 @@ typedef struct rasta_transport_channel {
      */
     rasta_redundancy_diagnostics_data diagnostics_data;
 
-    void (*send_callback)(redundancy_mux *mux, struct RastaByteArray data_to_send, struct rasta_transport_channel *channel, unsigned int channel_index);
+    void (*send_callback)(struct RastaByteArray data_to_send, struct rasta_transport_channel *channel);
 } rasta_transport_channel;
 
 typedef struct rasta_transport_socket {
@@ -93,13 +93,13 @@ typedef struct rasta_transport_socket {
 
 } rasta_transport_socket;
 
-void send_callback(redundancy_mux *mux, struct RastaByteArray data_to_send, rasta_transport_channel *channel, unsigned int channel_index);
+void send_callback(struct RastaByteArray data_to_send, rasta_transport_channel *channel);
 ssize_t receive_callback(struct receive_event_data *data, unsigned char *buffer, struct sockaddr_in *sender);
 
 void transport_init(struct rasta_handle *h, rasta_transport_channel *channel, unsigned id, const char *host, uint16_t port, const rasta_config_tls *tls_config);
 void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *socket, int id, const rasta_config_tls *tls_config);
-bool transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port);
-void transport_listen(struct rasta_handle *h, rasta_transport_socket *socket);
+bool transport_bind(rasta_transport_socket *socket, const char *ip, uint16_t port);
+void transport_listen(rasta_transport_socket *socket);
 int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr);
 int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel, rasta_config_tls tls_config);
 int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *socket);

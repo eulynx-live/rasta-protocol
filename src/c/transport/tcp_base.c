@@ -21,13 +21,11 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
     add_fd_event(h->ev_sys, &socket->accept_event, EV_READABLE);
 }
 
-bool transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port) {
-    UNUSED(h);
+bool transport_bind(rasta_transport_socket *socket, const char *ip, uint16_t port) {
     return tcp_bind_device(socket, ip, port);
 }
 
-void transport_listen(struct rasta_handle *h, rasta_transport_socket *socket) {
-    UNUSED(h);
+void transport_listen(rasta_transport_socket *socket) {
     tcp_listen(socket);
     enable_fd_event(&socket->accept_event);
 }
@@ -51,7 +49,7 @@ int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *s
     // bind new socket to the configured ip/port
     rasta_handle *h = socket->accept_event_data.h;
     const rasta_ip_data *ip_data = &h->mux.config->redundancy.connections.data[socket->id];
-    transport_bind(h, socket, ip_data->ip, (uint16_t)ip_data->port);
+    transport_bind(socket, ip_data->ip, (uint16_t)ip_data->port);
 
     if (transport_connect(socket, channel, *channel->tls_config) != 0) {
         return -1;
@@ -79,9 +77,7 @@ void transport_close(rasta_transport_channel *channel) {
     disable_fd_event(&channel->receive_event);
 }
 
-void send_callback(redundancy_mux *mux, struct RastaByteArray data_to_send, rasta_transport_channel *channel, unsigned int channel_index) {
-    UNUSED(mux);
-    UNUSED(channel_index);
+void send_callback(struct RastaByteArray data_to_send, rasta_transport_channel *channel) {
     tcp_send(channel, data_to_send.bytes, data_to_send.length);
 }
 

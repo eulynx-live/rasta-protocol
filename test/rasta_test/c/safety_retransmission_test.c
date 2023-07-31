@@ -5,14 +5,14 @@
 #include <rasta/rastautil.h>
 #include <rasta/rmemory.h>
 
-#include "../../../src/c/transport/transport.h"
 #include "../../../src/c/retransmission/safety_retransmission.h"
+#include "../../../src/c/transport/transport.h"
 
 #define SERVER_ID 0xA
 
-static fifo_t* test_send_fifo = NULL;
+static fifo_t *test_send_fifo = NULL;
 
-void fake_send_callback(redundancy_mux *mux, struct RastaByteArray data_to_send, rasta_transport_channel *channel, unsigned int channel_index) {
+void fake_send_callback(struct RastaByteArray data_to_send, rasta_transport_channel *channel) {
     if (test_send_fifo == NULL) {
         test_send_fifo = fifo_init(128);
     }
@@ -75,7 +75,7 @@ void test_sr_retransmit_data_shouldSendFinalHeartbeat() {
     CU_ASSERT_PTR_NOT_NULL_FATAL(test_send_fifo);
     CU_ASSERT_EQUAL(1, fifo_get_size(test_send_fifo));
 
-    struct RastaByteArray* hb_message = fifo_pop(test_send_fifo);
+    struct RastaByteArray *hb_message = fifo_pop(test_send_fifo);
     CU_ASSERT_EQUAL(36, hb_message->length);
     // 8 bytes retransmission header, 2 bytes offset for message type
     CU_ASSERT_EQUAL(RASTA_TYPE_HB, leShortToHost(hb_message->bytes + 8 + 2));
@@ -160,7 +160,7 @@ void test_sr_retransmit_data_shouldRetransmitPackage() {
     CU_ASSERT_PTR_NOT_NULL_FATAL(test_send_fifo);
     CU_ASSERT_EQUAL(2, fifo_get_size(test_send_fifo));
 
-    struct RastaByteArray* retrdata_message = fifo_pop(test_send_fifo);
+    struct RastaByteArray *retrdata_message = fifo_pop(test_send_fifo);
     CU_ASSERT_PTR_NOT_NULL(retrdata_message);
     CU_ASSERT_EQUAL(8 + 42, retrdata_message->length);
     CU_ASSERT_EQUAL(RASTA_TYPE_RETRDATA, leShortToHost(retrdata_message->bytes + 8 + 2));
@@ -168,7 +168,7 @@ void test_sr_retransmit_data_shouldRetransmitPackage() {
     CU_ASSERT_EQUAL(message.length, leShortToHost(retrdata_message->bytes + 8 + 28));
     CU_ASSERT_EQUAL(0, memcmp(retrdata_message->bytes + 8 + 28 + 2, message.bytes, message.length));
 
-    struct RastaByteArray* hb_message = fifo_pop(test_send_fifo);
+    struct RastaByteArray *hb_message = fifo_pop(test_send_fifo);
     CU_ASSERT_EQUAL(8 + 28, hb_message->length);
     CU_ASSERT_EQUAL(RASTA_TYPE_HB, leShortToHost(hb_message->bytes + 8 + 2));
 

@@ -152,7 +152,7 @@ void redundancy_mux_init_config(redundancy_mux *mux, struct logger_t *logger, ra
 /**
  * binds all transport sockets of a redundancy layer multiplexer to their respective IP/port
  * @param h the RaSTA handle containing the multiplexer
-*/
+ */
 bool redundancy_mux_bind(struct rasta_handle *h);
 
 /**
@@ -174,7 +174,7 @@ rasta_redundancy_channel *redundancy_mux_get_channel(redundancy_mux *mux, unsign
  * @param channel the redundancy channel to send on
  * @param data the packet to send
  * @param role whether to send as a client or server
-*/
+ */
 void redundancy_mux_send(rasta_redundancy_channel *channel, struct RastaPacket *data, rasta_role role);
 
 /**
@@ -192,10 +192,9 @@ void redundancy_mux_wait_for_entity(redundancy_mux *mux, unsigned long id);
 
 /**
  * listen on all transport sockets of the given multiplexer
- * @param h the RaSTA handle
  * @param mux the mux used for listening
-*/
-void redundancy_mux_listen_channels(struct rasta_handle *h, redundancy_mux *mux);
+ */
+void redundancy_mux_listen_channels(redundancy_mux *mux);
 
 /**
  * connects a given redundancy channel on a given connection and multiplexer.

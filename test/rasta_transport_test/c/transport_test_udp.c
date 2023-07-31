@@ -88,7 +88,7 @@ void test_transport_listen_should_enable_socket_receive_event() {
     CU_ASSERT_FALSE(socket.receive_event.enabled);
 
     // Act
-    transport_listen(&h, &socket);
+    transport_listen(&socket);
 
     // Assert
     CU_ASSERT(socket.receive_event.enabled);

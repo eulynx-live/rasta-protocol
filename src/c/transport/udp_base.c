@@ -22,13 +22,11 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
     add_fd_event(h->ev_sys, &socket->receive_event, EV_READABLE);
 }
 
-bool transport_bind(struct rasta_handle *h, rasta_transport_socket *socket, const char *ip, uint16_t port) {
-    UNUSED(h);
+bool transport_bind(rasta_transport_socket *socket, const char *ip, uint16_t port) {
     return udp_bind_device(socket, ip, port);
 }
 
-void transport_listen(struct rasta_handle *h, rasta_transport_socket *socket) {
-    UNUSED(h);
+void transport_listen(rasta_transport_socket *socket) {
     enable_fd_event(&socket->receive_event);
 }
 
@@ -69,9 +67,7 @@ void transport_close(rasta_transport_channel *channel) {
     UNUSED(channel);
 }
 
-void send_callback(redundancy_mux *mux, struct RastaByteArray data_to_send, rasta_transport_channel *channel, unsigned int channel_index) {
-    UNUSED(mux);
-    UNUSED(channel_index);
+void send_callback(struct RastaByteArray data_to_send, rasta_transport_channel *channel) {
     udp_send(channel, data_to_send.bytes, data_to_send.length, channel->remote_ip_address, channel->remote_port);
 }
 
