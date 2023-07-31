@@ -1,7 +1,7 @@
 #include "transport_test_udp.h"
+#include "../../src/c/transport/transport.h"
 #include "mock_socket.h"
 #include <CUnit/Basic.h>
-#include "../../src/c/transport/transport.h"
 
 void test_transport_create_socket_should_initialize_receive_event() {
     // Arrange
@@ -48,7 +48,6 @@ void test_transport_create_socket_should_initialize_receive_event_data() {
     // UDP is "connection-less"
     CU_ASSERT_PTR_NULL(socket.receive_event_data.connection);
     CU_ASSERT_PTR_NULL(socket.receive_event_data.channel);
-
 }
 
 void test_transport_create_socket_should_add_receive_event_to_event_system() {
@@ -105,8 +104,7 @@ void test_transport_connect_should_enable_socket_receive_event() {
     rasta_transport_socket socket;
     rasta_transport_channel channel;
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED
-    };
+        .mode = TLS_MODE_DISABLED};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);

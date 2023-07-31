@@ -1,8 +1,8 @@
 #include "transport_test_tcp.h"
 #include "mock_socket.h"
 
-#include <stdlib.h>
 #include <CUnit/Basic.h>
+#include <stdlib.h>
 
 #include "../../src/c/transport/transport.h"
 
@@ -104,8 +104,7 @@ void test_transport_connect_should_enable_channel_receive_event() {
     rasta_transport_socket socket;
     rasta_transport_channel channel;
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED
-    };
+        .mode = TLS_MODE_DISABLED};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -130,8 +129,7 @@ void test_transport_close_should_set_unconnected() {
     rasta_transport_socket socket;
     rasta_transport_channel channel;
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED
-    };
+        .mode = TLS_MODE_DISABLED};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -157,8 +155,7 @@ void test_transport_close_should_invalidate_fd() {
     rasta_transport_socket socket;
     rasta_transport_channel channel;
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED
-    };
+        .mode = TLS_MODE_DISABLED};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -181,8 +178,7 @@ void test_transport_close_should_disable_channel_receive_event() {
     rasta_transport_socket socket;
     rasta_transport_channel channel;
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED
-    };
+        .mode = TLS_MODE_DISABLED};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -205,13 +201,11 @@ void test_transport_redial_should_reconnect() {
     rasta_transport_socket socket;
     rasta_transport_channel channel;
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED
-    };
+        .mode = TLS_MODE_DISABLED};
 
     rasta_ip_data ip_data = {
         .ip = "127.0.0.1",
-        .port = 4711
-    };
+        .port = 4711};
     struct RastaConfigRedundancyConnections connections;
     connections.count = 1;
     connections.data = &ip_data;
@@ -243,13 +237,11 @@ void test_transport_redial_should_assign_new_fds() {
     rasta_transport_socket socket;
     rasta_transport_channel channel;
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED
-    };
+        .mode = TLS_MODE_DISABLED};
 
     rasta_ip_data ip_data = {
         .ip = "127.0.0.1",
-        .port = 4711
-    };
+        .port = 4711};
     struct RastaConfigRedundancyConnections connections;
     connections.count = 1;
     connections.data = &ip_data;
@@ -282,13 +274,11 @@ void test_transport_redial_should_update_event_fds() {
     rasta_transport_socket socket;
     rasta_transport_channel channel;
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED
-    };
+        .mode = TLS_MODE_DISABLED};
 
     rasta_ip_data ip_data = {
         .ip = "127.0.0.1",
-        .port = 4711
-    };
+        .port = 4711};
     struct RastaConfigRedundancyConnections connections;
     connections.count = 1;
     connections.data = &ip_data;

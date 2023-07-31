@@ -1,7 +1,7 @@
 #include "transport_test.h"
+#include "../../src/c/transport/transport.h"
 #include "mock_socket.h"
 #include <CUnit/Basic.h>
-#include "../../src/c/transport/transport.h"
 
 void test_transport_init_should_initialize_channel_props() {
 
@@ -42,7 +42,6 @@ void test_transport_init_should_initialize_receive_event() {
     CU_ASSERT_EQUAL(channel.receive_event.carry_data, &channel.receive_event_data);
     CU_ASSERT_EQUAL(channel.receive_event.callback, channel_receive_event);
 }
-
 
 void test_transport_init_should_initialize_receive_event_data() {
 
@@ -128,8 +127,7 @@ void test_transport_connect_should_set_connected() {
     rasta_transport_socket socket;
     rasta_transport_channel channel;
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED
-    };
+        .mode = TLS_MODE_DISABLED};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -154,8 +152,7 @@ void test_transport_connect_should_set_equal_fds() {
     rasta_transport_socket socket;
     rasta_transport_channel channel;
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED
-    };
+        .mode = TLS_MODE_DISABLED};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
