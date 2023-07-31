@@ -8,6 +8,7 @@
 #include <string.h> //memset
 #include <unistd.h>
 
+#include "tcp.h"
 #include "transport.h"
 
 #include <wolfssl/options.h>
@@ -91,11 +92,6 @@ static int Tls13SecretCallback(WOLFSSL *ssl, int id, const unsigned char *secret
 }
 #endif
 
-void tcp_init(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config) {
-    transport_socket->tls_config = tls_config;
-    transport_socket->file_descriptor = bsd_create_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-}
-
 static void apply_tls_mode(rasta_transport_socket *transport_socket) {
     const rasta_config_tls *tls_config = transport_socket->tls_config;
     switch (tls_config->mode) {
@@ -135,10 +131,6 @@ static void handle_tls_mode_client(rasta_transport_channel *transport_channel) {
     if (transport_channel->tls_mode == TLS_MODE_TLS_1_3) {
         wolfssl_start_tls_client(transport_channel, transport_channel->tls_config);
     }
-}
-
-bool tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
-    return bsd_bind_device(transport_socket->file_descriptor, port, ip);
 }
 
 void tcp_listen(rasta_transport_socket *transport_socket) {
@@ -185,28 +177,6 @@ int tcp_accept(rasta_transport_socket *socket) {
     return socket_fd;
 }
 
-int tcp_connect(rasta_transport_channel *channel) {
-    struct sockaddr_in server;
-
-    rmemset((char *)&server, 0, sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_port = htons(channel->remote_port);
-
-    // convert host string to usable format
-    if (inet_aton(channel->remote_ip_address, &server.sin_addr) == 0) {
-        fprintf(stderr, "inet_aton() failed\n");
-        abort();
-    }
-
-    if (connect(channel->file_descriptor, (struct sockaddr *)&server, sizeof(server)) < 0) {
-        channel->connected = false;
-        return 1;
-    }
-
-    channel->connected = true;
-    return 0;
-}
-
 ssize_t tcp_receive(rasta_transport_channel *transport_channel, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
     if (transport_channel->tls_mode == TLS_MODE_DISABLED) {
         ssize_t recv_len;
@@ -230,12 +200,12 @@ void tcp_send(rasta_transport_channel *transport_channel, unsigned char *message
     wolfssl_send_tls(transport_channel->ssl, message, message_len);
 }
 
-void tcp_close(rasta_transport_socket *transport_socket) {
-    if (transport_socket->tls_mode != TLS_MODE_DISABLED) {
-        wolfssl_cleanup(transport_socket);
+void tcp_close(rasta_transport_channel *transport_channel) {
+    if (transport_channel->tls_mode != TLS_MODE_DISABLED) {
+        wolfssl_cleanup(transport_channel);
     }
 
-    bsd_close(transport_socket->file_descriptor);
+    bsd_close(transport_channel->file_descriptor);
 }
 
 int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel, rasta_config_tls tls_config) {

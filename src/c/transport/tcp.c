@@ -8,16 +8,8 @@
 #include <string.h> //memset
 #include <unistd.h>
 
+#include "tcp.h"
 #include "transport.h"
-
-void tcp_init(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config) {
-    transport_socket->tls_config = tls_config;
-    transport_socket->file_descriptor = bsd_create_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-}
-
-bool tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
-    return bsd_bind_device(transport_socket->file_descriptor, port, ip);
-}
 
 void tcp_listen(rasta_transport_socket *transport_socket) {
     if (listen(transport_socket->file_descriptor, MAX_PENDING_CONNECTIONS) < 0) {
@@ -37,28 +29,6 @@ int tcp_accept(rasta_transport_socket *transport_socket) {
     }
 
     return socket;
-}
-
-int tcp_connect(rasta_transport_channel *channel) {
-    struct sockaddr_in server;
-
-    rmemset((char *)&server, 0, sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_port = htons(channel->remote_port);
-
-    // convert host string to usable format
-    if (inet_aton(channel->remote_ip_address, &server.sin_addr) == 0) {
-        fprintf(stderr, "inet_aton() failed\n");
-        abort();
-    }
-
-    if (connect(channel->file_descriptor, (struct sockaddr *)&server, sizeof(server)) < 0) {
-        channel->connected = false;
-        return 1;
-    }
-
-    channel->connected = true;
-    return 0;
 }
 
 ssize_t tcp_receive(rasta_transport_channel *transport_channel, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {

@@ -1,4 +1,5 @@
 #include "udp.h"
+#include <stdlib.h>
 
 // this file contains implementations for the transport methods of UDP-based protocols
 
@@ -73,4 +74,37 @@ void send_callback(struct RastaByteArray data_to_send, rasta_transport_channel *
 
 ssize_t receive_callback(struct receive_event_data *data, unsigned char *buffer, struct sockaddr_in *sender) {
     return udp_receive(data->socket, buffer, MAX_DEFER_QUEUE_MSG_SIZE, sender);
+}
+
+bool udp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
+    struct sockaddr_in local = {0};
+
+    local.sin_family = AF_INET;
+    local.sin_port = htons(port);
+    local.sin_addr.s_addr = inet_addr(ip);
+
+    // bind socket to port
+    if (bind(transport_socket->file_descriptor, (struct sockaddr *)&local, sizeof(struct sockaddr_in)) == -1) {
+        // bind failed
+        perror("bind");
+        return false;
+    }
+
+    handle_tls_mode(transport_socket);
+    return true;
+}
+
+void udp_init(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config) {
+    // the file descriptor of the socket
+    int file_desc;
+
+    transport_socket->tls_config = tls_config;
+
+    // create a udp socket
+    if ((file_desc = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
+        // creation failed, exit
+        perror("The udp socket could not be initialized");
+        abort();
+    }
+    transport_socket->file_descriptor = file_desc;
 }

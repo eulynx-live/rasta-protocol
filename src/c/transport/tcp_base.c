@@ -1,5 +1,6 @@
 #include "tcp.h"
 #include <rasta/bsd_utils.h>
+#include <rasta/rmemory.h>
 #include <stdlib.h>
 
 void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *socket, int id, const rasta_config_tls *tls_config) {
@@ -63,15 +64,9 @@ int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *s
 
 void transport_close(rasta_transport_channel *channel) {
     if (channel->connected) {
-        bsd_close(channel->file_descriptor);
+        tcp_close(channel);
         channel->file_descriptor = -1;
         channel->connected = false;
-#ifdef ENABLE_TLS
-        if (channel->ssl) {
-            wolfSSL_shutdown(channel->ssl);
-            wolfSSL_free(channel->ssl);
-        }
-#endif
     }
 
     disable_fd_event(&channel->receive_event);
@@ -86,4 +81,35 @@ ssize_t receive_callback(struct receive_event_data *data, unsigned char *buffer,
     // search for connected_recv_buffer_size
     // TODO: Manage possible remaining data in the receive buffer on next call to rasta_recv
     return tcp_receive(data->channel, buffer, MAX_DEFER_QUEUE_MSG_SIZE, sender);
+}
+
+void tcp_init(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config) {
+    transport_socket->tls_config = tls_config;
+    transport_socket->file_descriptor = bsd_create_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+}
+
+bool tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
+    return bsd_bind_device(transport_socket->file_descriptor, port, ip);
+}
+
+int tcp_connect(rasta_transport_channel *channel) {
+    struct sockaddr_in server;
+
+    rmemset((char *)&server, 0, sizeof(server));
+    server.sin_family = AF_INET;
+    server.sin_port = htons(channel->remote_port);
+
+    // convert host string to usable format
+    if (inet_aton(channel->remote_ip_address, &server.sin_addr) == 0) {
+        fprintf(stderr, "inet_aton() failed\n");
+        abort();
+    }
+
+    if (connect(channel->file_descriptor, (struct sockaddr *)&server, sizeof(server)) < 0) {
+        channel->connected = false;
+        return 1;
+    }
+
+    channel->connected = true;
+    return 0;
 }

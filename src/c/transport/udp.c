@@ -13,9 +13,7 @@
 
 #include "transport.h"
 
-#define MAX_WARNING_LENGTH_BYTES 128
-
-static void handle_tls_mode(rasta_transport_socket *transport_socket) {
+void handle_tls_mode(rasta_transport_socket *transport_socket) {
     const rasta_config_tls *tls_config = transport_socket->tls_config;
     switch (tls_config->mode) {
     case TLS_MODE_DISABLED: {
@@ -29,26 +27,8 @@ static void handle_tls_mode(rasta_transport_socket *transport_socket) {
     }
 }
 
-bool udp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
-    struct sockaddr_in local = {0};
-
-    local.sin_family = AF_INET;
-    local.sin_port = htons(port);
-    local.sin_addr.s_addr = inet_addr(ip);
-
-    // bind socket to port
-    if (bind(transport_socket->file_descriptor, (struct sockaddr *)&local, sizeof(struct sockaddr_in)) == -1) {
-        // bind failed
-        perror("bind");
-        return false;
-    }
-
-    handle_tls_mode(transport_socket);
-    return true;
-}
-
-void udp_close(rasta_transport_socket *transport_socket) {
-    int file_descriptor = transport_socket->file_descriptor;
+void udp_close(rasta_transport_channel *transport_channel) {
+    int file_descriptor = transport_channel->file_descriptor;
     if (file_descriptor >= 0) {
         getSO_ERROR(file_descriptor);                   // first clear any errors, which can cause close to fail
         if (shutdown(file_descriptor, SHUT_RDWR) < 0)   // secondly, terminate the 'reliable' delivery
@@ -97,19 +77,4 @@ void udp_send_sockaddr(rasta_transport_channel *transport_channel, unsigned char
             abort();
         }
     }
-}
-
-void udp_init(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config) {
-    // the file descriptor of the socket
-    int file_desc;
-
-    transport_socket->tls_config = tls_config;
-
-    // create a udp socket
-    if ((file_desc = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
-        // creation failed, exit
-        perror("The udp socket could not be initialized");
-        abort();
-    }
-    transport_socket->file_descriptor = file_desc;
 }

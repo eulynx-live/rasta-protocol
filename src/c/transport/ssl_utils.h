@@ -36,6 +36,6 @@ void wolfssl_send_dtls(rasta_transport_channel *transport_channel, unsigned char
 
 ssize_t wolfssl_receive_tls(WOLFSSL *ssl, unsigned char *received_message, size_t max_buffer_len);
 
-void wolfssl_cleanup(rasta_transport_socket *transport_socket);
+void wolfssl_cleanup(rasta_transport_channel *transport_socket);
 
 void tls_pin_certificate(WOLFSSL *ssl, const char *peer_tls_cert_path);

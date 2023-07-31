@@ -13,8 +13,6 @@
 
 #include "ssl_utils.h"
 
-#define MAX_WARNING_LENGTH_BYTES 128
-
 static void get_client_addr_from_socket(const rasta_transport_socket *transport_socket, struct sockaddr_in *client_addr, socklen_t *addr_len) {
     ssize_t received_bytes;
     char buffer;
@@ -119,7 +117,7 @@ static bool is_dtls_server(const rasta_config_tls *tls_config) {
     return tls_config->cert_path[0] && tls_config->key_path[0];
 }
 
-static void handle_tls_mode(rasta_transport_socket *transport_socket) {
+void handle_tls_mode(rasta_transport_socket *transport_socket) {
     const rasta_config_tls *tls_config = transport_socket->tls_config;
     switch (tls_config->mode) {
     case TLS_MODE_DISABLED: {
@@ -142,32 +140,11 @@ static void handle_tls_mode(rasta_transport_socket *transport_socket) {
     }
 }
 
-bool udp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
-    struct sockaddr_in local;
-
-    // set struct to 0s
-    rmemset((char *)&local, 0, sizeof(local));
-
-    local.sin_family = AF_INET;
-    local.sin_port = htons(port);
-    local.sin_addr.s_addr = inet_addr(ip);
-
-    // bind socket to port
-    if (bind(transport_socket->file_descriptor, (struct sockaddr *)&local, sizeof(struct sockaddr_in)) == -1) {
-        // bind failed
-        perror("bind");
-        return false;
-    }
-
-    handle_tls_mode(transport_socket);
-    return true;
-}
-
-void udp_close(rasta_transport_socket *transport_socket) {
-    int file_descriptor = transport_socket->file_descriptor;
+void udp_close(rasta_transport_channel *transport_channel) {
+    int file_descriptor = transport_channel->file_descriptor;
     if (file_descriptor >= 0) {
-        if (transport_socket->tls_mode != TLS_MODE_DISABLED) {
-            wolfssl_cleanup(transport_socket);
+        if (transport_channel->tls_mode != TLS_MODE_DISABLED) {
+            wolfssl_cleanup(transport_channel);
         }
 
         getSO_ERROR(file_descriptor);                   // first clear any errors, which can cause close to fail
@@ -184,7 +161,6 @@ void udp_close(rasta_transport_socket *transport_socket) {
     }
 }
 
-// TODO: UDP should not be implemented twice. Can we remove the UDP handling here if TLS is disabled? Same for TCP/TLS.
 size_t udp_receive(rasta_transport_socket *transport_socket, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
     if (transport_socket->tls_mode == TLS_MODE_DISABLED) {
         ssize_t recv_len;
@@ -207,7 +183,6 @@ size_t udp_receive(rasta_transport_socket *transport_socket, unsigned char *rece
 void udp_send(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len, char *host, uint16_t port) {
     struct sockaddr_in receiver = host_port_to_sockaddr(host, port);
     if (transport_channel->tls_mode == TLS_MODE_DISABLED) {
-
         // send the message using the other send function
         udp_send_sockaddr(transport_channel, message, message_len, receiver);
     } else if (transport_channel->tls_mode == TLS_MODE_DTLS_1_2) {
@@ -225,19 +200,4 @@ void udp_send_sockaddr(rasta_transport_channel *transport_channel, unsigned char
     } else {
         wolfssl_send_dtls(transport_channel, message, message_len, &receiver);
     }
-}
-
-void udp_init(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config) {
-    // the file descriptor of the socket
-    int file_desc;
-
-    transport_socket->tls_config = tls_config;
-
-    // create a udp socket
-    if ((file_desc = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == -1) {
-        // creation failed, exit
-        perror("The udp socket could not be initialized");
-        abort();
-    }
-    transport_socket->file_descriptor = file_desc;
 }

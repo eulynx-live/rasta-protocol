@@ -278,12 +278,12 @@ ssize_t wolfssl_receive_tls(WOLFSSL *ssl, unsigned char *received_message, size_
     return received_total;
 }
 
-void wolfssl_cleanup(rasta_transport_socket *transport_state) {
-    transport_state->tls_state = RASTA_TLS_CONNECTION_CLOSED;
-    wolfSSL_set_fd(transport_state->ssl, 0);
-    wolfSSL_shutdown(transport_state->ssl);
-    wolfSSL_free(transport_state->ssl);
-    wolfSSL_CTX_free(transport_state->ctx);
+void wolfssl_cleanup(rasta_transport_channel *transport_channel) {
+    transport_channel->tls_state = RASTA_TLS_CONNECTION_CLOSED;
+    wolfSSL_set_fd(transport_channel->ssl, 0);
+    wolfSSL_shutdown(transport_channel->ssl);
+    wolfSSL_free(transport_channel->ssl);
+    wolfSSL_CTX_free(transport_channel->ctx);
 }
 
 #define CHECK_NULL_AND_ASSIGN(type, varname, invocation) \
