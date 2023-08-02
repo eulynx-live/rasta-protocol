@@ -5,8 +5,9 @@
 #include <string.h> //memset
 #include <unistd.h>
 
-#include <rasta/bsd_utils.h>
 #include <rasta/rmemory.h>
+
+#include "bsd_utils.h"
 
 struct sockaddr_in host_port_to_sockaddr(const char *host, uint16_t port) {
     struct sockaddr_in receiver;
@@ -91,8 +92,7 @@ void bsd_send_sockaddr(int file_descriptor, unsigned char *message, size_t messa
 
 void bsd_close(int file_descriptor) {
     if (file_descriptor >= 0) {
-        if (close(file_descriptor) < 0)
-        {
+        if (close(file_descriptor) < 0) {
             perror("close");
             abort();
         }

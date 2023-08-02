@@ -7,11 +7,11 @@
 #include <string.h> //memset
 #include <unistd.h>
 
-#include "udp.h"
-#include <rasta/bsd_utils.h>
 #include <rasta/rmemory.h>
 
+#include "bsd_utils.h"
 #include "ssl_utils.h"
+#include "udp.h"
 
 static void get_client_addr_from_socket(const rasta_transport_socket *transport_socket, struct sockaddr_in *client_addr, socklen_t *addr_len) {
     ssize_t received_bytes;
@@ -118,20 +118,19 @@ static bool is_dtls_server(const rasta_config_tls *tls_config) {
 }
 
 void handle_tls_mode(rasta_transport_socket *transport_socket) {
-    const rasta_config_tls *tls_config = transport_socket->tls_config;
-    switch (tls_config->mode) {
+    switch (transport_socket->tls_config->mode) {
     case TLS_MODE_DISABLED:
         break;
     case TLS_MODE_DTLS_1_2: {
-        if (is_dtls_server(tls_config)) {
-            wolfssl_start_dtls_server(transport_socket, tls_config);
+        if (is_dtls_server(transport_socket->tls_config)) {
+            wolfssl_start_dtls_server(transport_socket, transport_socket->tls_config);
         } else {
-            wolfssl_start_dtls_client(transport_socket, tls_config);
+            wolfssl_start_dtls_client(transport_socket, transport_socket->tls_config);
         }
         break;
     }
     default: {
-        fprintf(stderr, "Unknown or unsupported TLS mode: %u", tls_config->mode);
+        fprintf(stderr, "Unknown or unsupported TLS mode: %u", transport_socket->tls_config->mode);
         abort();
     }
     }

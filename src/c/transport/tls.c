@@ -1,22 +1,22 @@
 #include <arpa/inet.h>
 #include <errno.h>
-#include <rasta/bsd_utils.h>
-#include <rasta/rmemory.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> //memset
 #include <unistd.h>
 
-#include "tcp.h"
-#include "transport.h"
-
 #include <wolfssl/options.h>
 #include <wolfssl/ssl.h>
 #include <wolfssl/wolfcrypt/error-crypt.h>
 #include <wolfssl/wolfio.h>
 
+#include <rasta/rmemory.h>
+
+#include "bsd_utils.h"
 #include "ssl_utils.h"
+#include "tcp.h"
+#include "transport.h"
 
 #ifdef WOLFSSL_SET_TLS13_SECRET_CB_EXISTS
 /* Callback function for TLS v1.3 secrets for use with Wireshark */
@@ -93,9 +93,8 @@ static int Tls13SecretCallback(WOLFSSL *ssl, int id, const unsigned char *secret
 #endif
 
 static void handle_tls_mode_server(rasta_transport_socket *transport_socket) {
-    const rasta_config_tls *tls_config = transport_socket->tls_config;
-    if (tls_config->mode != TLS_MODE_DISABLED && tls_config->mode != TLS_MODE_TLS_1_3) {
-        fprintf(stderr, "Unknown or unsupported TLS mode: %u", tls_config->mode);
+    if (transport_socket->tls_config->mode != TLS_MODE_DISABLED && transport_socket->tls_config->mode != TLS_MODE_TLS_1_3) {
+        fprintf(stderr, "Unknown or unsupported TLS mode: %u", transport_socket->tls_config->mode);
         abort();
     }
     if (transport_socket->tls_config->mode == TLS_MODE_TLS_1_3) {
@@ -104,9 +103,8 @@ static void handle_tls_mode_server(rasta_transport_socket *transport_socket) {
 }
 
 static void handle_tls_mode_client(rasta_transport_channel *transport_channel) {
-    const rasta_config_tls *tls_config = transport_channel->tls_config;
-    if (tls_config->mode != TLS_MODE_DISABLED && tls_config->mode != TLS_MODE_TLS_1_3) {
-        fprintf(stderr, "Unknown or unsupported TLS mode: %u", tls_config->mode);
+    if (transport_channel->tls_config->mode != TLS_MODE_DISABLED && transport_channel->tls_config->mode != TLS_MODE_TLS_1_3) {
+        fprintf(stderr, "Unknown or unsupported TLS mode: %u", transport_channel->tls_config->mode);
         abort();
     }
     if (transport_channel->tls_config->mode == TLS_MODE_TLS_1_3) {

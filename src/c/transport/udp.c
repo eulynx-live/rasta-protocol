@@ -7,11 +7,11 @@
 #include <string.h> //memset
 #include <unistd.h>
 
-#include "udp.h"
-#include <rasta/bsd_utils.h>
 #include <rasta/rmemory.h>
 
+#include "bsd_utils.h"
 #include "transport.h"
+#include "udp.h"
 
 void handle_tls_mode(rasta_transport_socket *transport_socket) {
     const rasta_config_tls *tls_config = transport_socket->tls_config;

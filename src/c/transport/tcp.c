@@ -1,13 +1,14 @@
 #include <arpa/inet.h>
 #include <errno.h>
-#include <rasta/bsd_utils.h>
-#include <rasta/rmemory.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h> //memset
 #include <unistd.h>
 
+#include <rasta/rmemory.h>
+
+#include "bsd_utils.h"
 #include "tcp.h"
 #include "transport.h"
 

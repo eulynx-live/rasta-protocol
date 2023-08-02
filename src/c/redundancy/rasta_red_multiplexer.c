@@ -4,16 +4,17 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "../retransmission/safety_retransmission.h"
-#include "../transport/events.h"
-#include "../transport/transport.h"
-#include <rasta/bsd_utils.h>
 #include <rasta/event_system.h>
 #include <rasta/rasta_red_multiplexer.h>
 #include <rasta/rastahandle.h>
 #include <rasta/rastaredundancy.h>
 #include <rasta/rastautil.h>
 #include <rasta/rmemory.h>
+
+#include "../retransmission/safety_retransmission.h"
+#include "../transport/bsd_utils.h"
+#include "../transport/events.h"
+#include "../transport/transport.h"
 
 /* --- Notifications --- */
 
@@ -252,6 +253,7 @@ void redundancy_mux_close(redundancy_mux *mux) {
     for (unsigned int i = 0; i < mux->port_count; ++i) {
         if (mux->transport_sockets[i].file_descriptor != -1) {
             logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux close", "closing socket %d/%d", i + 1, mux->port_count);
+            // TODO: replace this by transport_close_socket
             bsd_close(mux->transport_sockets[i].file_descriptor);
         }
     }
