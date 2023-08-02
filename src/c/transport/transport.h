@@ -39,8 +39,6 @@ typedef struct rasta_transport_channel {
      */
     char remote_ip_address[INET_ADDRSTRLEN];
 
-    rasta_tls_mode tls_mode;
-
     const rasta_config_tls *tls_config;
 
     /**
@@ -80,8 +78,6 @@ typedef struct rasta_transport_socket {
     fd_event receive_event;
 
     struct receive_event_data receive_event_data;
-
-    rasta_tls_mode tls_mode;
 
     const rasta_config_tls *tls_config;
 

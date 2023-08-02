@@ -84,7 +84,7 @@ static size_t wolfssl_receive_dtls(rasta_transport_socket *transport_socket, uns
         // propagate our TLS config to the channel
         if (channel != NULL) {
             channel->tls_state = transport_socket->tls_state;
-            channel->tls_mode = transport_socket->tls_mode;
+            channel->tls_config = transport_socket->tls_config;
             channel->ssl = transport_socket->ssl;
         }
         return 0;
@@ -120,12 +120,9 @@ static bool is_dtls_server(const rasta_config_tls *tls_config) {
 void handle_tls_mode(rasta_transport_socket *transport_socket) {
     const rasta_config_tls *tls_config = transport_socket->tls_config;
     switch (tls_config->mode) {
-    case TLS_MODE_DISABLED: {
-        transport_socket->tls_mode = TLS_MODE_DISABLED;
+    case TLS_MODE_DISABLED:
         break;
-    }
     case TLS_MODE_DTLS_1_2: {
-        transport_socket->tls_mode = TLS_MODE_DTLS_1_2;
         if (is_dtls_server(tls_config)) {
             wolfssl_start_dtls_server(transport_socket, tls_config);
         } else {
@@ -143,7 +140,7 @@ void handle_tls_mode(rasta_transport_socket *transport_socket) {
 void udp_close(rasta_transport_channel *transport_channel) {
     int file_descriptor = transport_channel->file_descriptor;
     if (file_descriptor >= 0) {
-        if (transport_channel->tls_mode != TLS_MODE_DISABLED) {
+        if (transport_channel->tls_config->mode != TLS_MODE_DISABLED) {
             wolfssl_cleanup(transport_channel);
         }
 
@@ -162,7 +159,7 @@ void udp_close(rasta_transport_channel *transport_channel) {
 }
 
 size_t udp_receive(rasta_transport_socket *transport_socket, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
-    if (transport_socket->tls_mode == TLS_MODE_DISABLED) {
+    if (transport_socket->tls_config->mode == TLS_MODE_DISABLED) {
         ssize_t recv_len;
         struct sockaddr_in empty_sockaddr_in;
         socklen_t sender_len = sizeof(empty_sockaddr_in);
@@ -174,7 +171,7 @@ size_t udp_receive(rasta_transport_socket *transport_socket, unsigned char *rece
         }
 
         return (size_t)recv_len;
-    } else if (transport_socket->tls_mode == TLS_MODE_DTLS_1_2) {
+    } else if (transport_socket->tls_config->mode == TLS_MODE_DTLS_1_2) {
         return wolfssl_receive_dtls(transport_socket, received_message, max_buffer_len, sender);
     }
     return 0;
@@ -182,16 +179,16 @@ size_t udp_receive(rasta_transport_socket *transport_socket, unsigned char *rece
 
 void udp_send(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len, char *host, uint16_t port) {
     struct sockaddr_in receiver = host_port_to_sockaddr(host, port);
-    if (transport_channel->tls_mode == TLS_MODE_DISABLED) {
+    if (transport_channel->tls_config->mode == TLS_MODE_DISABLED) {
         // send the message using the other send function
         udp_send_sockaddr(transport_channel, message, message_len, receiver);
-    } else if (transport_channel->tls_mode == TLS_MODE_DTLS_1_2) {
+    } else if (transport_channel->tls_config->mode == TLS_MODE_DTLS_1_2) {
         wolfssl_send_dtls(transport_channel, message, message_len, &receiver);
     }
 }
 
 void udp_send_sockaddr(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len, struct sockaddr_in receiver) {
-    if (transport_channel->tls_mode == TLS_MODE_DISABLED) {
+    if (transport_channel->tls_config->mode == TLS_MODE_DISABLED) {
         if (sendto(transport_channel->file_descriptor, message, message_len, 0, (struct sockaddr *)&receiver, sizeof(receiver)) ==
             -1) {
             perror("failed to send data");

@@ -12,9 +12,10 @@ void test_transport_init_should_initialize_channel_props() {
     rasta_handle_init(&h, NULL, NULL);
 
     rasta_transport_channel channel;
+    rasta_config_tls tls_config = {0};
 
     // Act
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, NULL);
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
     // Assert
 
@@ -32,9 +33,10 @@ void test_transport_init_should_initialize_receive_event() {
     rasta_handle_init(&h, NULL, NULL);
 
     rasta_transport_channel channel;
+    rasta_config_tls tls_config = {0};
 
     // Act
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, NULL);
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
     // Assert
 
@@ -52,9 +54,10 @@ void test_transport_init_should_initialize_receive_event_data() {
     rasta_handle_init(&h, NULL, NULL);
 
     rasta_transport_channel channel;
+    rasta_config_tls tls_config = {0};
 
     // Act
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, NULL);
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
     // Assert
 
@@ -73,9 +76,10 @@ void test_transport_init_should_add_receive_event_to_event_system() {
     rasta_handle_init(&h, NULL, NULL);
 
     rasta_transport_channel channel;
+    rasta_config_tls tls_config = {0};
 
     // Act
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, NULL);
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
     // Assert
 
@@ -90,7 +94,7 @@ void test_transport_create_socket_should_initialize_socket() {
     rasta_handle_init(&h, NULL, NULL);
 
     rasta_transport_socket socket;
-    rasta_config_tls tls_config;
+    rasta_config_tls tls_config = {0};
 
     // Act
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -108,7 +112,7 @@ void test_transport_create_socket_should_create_fd() {
     rasta_handle_init(&h, NULL, NULL);
 
     rasta_transport_socket socket;
-    rasta_config_tls tls_config;
+    rasta_config_tls tls_config = {0};
 
     // Act
     transport_create_socket(&h, &socket, 42, &tls_config);

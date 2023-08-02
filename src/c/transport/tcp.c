@@ -32,7 +32,7 @@ int tcp_accept(rasta_transport_socket *transport_socket) {
 }
 
 ssize_t tcp_receive(rasta_transport_channel *transport_channel, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
-    if (transport_channel->tls_mode == TLS_MODE_DISABLED) {
+    if (transport_channel->tls_config->mode == TLS_MODE_DISABLED) {
         ssize_t recv_len;
         struct sockaddr_in empty_sockaddr_in;
         socklen_t sender_len = sizeof(empty_sockaddr_in);

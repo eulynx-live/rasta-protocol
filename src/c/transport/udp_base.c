@@ -43,7 +43,7 @@ int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *c
     enable_fd_event(&socket->receive_event);
 
     channel->id = socket->id;
-    channel->tls_mode = socket->tls_mode;
+    channel->tls_config = socket->tls_config;
     channel->file_descriptor = socket->file_descriptor;
 #ifdef ENABLE_TLS
     channel->tls_state = RASTA_TLS_CONNECTION_READY;

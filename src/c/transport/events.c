@@ -2,18 +2,18 @@
 #include <stdlib.h>
 
 #include <rasta/logging.h>
-#include <rasta/rmemory.h>
 #include <rasta/rasta.h>
 #include <rasta/rastahandle.h>
 #include <rasta/rastaredundancy.h>
+#include <rasta/rmemory.h>
 
-#include "diagnostics.h"
-#include "events.h"
-#include "transport.h"
 #include "../experimental/handlers.h"
 #include "../retransmission/messages.h"
 #include "../retransmission/protocol.h"
 #include "../retransmission/safety_retransmission.h"
+#include "diagnostics.h"
+#include "events.h"
+#include "transport.h"
 
 int channel_accept_event(void *carry_data) {
     struct accept_event_data *data = carry_data;
@@ -31,14 +31,14 @@ int channel_accept_event(void *carry_data) {
 
     // Find the suitable transport channel in the mux
     find_channel_by_ip_address(data->h, addr, &red_channel_idx, &transport_channel_idx);
-    if(red_channel_idx != -1 && transport_channel_idx != -1){
+    if (red_channel_idx != -1 && transport_channel_idx != -1) {
         channel = &data->h->mux.redundancy_channels[red_channel_idx].transport_channels[transport_channel_idx];
     }
 
     if (channel != NULL) {
         channel->file_descriptor = fd;
         channel->receive_event.fd = fd;
-        channel->tls_mode = data->socket->tls_mode;
+        channel->tls_config = data->socket->tls_config;
         channel->connected = true;
 #ifdef ENABLE_TLS
         channel->tls_state = RASTA_TLS_CONNECTION_READY;
@@ -59,7 +59,7 @@ int channel_accept_event(void *carry_data) {
 
 int channel_receive_event(void *carry_data) {
     struct receive_event_data *data = carry_data;
-    rasta_connection * connection = data->connection;
+    rasta_connection *connection = data->connection;
 
     unsigned char buffer[MAX_DEFER_QUEUE_MSG_SIZE] = {0};
     struct sockaddr_in sender = {0};
@@ -67,7 +67,7 @@ int channel_receive_event(void *carry_data) {
     // when performing DTLS accept, len = 0 doesn't signal a broken connection
     // ifdef needed because UDP/TCP do not know about the tls_state
 #ifdef ENABLE_TLS
-    bool is_dtls_conn_ready = data->socket != NULL && data->socket->tls_mode == TLS_MODE_DTLS_1_2 && data->socket->tls_state == RASTA_TLS_CONNECTION_READY;
+    bool is_dtls_conn_ready = data->socket != NULL && data->socket->tls_config->mode == TLS_MODE_DTLS_1_2 && data->socket->tls_state == RASTA_TLS_CONNECTION_READY;
 #else
     bool is_dtls_conn_ready = false;
 #endif
@@ -206,13 +206,13 @@ int data_send_event(void *carry_data) {
         unsigned int send_backlog_size = sr_send_queue_item_count(con);
 
         // to prevent discarding packets, we can send at most as many packets as can be added to the retransmission queue
-        if(retransmission_available_size < send_backlog_size) {
+        if (retransmission_available_size < send_backlog_size) {
             send_backlog_size = retransmission_available_size;
         }
 
         if (send_backlog_size > 0) {
             logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA send handler", "Messages waiting to be sent: %d",
-                        sr_send_queue_item_count(con));
+                       sr_send_queue_item_count(con));
 
             struct RastaMessageData app_messages;
             struct RastaByteArray msg;
@@ -223,15 +223,15 @@ int data_send_event(void *carry_data) {
             allocateRastaMessageData(&app_messages, send_backlog_size);
 
             logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA send handler",
-                        "Sending %d application messages from queue",
-                        send_backlog_size);
+                       "Sending %d application messages from queue",
+                       send_backlog_size);
 
             for (unsigned int i = 0; i < send_backlog_size; i++) {
 
                 struct RastaByteArray *elem;
                 elem = fifo_pop(con->fifo_send);
                 logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA send handler",
-                            "Adding application message to data packet");
+                           "Adding application message to data packet");
 
                 allocateRastaByteArray(&msg, elem->length);
                 msg.bytes = rmemcpy(msg.bytes, elem->bytes, elem->length);

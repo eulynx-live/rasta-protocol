@@ -92,43 +92,24 @@ static int Tls13SecretCallback(WOLFSSL *ssl, int id, const unsigned char *secret
 }
 #endif
 
-static void apply_tls_mode(rasta_transport_socket *transport_socket) {
+static void handle_tls_mode_server(rasta_transport_socket *transport_socket) {
     const rasta_config_tls *tls_config = transport_socket->tls_config;
-    switch (tls_config->mode) {
-    case TLS_MODE_DISABLED:
-        transport_socket->tls_mode = TLS_MODE_DISABLED;
-        break;
-    case TLS_MODE_TLS_1_3:
-        transport_socket->tls_mode = TLS_MODE_TLS_1_3;
-        break;
-    default:
+    if (tls_config->mode != TLS_MODE_DISABLED && tls_config->mode != TLS_MODE_TLS_1_3) {
         fprintf(stderr, "Unknown or unsupported TLS mode: %u", tls_config->mode);
         abort();
     }
-}
-
-static void handle_tls_mode_server(rasta_transport_socket *transport_socket) {
-    apply_tls_mode(transport_socket);
-    if (transport_socket->tls_mode == TLS_MODE_TLS_1_3) {
+    if (transport_socket->tls_config->mode == TLS_MODE_TLS_1_3) {
         wolfssl_start_tls_server(transport_socket, transport_socket->tls_config);
     }
 }
 
 static void handle_tls_mode_client(rasta_transport_channel *transport_channel) {
     const rasta_config_tls *tls_config = transport_channel->tls_config;
-    switch (tls_config->mode) {
-    case TLS_MODE_DISABLED:
-        transport_channel->tls_mode = TLS_MODE_DISABLED;
-        break;
-    case TLS_MODE_TLS_1_3:
-        transport_channel->tls_mode = TLS_MODE_TLS_1_3;
-        break;
-    default:
+    if (tls_config->mode != TLS_MODE_DISABLED && tls_config->mode != TLS_MODE_TLS_1_3) {
         fprintf(stderr, "Unknown or unsupported TLS mode: %u", tls_config->mode);
         abort();
     }
-
-    if (transport_channel->tls_mode == TLS_MODE_TLS_1_3) {
+    if (transport_channel->tls_config->mode == TLS_MODE_TLS_1_3) {
         wolfssl_start_tls_client(transport_channel, transport_channel->tls_config);
     }
 }
@@ -178,7 +159,7 @@ int tcp_accept(rasta_transport_socket *socket) {
 }
 
 ssize_t tcp_receive(rasta_transport_channel *transport_channel, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
-    if (transport_channel->tls_mode == TLS_MODE_DISABLED) {
+    if (transport_channel->tls_config->mode == TLS_MODE_DISABLED) {
         ssize_t recv_len;
         struct sockaddr_in empty_sockaddr_in;
         socklen_t sender_len = sizeof(empty_sockaddr_in);
@@ -190,7 +171,7 @@ ssize_t tcp_receive(rasta_transport_channel *transport_channel, unsigned char *r
         }
 
         return (size_t)recv_len;
-    } else if (transport_channel->tls_mode == TLS_MODE_TLS_1_3) {
+    } else if (transport_channel->tls_config->mode == TLS_MODE_TLS_1_3) {
         return wolfssl_receive_tls(transport_channel->ssl, received_message, max_buffer_len);
     }
     return 0;
@@ -201,7 +182,7 @@ void tcp_send(rasta_transport_channel *transport_channel, unsigned char *message
 }
 
 void tcp_close(rasta_transport_channel *transport_channel) {
-    if (transport_channel->tls_mode != TLS_MODE_DISABLED) {
+    if (transport_channel->tls_config->mode != TLS_MODE_DISABLED) {
         wolfssl_cleanup(transport_channel);
     }
 
