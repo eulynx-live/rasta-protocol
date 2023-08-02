@@ -17,8 +17,8 @@ void handle_tls_mode(rasta_transport_socket *transport_socket) {
     UNUSED(transport_socket);
 }
 
-void udp_close(rasta_transport_channel *transport_channel) {
-    bsd_close(transport_channel->file_descriptor);
+void udp_close(rasta_transport_socket *transport_socket) {
+    bsd_close(transport_socket->file_descriptor);
 }
 
 size_t udp_receive(rasta_transport_socket *transport_socket, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {

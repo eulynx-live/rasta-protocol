@@ -80,7 +80,7 @@ int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *s
     return 0;
 }
 
-void transport_close(rasta_transport_channel *channel) {
+void transport_close_channel(rasta_transport_channel *channel) {
     if (channel->connected) {
         tcp_close(channel);
         channel->file_descriptor = -1;
@@ -88,6 +88,10 @@ void transport_close(rasta_transport_channel *channel) {
     }
 
     disable_fd_event(&channel->receive_event);
+}
+
+void transport_close_socket(rasta_transport_socket *socket) {
+    UNUSED(socket);
 }
 
 void send_callback(struct RastaByteArray data_to_send, rasta_transport_channel *channel) {

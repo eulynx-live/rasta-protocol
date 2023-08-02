@@ -99,7 +99,8 @@ void transport_listen(rasta_transport_socket *socket);
 int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr);
 int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel);
 int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *socket);
-void transport_close(rasta_transport_channel *channel);
+void transport_close_channel(rasta_transport_channel *channel);
+void transport_close_socket(rasta_transport_socket *socket);
 
 bool is_dtls_conn_ready(rasta_transport_socket *socket);
 

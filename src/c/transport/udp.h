@@ -48,12 +48,10 @@ void udp_send(rasta_transport_channel *transport_channel, unsigned char *message
 void udp_send_sockaddr(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len, struct sockaddr_in receiver);
 
 /**
- * Closes the udp channel
- * @param transport_channel the rasta_transport_channel which identifies the channel
+ * Closes the udp socket
+ * @param transport_socket the rasta_transport_socket which identifies the socket
  */
-// TODO: This is unused! Why? Why does udp_close even exist?
-// TODO: transport_channel signature needed to compile, but doesn't make sense here!
-void udp_close(rasta_transport_channel *transport_channel);
+void udp_close(rasta_transport_socket *transport_socket);
 
 #ifdef __cplusplus
 }

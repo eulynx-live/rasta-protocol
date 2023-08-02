@@ -215,6 +215,6 @@ void tcp_send(rasta_transport_channel *transport_channel, unsigned char *message
 }
 
 void tcp_close(rasta_transport_channel *transport_channel) {
-    wolfssl_cleanup(transport_channel);
+    wolfssl_cleanup_channel(transport_channel);
     bsd_close(transport_channel->file_descriptor);
 }
