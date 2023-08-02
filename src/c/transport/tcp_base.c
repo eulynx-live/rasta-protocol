@@ -45,6 +45,21 @@ int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr) {
     return fd;
 }
 
+int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel) {
+    channel->file_descriptor = socket->file_descriptor;
+
+    if (tcp_connect(channel) != 0) {
+        return -1;
+    };
+
+    channel->receive_event.fd = channel->file_descriptor;
+    channel->receive_event_data.channel = channel;
+
+    enable_fd_event(&channel->receive_event);
+
+    return 0;
+}
+
 int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *socket) {
     // create a new socket (closed socket cannot be reused)
     socket->file_descriptor = bsd_create_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -92,21 +107,6 @@ void tcp_init(rasta_transport_socket *transport_socket, const rasta_config_tls *
 
 bool tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
     return bsd_bind_device(transport_socket->file_descriptor, port, ip);
-}
-
-int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel) {
-    channel->file_descriptor = socket->file_descriptor;
-
-    if (tcp_connect(channel) != 0) {
-        return -1;
-    };
-
-    channel->receive_event.fd = channel->file_descriptor;
-    channel->receive_event_data.channel = channel;
-
-    enable_fd_event(&channel->receive_event);
-
-    return 0;
 }
 
 bool is_dtls_conn_ready(rasta_transport_socket *socket) {

@@ -82,6 +82,6 @@ target_compile_definitions(rasta_transport_test_udp PUBLIC TEST_UDP)
 target_compile_definitions(rasta_transport_test_tcp PUBLIC TEST_TCP)
 
 if(ENABLE_RASTA_TLS)
-    target_compile_definitions(rasta_transport_test_dtls PUBLIC TEST_UDP)
-    target_compile_definitions(rasta_transport_test_tls PUBLIC TEST_TCP)
+    target_compile_definitions(rasta_transport_test_dtls PUBLIC TEST_UDP ENABLE_TLS)
+    target_compile_definitions(rasta_transport_test_tls PUBLIC TEST_TCP ENABLE_TLS)
 endif(ENABLE_RASTA_TLS)

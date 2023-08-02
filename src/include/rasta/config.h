@@ -5,7 +5,7 @@ extern "C" { // only need to export C interface if
              // used by C++ source code
 #endif
 
-#include <limits.h>
+#include <linux/limits.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -89,6 +89,7 @@ typedef struct rasta_config_general {
 /**
  * Non-standard extension
  */
+// TODO: PATH_MAX is Linux-specific, replace if possible
 typedef struct rasta_config_tls {
     /**
      * Path to CA certificate to use, required for server and client operation

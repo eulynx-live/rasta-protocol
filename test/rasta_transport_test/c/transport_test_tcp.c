@@ -79,7 +79,12 @@ void test_transport_listen_should_enable_socket_accept_event() {
 
     rasta_transport_socket socket;
     rasta_transport_channel channel;
-    rasta_config_tls tls_config;
+    rasta_config_tls tls_config = {
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -103,7 +108,12 @@ void test_transport_connect_should_enable_channel_receive_event() {
 
     rasta_transport_socket socket;
     rasta_transport_channel channel;
-    rasta_config_tls tls_config = {0};
+    rasta_config_tls tls_config = {
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -127,7 +137,12 @@ void test_transport_close_should_set_unconnected() {
 
     rasta_transport_socket socket;
     rasta_transport_channel channel;
-    rasta_config_tls tls_config = {0};
+    rasta_config_tls tls_config = {
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -152,7 +167,12 @@ void test_transport_close_should_invalidate_fd() {
 
     rasta_transport_socket socket;
     rasta_transport_channel channel;
-    rasta_config_tls tls_config = {0};
+    rasta_config_tls tls_config = {
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -174,7 +194,12 @@ void test_transport_close_should_disable_channel_receive_event() {
 
     rasta_transport_socket socket;
     rasta_transport_channel channel;
-    rasta_config_tls tls_config = {0};
+    rasta_config_tls tls_config = {
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -196,7 +221,12 @@ void test_transport_redial_should_reconnect() {
 
     rasta_transport_socket socket;
     rasta_transport_channel channel;
-    rasta_config_tls tls_config = {0};
+    rasta_config_tls tls_config = {
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     rasta_ip_data ip_data = {
         .ip = "127.0.0.1",
@@ -231,7 +261,12 @@ void test_transport_redial_should_assign_new_fds() {
 
     rasta_transport_socket socket;
     rasta_transport_channel channel;
-    rasta_config_tls tls_config = {0};
+    rasta_config_tls tls_config = {
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     rasta_ip_data ip_data = {
         .ip = "127.0.0.1",
@@ -267,7 +302,12 @@ void test_transport_redial_should_update_event_fds() {
 
     rasta_transport_socket socket;
     rasta_transport_channel channel;
-    rasta_config_tls tls_config = {0};
+    rasta_config_tls tls_config = {
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     rasta_ip_data ip_data = {
         .ip = "127.0.0.1",

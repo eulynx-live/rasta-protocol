@@ -284,6 +284,8 @@ void wolfssl_cleanup(rasta_transport_channel *transport_channel) {
     wolfSSL_shutdown(transport_channel->ssl);
     wolfSSL_free(transport_channel->ssl);
     wolfSSL_CTX_free(transport_channel->ctx);
+    transport_channel->ctx = NULL;
+    transport_channel->ssl = NULL;
 }
 
 #define CHECK_NULL_AND_ASSIGN(type, varname, invocation) \
