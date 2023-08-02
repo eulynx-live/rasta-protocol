@@ -26,7 +26,6 @@ struct rasta_handle;
  */
 #define MAX_DEFER_QUEUE_MSG_SIZE 1000
 
-
 /**
  * representation of the state of a redundancy channel as defined in 6.6.4.1
  */
@@ -140,9 +139,9 @@ int red_f_deliverDeferQueue(rasta_connection *con, rasta_redundancy_channel *cha
 void red_f_deferTmo(rasta_connection *h, rasta_redundancy_channel *channel);
 
 /**
- * connects the transport channel of the given redundancy @p channel which corresponds to the supplied @p transport_socket, on the given @p connection
+ * connects the transport channel of the given redundancy @p channel which corresponds to the supplied @p transport_socket
  */
-int rasta_red_connect_transport_channel(rasta_connection *h, rasta_redundancy_channel *channel, rasta_transport_socket *transport_socket);
+int rasta_red_connect_transport_channel(rasta_redundancy_channel *channel, rasta_transport_socket *transport_socket);
 
 /**
  * frees memory for the @p channel

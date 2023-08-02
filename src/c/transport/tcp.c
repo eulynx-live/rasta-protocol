@@ -57,18 +57,24 @@ void tcp_close(rasta_transport_channel *transport_channel) {
     bsd_close(transport_channel->file_descriptor);
 }
 
-int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel, rasta_config_tls tls_config) {
-    UNUSED(tls_config);
-    channel->file_descriptor = socket->file_descriptor;
+int tcp_connect(rasta_transport_channel *channel) {
+    struct sockaddr_in server;
 
-    if (tcp_connect(channel) != 0) {
-        return -1;
-    };
+    rmemset((char *)&server, 0, sizeof(server));
+    server.sin_family = AF_INET;
+    server.sin_port = htons(channel->remote_port);
 
-    channel->receive_event.fd = channel->file_descriptor;
-    channel->receive_event_data.channel = channel;
+    // convert host string to usable format
+    if (inet_aton(channel->remote_ip_address, &server.sin_addr) == 0) {
+        fprintf(stderr, "inet_aton() failed\n");
+        abort();
+    }
 
-    enable_fd_event(&channel->receive_event);
+    if (connect(channel->file_descriptor, (struct sockaddr *)&server, sizeof(server)) < 0) {
+        channel->connected = false;
+        return 1;
+    }
 
+    channel->connected = true;
     return 0;
 }

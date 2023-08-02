@@ -54,7 +54,7 @@ int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *s
     const rasta_ip_data *ip_data = &h->mux.config->redundancy.connections.data[socket->id];
     transport_bind(socket, ip_data->ip, (uint16_t)ip_data->port);
 
-    if (transport_connect(socket, channel, *channel->tls_config) != 0) {
+    if (transport_connect(socket, channel) != 0) {
         return -1;
     }
 
@@ -94,26 +94,18 @@ bool tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, u
     return bsd_bind_device(transport_socket->file_descriptor, port, ip);
 }
 
-// TODO have the tcp/tls-specific parts in tcp_connect, the common parts in transport_connect
-int tcp_connect(rasta_transport_channel *channel) {
-    struct sockaddr_in server;
+int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel) {
+    channel->file_descriptor = socket->file_descriptor;
 
-    rmemset((char *)&server, 0, sizeof(server));
-    server.sin_family = AF_INET;
-    server.sin_port = htons(channel->remote_port);
+    if (tcp_connect(channel) != 0) {
+        return -1;
+    };
 
-    // convert host string to usable format
-    if (inet_aton(channel->remote_ip_address, &server.sin_addr) == 0) {
-        fprintf(stderr, "inet_aton() failed\n");
-        abort();
-    }
+    channel->receive_event.fd = channel->file_descriptor;
+    channel->receive_event_data.channel = channel;
 
-    if (connect(channel->file_descriptor, (struct sockaddr *)&server, sizeof(server)) < 0) {
-        channel->connected = false;
-        return 1;
-    }
+    enable_fd_event(&channel->receive_event);
 
-    channel->connected = true;
     return 0;
 }
 

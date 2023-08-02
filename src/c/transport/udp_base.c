@@ -37,9 +37,7 @@ int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr) {
     return 0;
 }
 
-int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel, rasta_config_tls tls_config) {
-    UNUSED(tls_config);
-
+int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel) {
     enable_fd_event(&socket->receive_event);
 
     channel->id = socket->id;

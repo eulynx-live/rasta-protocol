@@ -435,7 +435,7 @@ struct rasta_connection *sr_connect(struct rasta_handle *h, unsigned long id) {
         }
     }
 
-    if (connection == NULL || redundancy_mux_connect_channel(connection, &h->mux, connection->redundancy_channel) != 0) {
+    if (connection == NULL || redundancy_mux_connect_channel(&h->mux, connection->redundancy_channel) != 0) {
         return NULL;
     }
 

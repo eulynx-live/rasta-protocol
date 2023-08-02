@@ -139,7 +139,7 @@ void test_transport_connect_should_set_connected() {
     CU_ASSERT_FALSE(channel.connected);
 
     // Act
-    CU_ASSERT_EQUAL(transport_connect(&socket, &channel, tls_config), 0);
+    CU_ASSERT_EQUAL(transport_connect(&socket, &channel), 0);
 
     // Assert
     CU_ASSERT(channel.connected);
@@ -160,7 +160,7 @@ void test_transport_connect_should_set_equal_fds() {
     transport_create_socket(&h, &socket, 42, &tls_config);
 
     // Act
-    CU_ASSERT_EQUAL(transport_connect(&socket, &channel, tls_config), 0);
+    CU_ASSERT_EQUAL(transport_connect(&socket, &channel), 0);
 
     // Assert
     CU_ASSERT_EQUAL(channel.file_descriptor, socket.file_descriptor);

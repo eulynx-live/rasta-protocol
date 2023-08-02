@@ -368,18 +368,18 @@ void redundancy_mux_listen_channels(redundancy_mux *mux) {
     }
 }
 
-int rasta_red_connect_transport_channel(rasta_connection *h, rasta_redundancy_channel *channel, rasta_transport_socket *transport_socket) {
+int rasta_red_connect_transport_channel(rasta_redundancy_channel *channel, rasta_transport_socket *transport_socket) {
     rasta_transport_channel *transport_connection = &channel->transport_channels[transport_socket->id];
-    transport_connect(transport_socket, transport_connection, h->config->tls);
+    transport_connect(transport_socket, transport_connection);
     return transport_connection->connected;
 }
 
-int redundancy_mux_connect_channel(rasta_connection *connection, redundancy_mux *mux, rasta_redundancy_channel *channel) {
+int redundancy_mux_connect_channel(redundancy_mux *mux, rasta_redundancy_channel *channel) {
     // add transport channels
     int success = 0;
     for (unsigned int i = 0; i < channel->transport_channel_count; i++) {
         // Provided transport channels have to match with local ports configured
-        success |= rasta_red_connect_transport_channel(connection, channel, &mux->transport_sockets[i]);
+        success |= rasta_red_connect_transport_channel(channel, &mux->transport_sockets[i]);
 #ifdef SLEEP_ON_CONNECT
         if (success) {
             logger_log(mux->logger, LOG_LEVEL_INFO, "RaSTA RedMux connect", "connection established, sleeping for 5 seconds");

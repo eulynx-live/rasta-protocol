@@ -112,7 +112,7 @@ void test_transport_connect_should_enable_socket_receive_event() {
     CU_ASSERT_FALSE(socket.receive_event.enabled);
 
     // Act
-    CU_ASSERT_EQUAL(transport_connect(&socket, &channel, tls_config), 0);
+    CU_ASSERT_EQUAL(transport_connect(&socket, &channel), 0);
 
     // Assert
     CU_ASSERT(socket.receive_event.enabled);

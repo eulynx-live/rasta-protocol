@@ -198,11 +198,10 @@ void redundancy_mux_listen_channels(redundancy_mux *mux);
 
 /**
  * connects a given redundancy channel on a given connection and multiplexer.
- * @param h the connection on which to connect the redundancy channel
  * @param mux the multiplexer to which the redundancy channel belongs
  * @param channel the redundancy channel to connect
  */
-int redundancy_mux_connect_channel(rasta_connection *h, redundancy_mux *mux, rasta_redundancy_channel *channel);
+int redundancy_mux_connect_channel(redundancy_mux *mux, rasta_redundancy_channel *channel);
 
 /**
  * close an existing redundancy channel by closing all its transport channels

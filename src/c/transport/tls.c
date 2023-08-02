@@ -136,28 +136,23 @@ int tcp_accept(rasta_transport_socket *socket) {
     return socket_fd;
 }
 
-ssize_t tcp_receive(rasta_transport_channel *transport_channel, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
-    UNUSED(sender);
-    return wolfssl_receive_tls(transport_channel->ssl, received_message, max_buffer_len);
-}
+int tcp_connect(rasta_transport_channel *channel) {
+    struct sockaddr_in server;
 
-void tcp_send(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len) {
-    wolfssl_send_tls(transport_channel->ssl, message, message_len);
-}
+    rmemset((char *)&server, 0, sizeof(server));
+    server.sin_family = AF_INET;
+    server.sin_port = htons(channel->remote_port);
 
-void tcp_close(rasta_transport_channel *transport_channel) {
-    wolfssl_cleanup(transport_channel);
-    bsd_close(transport_channel->file_descriptor);
-}
-
-int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel, rasta_config_tls tls_config) {
-    channel->file_descriptor = socket->file_descriptor;
-
-    if (tcp_connect(channel) != 0) {
-        return -1;
+    // convert host string to usable format
+    if (inet_aton(channel->remote_ip_address, &server.sin_addr) == 0) {
+        fprintf(stderr, "inet_aton() failed\n");
+        abort();
     }
 
-    channel->connected = false;
+    if (connect(channel->file_descriptor, (struct sockaddr *)&server, sizeof(server)) < 0) {
+        channel->connected = false;
+        return 1;
+    }
 
     if (channel->ctx == NULL) {
         wolfssl_start_tls_client(channel, channel->tls_config);
@@ -167,14 +162,14 @@ int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *c
     if (!channel->ssl) {
         const char *error_str = wolfSSL_ERR_reason_error_string(wolfSSL_get_error(channel->ssl, 0));
         fprintf(stderr, "Error allocating WolfSSL session: %s.\n", error_str);
-        return -1;
+        return 1;
     }
 
-    if (tls_config.tls_hostname[0]) {
-        int ret = wolfSSL_check_domain_name(channel->ssl, tls_config.tls_hostname);
+    if (channel->tls_config->tls_hostname[0]) {
+        int ret = wolfSSL_check_domain_name(channel->ssl, channel->tls_config->tls_hostname);
         if (ret != SSL_SUCCESS) {
-            fprintf(stderr, "Could not add domain name check for domain %s: %d", tls_config.tls_hostname, ret);
-            return -1;
+            fprintf(stderr, "Could not add domain name check for domain %s: %d", channel->tls_config->tls_hostname, ret);
+            return 1;
         }
     } else {
         fprintf(stderr, "No TLS hostname specified. Will accept ANY valid TLS certificate. Double-check configuration file.\n");
@@ -182,7 +177,7 @@ int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *c
     /* Attach wolfSSL to the socket */
     if (wolfSSL_set_fd(channel->ssl, channel->file_descriptor) != WOLFSSL_SUCCESS) {
         fprintf(stderr, "ERROR: Failed to set the file descriptor\n");
-        return -1;
+        return 1;
     }
 
     /* required for getting random used */
@@ -200,20 +195,26 @@ int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *c
     if (wolfSSL_connect(channel->ssl) != WOLFSSL_SUCCESS) {
         const char *error_str = wolfSSL_ERR_reason_error_string(wolfSSL_get_error(channel->ssl, 0));
         fprintf(stderr, "ERROR: failed to connect to wolfSSL %s.\n", error_str);
-        return -1;
+        return 1;
     }
 
-    tls_pin_certificate(channel->ssl, tls_config.peer_tls_cert_path);
-
-    wolfSSL_FreeArrays(channel->ssl);
-    set_tls_async(channel->file_descriptor, channel->ssl);
-
-    channel->receive_event.fd = channel->file_descriptor;
-    channel->receive_event_data.channel = channel;
-
-    enable_fd_event(&channel->receive_event);
+    tls_pin_certificate(channel->ssl, channel->tls_config->peer_tls_cert_path);
 
     channel->connected = true;
 
     return 0;
+}
+
+ssize_t tcp_receive(rasta_transport_channel *transport_channel, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
+    UNUSED(sender);
+    return wolfssl_receive_tls(transport_channel->ssl, received_message, max_buffer_len);
+}
+
+void tcp_send(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len) {
+    wolfssl_send_tls(transport_channel->ssl, message, message_len);
+}
+
+void tcp_close(rasta_transport_channel *transport_channel) {
+    wolfssl_cleanup(transport_channel);
+    bsd_close(transport_channel->file_descriptor);
 }

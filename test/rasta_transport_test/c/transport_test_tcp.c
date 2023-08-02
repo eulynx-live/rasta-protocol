@@ -112,7 +112,7 @@ void test_transport_connect_should_enable_channel_receive_event() {
     CU_ASSERT_FALSE(channel.receive_event.enabled);
 
     // Act
-    CU_ASSERT_EQUAL(transport_connect(&socket, &channel, tls_config), 0);
+    CU_ASSERT_EQUAL(transport_connect(&socket, &channel), 0);
 
     // Assert
     CU_ASSERT(channel.receive_event.enabled);
@@ -131,7 +131,7 @@ void test_transport_close_should_set_unconnected() {
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
-    transport_connect(&socket, &channel, tls_config);
+    transport_connect(&socket, &channel);
 
     // Assert
     CU_ASSERT(channel.connected);
@@ -156,7 +156,7 @@ void test_transport_close_should_invalidate_fd() {
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
-    transport_connect(&socket, &channel, tls_config);
+    transport_connect(&socket, &channel);
 
     // Act
     transport_close(&channel);
@@ -178,7 +178,7 @@ void test_transport_close_should_disable_channel_receive_event() {
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
-    transport_connect(&socket, &channel, tls_config);
+    transport_connect(&socket, &channel);
 
     // Act
     transport_close(&channel);
@@ -212,7 +212,7 @@ void test_transport_redial_should_reconnect() {
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
-    transport_connect(&socket, &channel, tls_config);
+    transport_connect(&socket, &channel);
     transport_close(&channel);
 
     // Act
@@ -247,7 +247,7 @@ void test_transport_redial_should_assign_new_fds() {
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
-    transport_connect(&socket, &channel, tls_config);
+    transport_connect(&socket, &channel);
     transport_close(&channel);
 
     // Act
@@ -283,7 +283,7 @@ void test_transport_redial_should_update_event_fds() {
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
-    transport_connect(&socket, &channel, tls_config);
+    transport_connect(&socket, &channel);
     transport_close(&channel);
 
     // Act
