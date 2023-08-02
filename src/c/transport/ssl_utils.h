@@ -16,17 +16,17 @@ void wolfssl_start_tls_server(rasta_transport_socket *transport_socket, const ra
 
 void wolfssl_start_server(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config, WOLFSSL_METHOD *server_method);
 
-void set_dtls_async(rasta_transport_socket *transport_socket);
+void set_dtls_async(int fd, WOLFSSL *ssl);
 
 void set_tls_async(int fd, WOLFSSL *ssl);
 
-void set_socket_async(rasta_transport_channel *transport_channel, WOLFSSL_ASYNC_METHOD *wolfssl_async_method);
+void set_socket_async(int fd, WOLFSSL *ssl, WOLFSSL_ASYNC_METHOD *wolfssl_async_method);
 
 void wolfssl_start_dtls_client(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config);
 
 void wolfssl_start_tls_client(rasta_transport_channel *transport_channel, const rasta_config_tls *tls_config);
 
-void wolfssl_start_client(rasta_transport_channel *transport_channel, const rasta_config_tls *tls_config, WOLFSSL_METHOD *client_method);
+void wolfssl_start_client(WOLFSSL_CTX *ctx, const rasta_config_tls *tls_config, WOLFSSL_METHOD *client_method);
 
 void wolfssl_send(WOLFSSL *ssl, unsigned char *message, size_t message_len);
 

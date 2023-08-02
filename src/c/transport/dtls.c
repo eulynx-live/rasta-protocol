@@ -50,7 +50,7 @@ static void wolfssl_accept(rasta_transport_socket *transport_socket) {
 
     tls_pin_certificate(transport_socket->ssl, transport_socket->tls_config->peer_tls_cert_path);
 
-    set_dtls_async(transport_socket);
+    set_dtls_async(transport_socket->file_descriptor, transport_socket->ssl);
 }
 
 static size_t wolfssl_receive_dtls(rasta_transport_socket *transport_socket, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
