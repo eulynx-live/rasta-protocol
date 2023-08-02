@@ -8,9 +8,10 @@ extern "C" { // only need to export C interface if
              // used by C++ source code
 #endif
 
-#include "transport.h"
 #include <netinet/in.h>
 #include <stdint.h>
+
+#include "transport.h"
 
 void handle_tls_mode(rasta_transport_socket *transport_socket);
 

@@ -130,8 +130,7 @@ void test_transport_connect_should_set_connected() {
 
     rasta_transport_socket socket;
     rasta_transport_channel channel;
-    rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED};
+    rasta_config_tls tls_config = {0};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -155,8 +154,7 @@ void test_transport_connect_should_set_equal_fds() {
 
     rasta_transport_socket socket;
     rasta_transport_channel channel;
-    rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED};
+    rasta_config_tls tls_config = {0};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);

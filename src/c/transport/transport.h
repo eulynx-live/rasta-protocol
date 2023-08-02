@@ -101,5 +101,7 @@ int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *c
 int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *socket);
 void transport_close(rasta_transport_channel *channel);
 
+bool is_dtls_conn_ready(rasta_transport_socket *socket);
+
 // Protected methods
 void find_channel_by_ip_address(struct rasta_handle *h, struct sockaddr_in sender, int *red_channel_idx, int *transport_channel_idx);

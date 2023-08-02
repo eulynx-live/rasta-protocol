@@ -33,20 +33,17 @@ int tcp_accept(rasta_transport_socket *transport_socket) {
 }
 
 ssize_t tcp_receive(rasta_transport_channel *transport_channel, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
-    if (transport_channel->tls_config->mode == TLS_MODE_DISABLED) {
-        ssize_t recv_len;
-        struct sockaddr_in empty_sockaddr_in;
-        socklen_t sender_len = sizeof(empty_sockaddr_in);
+    ssize_t recv_len;
+    struct sockaddr_in empty_sockaddr_in;
+    socklen_t sender_len = sizeof(empty_sockaddr_in);
 
-        // wait for incoming data
-        if ((recv_len = recvfrom(transport_channel->file_descriptor, received_message, max_buffer_len, 0, (struct sockaddr *)sender, &sender_len)) < 0) {
-            perror("an error occured while trying to receive data");
-            return -1;
-        }
-
-        return (size_t)recv_len;
+    // wait for incoming data
+    if ((recv_len = recvfrom(transport_channel->file_descriptor, received_message, max_buffer_len, 0, (struct sockaddr *)sender, &sender_len)) < 0) {
+        perror("an error occured while trying to receive data");
+        return -1;
     }
-    return 0;
+
+    return (size_t)recv_len;
 }
 
 void tcp_send(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len) {

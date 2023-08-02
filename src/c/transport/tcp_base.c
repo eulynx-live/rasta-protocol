@@ -94,6 +94,7 @@ bool tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, u
     return bsd_bind_device(transport_socket->file_descriptor, port, ip);
 }
 
+// TODO have the tcp/tls-specific parts in tcp_connect, the common parts in transport_connect
 int tcp_connect(rasta_transport_channel *channel) {
     struct sockaddr_in server;
 
@@ -114,4 +115,9 @@ int tcp_connect(rasta_transport_channel *channel) {
 
     channel->connected = true;
     return 0;
+}
+
+bool is_dtls_conn_ready(rasta_transport_socket *socket) {
+    UNUSED(socket);
+    return false;
 }

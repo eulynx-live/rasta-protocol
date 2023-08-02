@@ -710,27 +710,6 @@ void config_setstd(struct RastaConfig *cfg) {
 
     // TLS settings
 
-    entr = config_get(cfg, "RASTA_TLS_MODE");
-    if (entr.type == DICTIONARY_STRING) {
-        bool accepted = false;
-#ifdef ENABLE_TLS
-        if (!strncmp(entr.value.string.c, stringify(TLS_MODE_DTLS_1_2), strlen(stringify(TLS_MODE_DTLS_1_2)))) {
-            cfg->values.tls.mode = TLS_MODE_DTLS_1_2;
-            accepted = true;
-        }
-        if (!strncmp(entr.value.string.c, stringify(TLS_MODE_TLS_1_3), strlen(stringify(TLS_MODE_TLS_1_3)))) {
-            cfg->values.tls.mode = TLS_MODE_TLS_1_3;
-            accepted = true;
-        }
-#endif
-        if (!accepted) {
-            fprintf(stderr, "Unknown or unsupported TLS mode: %s\n", entr.value.string.c);
-            abort();
-        }
-    } else {
-        cfg->values.tls.mode = TLS_MODE_DISABLED;
-    }
-
     entr = config_get(cfg, "RASTA_CA_PATH");
     if (entr.type == DICTIONARY_STRING) {
         cfg->values.tls.ca_cert_path[PATH_MAX - 1] = 0;
@@ -823,7 +802,7 @@ void config_setstd(struct RastaConfig *cfg) {
 /*
  * Public functions
  */
-int config_load(struct RastaConfig *config, const char* filename) {
+int config_load(struct RastaConfig *config, const char *filename) {
 
     memset(config, 0, sizeof(struct RastaConfig));
 

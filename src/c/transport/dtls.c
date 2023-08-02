@@ -118,31 +118,17 @@ static bool is_dtls_server(const rasta_config_tls *tls_config) {
 }
 
 void handle_tls_mode(rasta_transport_socket *transport_socket) {
-    switch (transport_socket->tls_config->mode) {
-    case TLS_MODE_DISABLED:
-        break;
-    case TLS_MODE_DTLS_1_2: {
-        if (is_dtls_server(transport_socket->tls_config)) {
-            wolfssl_start_dtls_server(transport_socket, transport_socket->tls_config);
-        } else {
-            wolfssl_start_dtls_client(transport_socket, transport_socket->tls_config);
-        }
-        break;
-    }
-    default: {
-        fprintf(stderr, "Unknown or unsupported TLS mode: %u", transport_socket->tls_config->mode);
-        abort();
-    }
+    if (is_dtls_server(transport_socket->tls_config)) {
+        wolfssl_start_dtls_server(transport_socket, transport_socket->tls_config);
+    } else {
+        wolfssl_start_dtls_client(transport_socket, transport_socket->tls_config);
     }
 }
 
 void udp_close(rasta_transport_channel *transport_channel) {
     int file_descriptor = transport_channel->file_descriptor;
     if (file_descriptor >= 0) {
-        if (transport_channel->tls_config->mode != TLS_MODE_DISABLED) {
-            wolfssl_cleanup(transport_channel);
-        }
-
+        wolfssl_cleanup(transport_channel);
         getSO_ERROR(file_descriptor);                   // first clear any errors, which can cause close to fail
         if (shutdown(file_descriptor, SHUT_RDWR) < 0)   // secondly, terminate the 'reliable' delivery
             if (errno != ENOTCONN && errno != EINVAL) { // SGI causes EINVAL
@@ -158,42 +144,18 @@ void udp_close(rasta_transport_channel *transport_channel) {
 }
 
 size_t udp_receive(rasta_transport_socket *transport_socket, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
-    if (transport_socket->tls_config->mode == TLS_MODE_DISABLED) {
-        ssize_t recv_len;
-        struct sockaddr_in empty_sockaddr_in;
-        socklen_t sender_len = sizeof(empty_sockaddr_in);
-
-        // wait for incoming data
-        if ((recv_len = recvfrom(transport_socket->file_descriptor, received_message, max_buffer_len, 0, (struct sockaddr *)sender, &sender_len)) == -1) {
-            perror("an error occured while trying to receive data");
-            abort();
-        }
-
-        return (size_t)recv_len;
-    } else if (transport_socket->tls_config->mode == TLS_MODE_DTLS_1_2) {
-        return wolfssl_receive_dtls(transport_socket, received_message, max_buffer_len, sender);
-    }
-    return 0;
+    return wolfssl_receive_dtls(transport_socket, received_message, max_buffer_len, sender);
 }
 
 void udp_send(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len, char *host, uint16_t port) {
     struct sockaddr_in receiver = host_port_to_sockaddr(host, port);
-    if (transport_channel->tls_config->mode == TLS_MODE_DISABLED) {
-        // send the message using the other send function
-        udp_send_sockaddr(transport_channel, message, message_len, receiver);
-    } else if (transport_channel->tls_config->mode == TLS_MODE_DTLS_1_2) {
-        wolfssl_send_dtls(transport_channel, message, message_len, &receiver);
-    }
+    udp_send_sockaddr(transport_channel, message, message_len, receiver);
 }
 
 void udp_send_sockaddr(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len, struct sockaddr_in receiver) {
-    if (transport_channel->tls_config->mode == TLS_MODE_DISABLED) {
-        if (sendto(transport_channel->file_descriptor, message, message_len, 0, (struct sockaddr *)&receiver, sizeof(receiver)) ==
-            -1) {
-            perror("failed to send data");
-            abort();
-        }
-    } else {
-        wolfssl_send_dtls(transport_channel, message, message_len, &receiver);
-    }
+    wolfssl_send_dtls(transport_channel, message, message_len, &receiver);
+}
+
+bool is_dtls_conn_ready(rasta_transport_socket *socket) {
+    return socket != NULL && socket->tls_state == RASTA_TLS_CONNECTION_READY;
 }

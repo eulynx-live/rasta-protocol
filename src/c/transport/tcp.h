@@ -1,8 +1,9 @@
-#include "transport.h"
 #include <netinet/in.h>
 #include <stdint.h>
 
 #include <rasta/config.h>
+
+#include "transport.h"
 
 typedef struct rasta_transport_socket rasta_transport_socket;
 typedef struct rasta_transport_channel rasta_transport_channel;
