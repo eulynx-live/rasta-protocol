@@ -126,21 +126,8 @@ void handle_tls_mode(rasta_transport_socket *transport_socket) {
 }
 
 void udp_close(rasta_transport_channel *transport_channel) {
-    int file_descriptor = transport_channel->file_descriptor;
-    if (file_descriptor >= 0) {
-        wolfssl_cleanup(transport_channel);
-        getSO_ERROR(file_descriptor);                   // first clear any errors, which can cause close to fail
-        if (shutdown(file_descriptor, SHUT_RDWR) < 0)   // secondly, terminate the 'reliable' delivery
-            if (errno != ENOTCONN && errno != EINVAL) { // SGI causes EINVAL
-                perror("shutdown");
-                abort();
-            }
-        if (close(file_descriptor) < 0) // finally call close()
-        {
-            perror("close");
-            abort();
-        }
-    }
+    wolfssl_cleanup(transport_channel);
+    bsd_close(transport_channel->file_descriptor);
 }
 
 size_t udp_receive(rasta_transport_socket *transport_socket, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {

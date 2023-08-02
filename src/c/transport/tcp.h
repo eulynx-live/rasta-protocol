@@ -9,26 +9,10 @@ typedef struct rasta_transport_socket rasta_transport_socket;
 typedef struct rasta_transport_channel rasta_transport_channel;
 
 /**
- * This function will initialise a tcp socket and return its file descriptor, which is used to reference it in later
- * function calls
- * @param transport_state the tcp socket's tls_transport_state buffer
- * @param tls_config TLS options
- */
-void tcp_init(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config);
-
-/**
  * Prepare to accept connections on the given @p file_descriptor.
  * @param file_descriptor the file descriptor to accept connections from
  */
 void tcp_listen(rasta_transport_socket *transport_socket);
-
-/**
- * Binds a given file descriptor to the given @p port at the network interface with IPv4 address @p ip
- * @param file_descriptor the is the file descriptor which will be bound to to the @p port.
- * @param ip the IPv4 address of the network interface the socket will listen on.
- * @param port the port the socket will listen on
- */
-bool tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port);
 
 /**
  * Receive data on the given @p file descriptor and store it in the given buffer.

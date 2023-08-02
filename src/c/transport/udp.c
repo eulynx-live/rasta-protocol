@@ -18,20 +18,7 @@ void handle_tls_mode(rasta_transport_socket *transport_socket) {
 }
 
 void udp_close(rasta_transport_channel *transport_channel) {
-    int file_descriptor = transport_channel->file_descriptor;
-    if (file_descriptor >= 0) {
-        getSO_ERROR(file_descriptor);                   // first clear any errors, which can cause close to fail
-        if (shutdown(file_descriptor, SHUT_RDWR) < 0)   // secondly, terminate the 'reliable' delivery
-            if (errno != ENOTCONN && errno != EINVAL) { // SGI causes EINVAL
-                perror("shutdown");
-                abort();
-            }
-        if (close(file_descriptor) < 0) // finally call close()
-        {
-            perror("close");
-            abort();
-        }
-    }
+    bsd_close(transport_channel->file_descriptor);
 }
 
 size_t udp_receive(rasta_transport_socket *transport_socket, unsigned char *received_message, size_t max_buffer_len, struct sockaddr_in *sender) {
@@ -49,16 +36,11 @@ size_t udp_receive(rasta_transport_socket *transport_socket, unsigned char *rece
 }
 
 void udp_send(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len, char *host, uint16_t port) {
-    struct sockaddr_in receiver = host_port_to_sockaddr(host, port);
-    udp_send_sockaddr(transport_channel, message, message_len, receiver);
+    bsd_send(transport_channel->file_descriptor, message, message_len, host, port);
 }
 
 void udp_send_sockaddr(rasta_transport_channel *transport_channel, unsigned char *message, size_t message_len, struct sockaddr_in receiver) {
-    if (sendto(transport_channel->file_descriptor, message, message_len, 0, (struct sockaddr *)&receiver, sizeof(receiver)) ==
-        -1) {
-        perror("failed to send data");
-        abort();
-    }
+    bsd_send_sockaddr(transport_channel->file_descriptor, message, message_len, receiver);
 }
 
 bool is_dtls_conn_ready(rasta_transport_socket *socket) {

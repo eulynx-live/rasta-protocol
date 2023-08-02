@@ -8,7 +8,8 @@
 void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *socket, int id, const rasta_config_tls *tls_config) {
     // init socket
     socket->id = id;
-    tcp_init(socket, tls_config);
+    socket->tls_config = tls_config;
+    socket->file_descriptor = bsd_create_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
     // register accept event
     memset(&socket->accept_event, 0, sizeof(fd_event));
@@ -25,7 +26,7 @@ void transport_create_socket(struct rasta_handle *h, rasta_transport_socket *soc
 }
 
 bool transport_bind(rasta_transport_socket *socket, const char *ip, uint16_t port) {
-    return tcp_bind_device(socket, ip, port);
+    return bsd_bind_device(socket->file_descriptor, port, ip);
 }
 
 void transport_listen(rasta_transport_socket *socket) {
@@ -98,15 +99,6 @@ ssize_t receive_callback(struct receive_event_data *data, unsigned char *buffer,
     // search for connected_recv_buffer_size
     // TODO: Manage possible remaining data in the receive buffer on next call to rasta_recv
     return tcp_receive(data->channel, buffer, MAX_DEFER_QUEUE_MSG_SIZE, sender);
-}
-
-void tcp_init(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config) {
-    transport_socket->tls_config = tls_config;
-    transport_socket->file_descriptor = bsd_create_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-}
-
-bool tcp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port) {
-    return bsd_bind_device(transport_socket->file_descriptor, port, ip);
 }
 
 bool is_dtls_conn_ready(rasta_transport_socket *socket) {
