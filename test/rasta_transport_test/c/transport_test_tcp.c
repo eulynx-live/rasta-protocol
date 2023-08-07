@@ -13,9 +13,9 @@ void test_transport_create_socket_should_initialize_accept_event() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
-    rasta_config_tls tls_config;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
+    rasta_config_tls tls_config = {0};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
@@ -35,9 +35,9 @@ void test_transport_create_socket_should_initialize_accept_event_data() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
-    rasta_config_tls tls_config;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
+    rasta_config_tls tls_config = {0};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
@@ -57,9 +57,9 @@ void test_transport_create_socket_should_add_accept_event_to_event_system() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
-    rasta_config_tls tls_config;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
+    rasta_config_tls tls_config = {0};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
@@ -77,8 +77,8 @@ void test_transport_listen_should_enable_socket_accept_event() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
         .tls_hostname = "localhost",
         .ca_cert_path = "../examples/root-ca.pem",
@@ -106,8 +106,8 @@ void test_transport_connect_should_enable_channel_receive_event() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
         .tls_hostname = "localhost",
         .ca_cert_path = "../examples/root-ca.pem",
@@ -135,8 +135,8 @@ void test_transport_close_channel_should_set_unconnected() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
         .tls_hostname = "localhost",
         .ca_cert_path = "../examples/root-ca.pem",
@@ -165,8 +165,8 @@ void test_transport_close_channel_should_invalidate_fd() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
         .tls_hostname = "localhost",
         .ca_cert_path = "../examples/root-ca.pem",
@@ -192,8 +192,8 @@ void test_transport_close_channel_should_disable_channel_receive_event() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
         .tls_hostname = "localhost",
         .ca_cert_path = "../examples/root-ca.pem",
@@ -219,8 +219,8 @@ void test_transport_redial_should_reconnect() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
         .tls_hostname = "localhost",
         .ca_cert_path = "../examples/root-ca.pem",
@@ -259,8 +259,8 @@ void test_transport_redial_should_assign_new_fds() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
         .tls_hostname = "localhost",
         .ca_cert_path = "../examples/root-ca.pem",
@@ -300,8 +300,8 @@ void test_transport_redial_should_update_event_fds() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
         .tls_hostname = "localhost",
         .ca_cert_path = "../examples/root-ca.pem",
