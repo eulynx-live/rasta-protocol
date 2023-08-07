@@ -57,23 +57,23 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -v
 
-    - name: Test
-      run: cd ${{github.workspace}}/build && ctest . --output-on-failure
-
-    - name: UDP Test
+    - name: Rcat UDP Test
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_udp.sh
       
-    - name: TCP Test
+    - name: Rcat TCP Test
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_tcp.sh
 
-    - name: TLS Test
+    - name: Rcat TLS Test
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_tls.sh
 
-    - name: DTLS Test
+    - name: Rcat DTLS Test
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_dtls.sh
 
-    - name: KEX / Opaque Test
+    - name: Rcat KEX / Opaque Test
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_kex.sh
+
+    - name: CTest
+      run: cd ${{github.workspace}}/build && ctest . --output-on-failure
 
     - name: Configure CMake without extensions
       # force full rebuild
@@ -83,8 +83,8 @@ jobs:
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-    - name: Test without extensions
-      run: cd ${{github.workspace}}/build && ctest .
-
-    - name: UDP Test without extensions
+    - name: Rcat UDP Test without extensions
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_udp.sh
+
+    - name: CTest without extensions
+      run: cd ${{github.workspace}}/build && ctest .

@@ -249,12 +249,10 @@ bool redundancy_mux_bind(struct rasta_handle *h) {
 void redundancy_mux_close(redundancy_mux *mux) {
     // TODO: red_f_cleanup should be called when closing a rasta_connection
 
-    // Close listening ports (if not already closed for the case that we are a client)
+    // Close listening ports
     for (unsigned int i = 0; i < mux->port_count; ++i) {
-        if (mux->transport_sockets[i].file_descriptor != -1) {
-            logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux close", "closing socket %d/%d", i + 1, mux->port_count);
-            transport_close_socket(&mux->transport_sockets[i]);
-        }
+        logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux close", "closing socket %d/%d", i + 1, mux->port_count);
+        transport_close_socket(&mux->transport_sockets[i]);
     }
 
     mux->port_count = 0;
