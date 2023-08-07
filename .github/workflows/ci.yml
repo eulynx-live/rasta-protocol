@@ -85,6 +85,15 @@ jobs:
 
     - name: Rcat UDP Test without extensions
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_udp.sh
+      
+    - name: Rcat TCP Test without extensions
+      run: cd ${{github.workspace}} && ./examples/example_scripts/example_tcp.sh
+
+    - name: Rcat TLS Test without extensions
+      run: cd ${{github.workspace}} && ./examples/example_scripts/example_tls.sh
+
+    - name: Rcat DTLS Test without extensions
+      run: cd ${{github.workspace}} && ./examples/example_scripts/example_dtls.sh
 
     - name: CTest without extensions
       run: cd ${{github.workspace}}/build && ctest .
