@@ -308,8 +308,7 @@ void redundancy_mux_send(rasta_redundancy_channel *receiver, struct RastaPacket 
             if (role == RASTA_ROLE_CLIENT) {
                 logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux send", "Channel %d/%d is not connected, re-trying %s:%d",
                            i + 1, receiver->transport_channel_count, channel->remote_ip_address, channel->remote_port);
-                rasta_transport_socket *socket = &mux->transport_sockets[channel->id];
-                if (transport_redial(channel, socket) != 0) {
+                if (transport_redial(channel) != 0) {
                     continue;
                 }
                 logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux send", "Reconnected channel %d/%d",
@@ -395,15 +394,14 @@ int redundancy_mux_connect_channel(redundancy_mux *mux, rasta_redundancy_channel
     return 0;
 }
 
-void redundancy_mux_close_channel(rasta_redundancy_channel *c) {
-    for (unsigned int i = 0; i < c->transport_channel_count; ++i) {
-        rasta_transport_channel *channel = &c->transport_channels[i];
-        logger_log(c->mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux remove channel", "closing transport channel %u/%u", i + 1, c->transport_channel_count);
-        int channel_fd = channel->file_descriptor;
+void redundancy_mux_close_channel(rasta_connection *conn, rasta_redundancy_channel *red_channel) {
+    for (unsigned int i = 0; i < red_channel->transport_channel_count; ++i) {
+        rasta_transport_channel *channel = &red_channel->transport_channels[i];
+        logger_log(red_channel->mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux remove channel", "closing transport channel %u/%u", i + 1, red_channel->transport_channel_count);
         transport_close_channel(channel);
         // if we are a TCP/TLS client (and transport_close_channel actually closes the channel), the socket fd also becomes invalid
-        if (!channel->connected && channel_fd == c->mux->transport_sockets[channel->id].file_descriptor) {
-            c->mux->transport_sockets[channel->id].file_descriptor = -1;
+        if (!channel->connected && conn->role == RASTA_ROLE_CLIENT) {
+            channel->associated_socket->file_descriptor = -1;
         }
     }
 }

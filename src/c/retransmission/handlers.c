@@ -1,36 +1,36 @@
 #include "handlers.h"
-#include "safety_retransmission.h"
 #include "protocol.h"
+#include "safety_retransmission.h"
 
 #include "../experimental/handlers.h"
 
 int handle_received_packet(struct rasta_connection *connection, struct RastaPacket *receivedPacket) {
     switch (receivedPacket->type) {
-        case RASTA_TYPE_RETRDATA:
-            return handle_retrdata(connection, receivedPacket);
-        case RASTA_TYPE_DATA:
-            return handle_data(connection, receivedPacket);
-        case RASTA_TYPE_RETRREQ:
-            return handle_retrreq(connection, receivedPacket);
-        case RASTA_TYPE_RETRRESP:
-            return handle_retrresp(connection, receivedPacket);
-        case RASTA_TYPE_DISCREQ:
-            return handle_discreq(connection, receivedPacket);
-        case RASTA_TYPE_HB:
-            return handle_hb(connection, receivedPacket);
+    case RASTA_TYPE_RETRDATA:
+        return handle_retrdata(connection, receivedPacket);
+    case RASTA_TYPE_DATA:
+        return handle_data(connection, receivedPacket);
+    case RASTA_TYPE_RETRREQ:
+        return handle_retrreq(connection, receivedPacket);
+    case RASTA_TYPE_RETRRESP:
+        return handle_retrresp(connection, receivedPacket);
+    case RASTA_TYPE_DISCREQ:
+        return handle_discreq(connection, receivedPacket);
+    case RASTA_TYPE_HB:
+        return handle_hb(connection, receivedPacket);
 #ifdef ENABLE_OPAQUE
-        case RASTA_TYPE_KEX_REQUEST:
-            return handle_kex_request(connection, receivedPacket);
-        case RASTA_TYPE_KEX_RESPONSE:
-            return handle_kex_response(connection, receivedPacket);
-        case RASTA_TYPE_KEX_AUTHENTICATION:
-            return handle_kex_auth(connection, receivedPacket);
+    case RASTA_TYPE_KEX_REQUEST:
+        return handle_kex_request(connection, receivedPacket);
+    case RASTA_TYPE_KEX_RESPONSE:
+        return handle_kex_response(connection, receivedPacket);
+    case RASTA_TYPE_KEX_AUTHENTICATION:
+        return handle_kex_auth(connection, receivedPacket);
 #endif
-        default:
-            logger_log(connection->logger, LOG_LEVEL_ERROR, "RaSTA RECEIVE", "Received unexpected packet type %d", receivedPacket->type);
-            // increase type error counter
-            connection->errors.type++;
-            break;
+    default:
+        logger_log(connection->logger, LOG_LEVEL_ERROR, "RaSTA RECEIVE", "Received unexpected packet type %d", receivedPacket->type);
+        // increase type error counter
+        connection->errors.type++;
+        break;
     }
     return 0;
 }
@@ -53,7 +53,7 @@ int handle_discreq(struct rasta_connection *connection, struct RastaPacket *rece
     sr_reset_connection(connection);
 
     // remove redundancy channel
-    redundancy_mux_close_channel(connection->redundancy_channel);
+    redundancy_mux_close_channel(connection, connection->redundancy_channel);
 
     // fire connection state changed event
     fire_on_connection_state_change(sr_create_notification_result(NULL, connection));

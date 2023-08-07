@@ -50,6 +50,7 @@ int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *c
     channel->id = socket->id;
     channel->tls_config = socket->tls_config;
     channel->file_descriptor = socket->file_descriptor;
+    channel->associated_socket = socket;
 #ifdef ENABLE_TLS
     channel->tls_state = RASTA_TLS_CONNECTION_READY;
     channel->ctx = socket->ctx;
@@ -62,10 +63,9 @@ int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *c
     return 0;
 }
 
-int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *socket) {
+int transport_redial(rasta_transport_channel *channel) {
     // We can't reconnect when using UDP/DTLS
     UNUSED(channel);
-    UNUSED(socket);
     return -1;
 }
 

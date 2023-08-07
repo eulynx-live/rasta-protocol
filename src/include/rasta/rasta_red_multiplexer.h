@@ -207,7 +207,7 @@ int redundancy_mux_connect_channel(redundancy_mux *mux, rasta_redundancy_channel
  * close an existing redundancy channel by closing all its transport channels
  * @param c the RaSTA redundancy channel to close
  */
-void redundancy_mux_close_channel(rasta_redundancy_channel *c);
+void redundancy_mux_close_channel(rasta_connection *conn, rasta_redundancy_channel *red_channel);
 
 // handlers
 int receive_packet(redundancy_mux *mux, rasta_transport_channel *channel, unsigned char *buffer, size_t len);

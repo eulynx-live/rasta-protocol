@@ -40,6 +40,7 @@ int channel_accept_event(void *carry_data) {
         channel->receive_event.fd = fd;
         channel->tls_config = data->socket->tls_config;
         channel->connected = true;
+        channel->associated_socket = data->socket;
 #ifdef ENABLE_TLS
         channel->tls_state = RASTA_TLS_CONNECTION_READY;
         channel->ctx = data->socket->ctx;

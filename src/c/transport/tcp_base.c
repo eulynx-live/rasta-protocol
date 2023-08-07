@@ -48,6 +48,7 @@ int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr) {
 
 int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel) {
     channel->file_descriptor = socket->file_descriptor;
+    channel->associated_socket = socket;
 
     if (tcp_connect(channel) != 0) {
         return -1;
@@ -61,8 +62,9 @@ int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *c
     return 0;
 }
 
-int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *socket) {
+int transport_redial(rasta_transport_channel *channel) {
     // create a new socket (closed socket cannot be reused)
+    rasta_transport_socket *socket = channel->associated_socket;
     socket->file_descriptor = bsd_create_socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
     // bind new socket to the configured ip/port

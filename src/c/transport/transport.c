@@ -6,6 +6,7 @@ void transport_init(struct rasta_handle *h, rasta_transport_channel *channel, un
     strncpy(channel->remote_ip_address, host, INET_ADDRSTRLEN - 1);
     channel->send_callback = send_callback;
     channel->tls_config = tls_config;
+    channel->associated_socket = NULL;
 
     memset(&channel->receive_event, 0, sizeof(fd_event));
     channel->receive_event.carry_data = &channel->receive_event_data;

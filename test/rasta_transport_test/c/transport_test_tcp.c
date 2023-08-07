@@ -246,7 +246,7 @@ void test_transport_redial_should_reconnect() {
     transport_close_channel(&channel);
 
     // Act
-    transport_redial(&channel, &socket);
+    transport_redial(&channel);
 
     // Assert
     CU_ASSERT(channel.connected);
@@ -286,7 +286,7 @@ void test_transport_redial_should_assign_new_fds() {
     transport_close_channel(&channel);
 
     // Act
-    transport_redial(&channel, &socket);
+    transport_redial(&channel);
 
     // Assert
     CU_ASSERT_NOT_EQUAL(channel.file_descriptor, -1);
@@ -327,7 +327,7 @@ void test_transport_redial_should_update_event_fds() {
     transport_close_channel(&channel);
 
     // Act
-    transport_redial(&channel, &socket);
+    transport_redial(&channel);
 
     // Assert
     CU_ASSERT_EQUAL(socket.accept_event.fd, socket.file_descriptor);

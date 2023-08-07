@@ -63,6 +63,8 @@ typedef struct rasta_transport_channel {
     rasta_redundancy_diagnostics_data diagnostics_data;
 
     void (*send_callback)(struct RastaByteArray data_to_send, struct rasta_transport_channel *channel);
+
+    rasta_transport_socket *associated_socket;
 } rasta_transport_channel;
 
 typedef struct rasta_transport_socket {
@@ -98,7 +100,7 @@ bool transport_bind(rasta_transport_socket *socket, const char *ip, uint16_t por
 void transport_listen(rasta_transport_socket *socket);
 int transport_accept(rasta_transport_socket *socket, struct sockaddr_in *addr);
 int transport_connect(rasta_transport_socket *socket, rasta_transport_channel *channel);
-int transport_redial(rasta_transport_channel *channel, rasta_transport_socket *socket);
+int transport_redial(rasta_transport_channel *channel);
 void transport_close_channel(rasta_transport_channel *channel);
 void transport_close_socket(rasta_transport_socket *socket);
 
