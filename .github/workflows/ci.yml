@@ -58,7 +58,7 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} -v
 
     - name: Test
-      run: cd ${{github.workspace}}/build && ctest .
+      run: cd ${{github.workspace}}/build && ctest . --output-on-failure
 
     - name: UDP Test
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_udp.sh
