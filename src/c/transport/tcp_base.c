@@ -91,7 +91,12 @@ void transport_close_channel(rasta_transport_channel *channel) {
 }
 
 void transport_close_socket(rasta_transport_socket *socket) {
-    UNUSED(socket);
+    if (socket->file_descriptor != -1) {
+        bsd_close(socket->file_descriptor);
+        socket->file_descriptor = -1;
+    }
+
+    disable_fd_event(&socket->accept_event);
 }
 
 void send_callback(struct RastaByteArray data_to_send, rasta_transport_channel *channel) {
