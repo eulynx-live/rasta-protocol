@@ -199,6 +199,7 @@ int tcp_connect(rasta_transport_channel *channel) {
     }
 
     tls_pin_certificate(channel->ssl, channel->tls_config->peer_tls_cert_path);
+    set_tls_async(channel->file_descriptor, channel->ssl);
 
     channel->connected = true;
 
