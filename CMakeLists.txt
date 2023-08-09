@@ -21,7 +21,8 @@ if(ENABLE_STATIC_ANALYSIS)
     set(CMAKE_C_CPPCHECK "cppcheck" "--enable=performance,information")
 endif(ENABLE_STATIC_ANALYSIS)
 
-set(VALGRIND_COMMAND_OPTIONS "--leak-check=full --show-leak-kinds=all")
+find_program(MEMORYCHECK_COMMAND valgrind)
+set(MEMORYCHECK_COMMAND_OPTIONS "--leak-check=full --show-leak-kinds=all")
 
 include(CTest)
 include(GNUInstallDirs)
