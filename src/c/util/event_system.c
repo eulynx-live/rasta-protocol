@@ -8,7 +8,7 @@
 uint64_t get_nanotime() {
     struct timespec t;
     clock_gettime(CLOCK_MONOTONIC, &t);
-    return t.tv_sec * 1000000000 + t.tv_nsec;
+    return t.tv_sec * NS_PER_S + t.tv_nsec;
 }
 
 int get_max_nfds(struct fd_event_linked_list_s *fd_events) {
@@ -30,8 +30,8 @@ int get_max_nfds(struct fd_event_linked_list_s *fd_events) {
  */
 int event_system_sleep(uint64_t time_to_wait, struct fd_event_linked_list_s *fd_events) {
     struct timeval tv;
-    tv.tv_sec = time_to_wait / 1000000000;
-    tv.tv_usec = (time_to_wait / 1000) % 1000000;
+    tv.tv_sec = time_to_wait / NS_PER_S;
+    tv.tv_usec = (time_to_wait / MS_PER_S) % NS_PER_MS;
     int nfds = get_max_nfds(fd_events);
     if (nfds >= FD_SETSIZE) {
         // too high file desriptors, can be fixed by using poll instead but should not be an issue
@@ -55,7 +55,7 @@ int event_system_sleep(uint64_t time_to_wait, struct fd_event_linked_list_s *fd_
         }
     }
     // wait
-    struct timeval* timeout = time_to_wait == UINT64_MAX ? NULL : &tv;
+    struct timeval *timeout = time_to_wait == UINT64_MAX ? NULL : &tv;
     int result = select(nfds, &on_readable, &on_writable, &on_exceptional, timeout);
     if (result == -1) {
         perror("select failed");

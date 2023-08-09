@@ -1,14 +1,18 @@
 #pragma once
 
 #ifdef __cplusplus
-extern "C" {  // only need to export C interface if
-              // used by C++ source code
+extern "C" { // only need to export C interface if
+             // used by C++ source code
 #endif
 
 #include <stdint.h>
 
+#define NS_PER_S 1000000000ULL
+#define MS_PER_S 1000ULL
+#define NS_PER_MS 1000000ULL
+
 struct RastaByteArray {
-    unsigned char* bytes;
+    unsigned char *bytes;
     unsigned int length;
 };
 
@@ -16,14 +20,14 @@ struct RastaByteArray {
  * Frees the bytes array and sets length to 0
  * @param data the byte array
  */
-void freeRastaByteArray(struct RastaByteArray* data);
+void freeRastaByteArray(struct RastaByteArray *data);
 
 /**
  * Allocates space for the bytearray
  * @param data the data
  * @param length the length
  */
-void allocateRastaByteArray(struct RastaByteArray* data, unsigned int length);
+void allocateRastaByteArray(struct RastaByteArray *data, unsigned int length);
 
 /**
  * this will generate a 4 byte timestamp of the current system time
@@ -38,7 +42,7 @@ int isBigEndian();
  * @param v the uchar array
  * @param result the assigned uchar array; length should be 4
  */
-void hostLongToLe(uint32_t v, unsigned char* result);
+void hostLongToLe(uint32_t v, unsigned char *result);
 
 /**
  * Converts 4 little-endian bytes to a host ulong

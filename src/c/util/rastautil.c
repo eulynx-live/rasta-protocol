@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include <rasta/rmemory.h>
 #include <rasta/rastautil.h>
+#include <rasta/rmemory.h>
 
 #define rasta_htole32(X) (X)
 #define rasta_le32toh(X) (X)
@@ -21,7 +21,7 @@ uint32_t cur_timestamp() {
     s = spec.tv_sec;
 
     // seconds to milliseconds
-    ms = s * 1000;
+    ms = s * MS_PER_S;
 
     // nanoseconds to milliseconds
     ms += (long)(spec.tv_nsec / 1.0e6);

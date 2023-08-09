@@ -1,8 +1,12 @@
+#include <stdlib.h>
+#include <time.h>
+
+#include <rasta/config.h>
+#include <rasta/rastautil.h>
+
 #include "protocol.h"
 
-#include <time.h>
-#include <stdlib.h>
-#include <rasta/config.h>
+// TODO: This contains mostly utility functions, like rastautil.c. Merge these two files?
 
 uint64_t get_current_time_ms() {
     uint64_t current_time;
