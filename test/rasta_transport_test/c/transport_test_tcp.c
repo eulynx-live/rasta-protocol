@@ -13,9 +13,9 @@ void test_transport_create_socket_should_initialize_accept_event() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
-    rasta_config_tls tls_config;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
+    rasta_config_tls tls_config = {0};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
@@ -35,9 +35,9 @@ void test_transport_create_socket_should_initialize_accept_event_data() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
-    rasta_config_tls tls_config;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
+    rasta_config_tls tls_config = {0};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
@@ -57,9 +57,9 @@ void test_transport_create_socket_should_add_accept_event_to_event_system() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
-    rasta_config_tls tls_config;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
+    rasta_config_tls tls_config = {0};
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
@@ -77,9 +77,14 @@ void test_transport_listen_should_enable_socket_accept_event() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
-    rasta_config_tls tls_config;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
+    rasta_config_tls tls_config = {
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -88,7 +93,7 @@ void test_transport_listen_should_enable_socket_accept_event() {
     CU_ASSERT_FALSE(socket.accept_event.enabled);
 
     // Act
-    transport_listen(&h, &socket);
+    transport_listen(&socket);
 
     // Assert
     CU_ASSERT(socket.accept_event.enabled);
@@ -101,10 +106,14 @@ void test_transport_connect_should_enable_channel_receive_event() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED};
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -113,79 +122,91 @@ void test_transport_connect_should_enable_channel_receive_event() {
     CU_ASSERT_FALSE(channel.receive_event.enabled);
 
     // Act
-    CU_ASSERT_EQUAL(transport_connect(&socket, &channel, tls_config), 0);
+    CU_ASSERT_EQUAL(transport_connect(&socket, &channel), 0);
 
     // Assert
     CU_ASSERT(channel.receive_event.enabled);
 }
 
-void test_transport_close_should_set_unconnected() {
+void test_transport_close_channel_should_set_unconnected() {
     // Arrange
     event_system event_system = {0};
     struct rasta_handle h;
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED};
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
-    transport_connect(&socket, &channel, tls_config);
+    transport_connect(&socket, &channel);
 
     // Assert
     CU_ASSERT(channel.connected);
 
     // Act
-    transport_close(&channel);
+    transport_close_channel(&channel);
 
     // Assert
     CU_ASSERT_FALSE(channel.connected);
 }
 
-void test_transport_close_should_invalidate_fd() {
+void test_transport_close_channel_should_invalidate_fd() {
     // Arrange
     event_system event_system = {0};
     struct rasta_handle h;
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED};
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
-    transport_connect(&socket, &channel, tls_config);
+    transport_connect(&socket, &channel);
 
     // Act
-    transport_close(&channel);
+    transport_close_channel(&channel);
 
     // Assert
     CU_ASSERT_EQUAL(channel.file_descriptor, -1);
 }
 
-void test_transport_close_should_disable_channel_receive_event() {
+void test_transport_close_channel_should_disable_channel_receive_event() {
     // Arrange
     event_system event_system = {0};
     struct rasta_handle h;
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED};
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
-    transport_connect(&socket, &channel, tls_config);
+    transport_connect(&socket, &channel);
 
     // Act
-    transport_close(&channel);
+    transport_close_channel(&channel);
 
     // Assert
     CU_ASSERT_FALSE(channel.receive_event.enabled);
@@ -198,10 +219,14 @@ void test_transport_redial_should_reconnect() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED};
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     rasta_ip_data ip_data = {
         .ip = "127.0.0.1",
@@ -217,11 +242,11 @@ void test_transport_redial_should_reconnect() {
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
-    transport_connect(&socket, &channel, tls_config);
-    transport_close(&channel);
+    transport_connect(&socket, &channel);
+    transport_close_channel(&channel);
 
     // Act
-    transport_redial(&channel, &socket);
+    transport_redial(&channel);
 
     // Assert
     CU_ASSERT(channel.connected);
@@ -234,10 +259,14 @@ void test_transport_redial_should_assign_new_fds() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED};
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     rasta_ip_data ip_data = {
         .ip = "127.0.0.1",
@@ -253,11 +282,11 @@ void test_transport_redial_should_assign_new_fds() {
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
-    transport_connect(&socket, &channel, tls_config);
-    transport_close(&channel);
+    transport_connect(&socket, &channel);
+    transport_close_channel(&channel);
 
     // Act
-    transport_redial(&channel, &socket);
+    transport_redial(&channel);
 
     // Assert
     CU_ASSERT_NOT_EQUAL(channel.file_descriptor, -1);
@@ -271,10 +300,14 @@ void test_transport_redial_should_update_event_fds() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED};
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     rasta_ip_data ip_data = {
         .ip = "127.0.0.1",
@@ -290,11 +323,11 @@ void test_transport_redial_should_update_event_fds() {
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
-    transport_connect(&socket, &channel, tls_config);
-    transport_close(&channel);
+    transport_connect(&socket, &channel);
+    transport_close_channel(&channel);
 
     // Act
-    transport_redial(&channel, &socket);
+    transport_redial(&channel);
 
     // Assert
     CU_ASSERT_EQUAL(socket.accept_event.fd, socket.file_descriptor);

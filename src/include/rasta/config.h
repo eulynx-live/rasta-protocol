@@ -1,17 +1,17 @@
 #pragma once
 
 #ifdef __cplusplus
-extern "C" {  // only need to export C interface if
-              // used by C++ source code
+extern "C" { // only need to export C interface if
+             // used by C++ source code
 #endif
 
-#include <limits.h>
-#include <stdint.h>
+#include <linux/limits.h>
 #include <stdbool.h>
+#include <stdint.h>
 
+#include "key_exchange.h"
 #include "logging.h"
 #include "rastafactory.h"
-#include "key_exchange.h"
 
 #define CONFIG_BUFFER_LENGTH 10000
 
@@ -83,33 +83,25 @@ typedef struct rasta_config_general {
     unsigned long rasta_id;
 } rasta_config_general;
 
-typedef enum rasta_tls_mode
-{
-    TLS_MODE_DISABLED,
-    TLS_MODE_DTLS_1_2,
-    TLS_MODE_TLS_1_3
-} rasta_tls_mode;
-
 // max length of CN in ASN.1
 #define MAX_DOMAIN_LENGTH 64
 
 /**
  * Non-standard extension
  */
+// TODO: PATH_MAX is Linux-specific, replace if possible
 typedef struct rasta_config_tls {
-    rasta_tls_mode mode;
-
     /**
      * Path to CA certificate to use, required for server and client operation
      */
     char ca_cert_path[PATH_MAX];
     /**
-    * Path to server certificate to use, required for server and client operation
-    */
+     * Path to server certificate to use, required for server and client operation
+     */
     char cert_path[PATH_MAX];
     /**
-    * Path to server private key to use, required for server operation
-    */
+     * Path to server private key to use, required for server operation
+     */
     char key_path[PATH_MAX];
     /**
      * Domain / common name to validate TLS certificates against (as client)
@@ -120,7 +112,6 @@ typedef struct rasta_config_tls {
      */
     char peer_tls_cert_path[PATH_MAX];
 } rasta_config_tls;
-
 
 /**
  * stores all presets after load
@@ -154,7 +145,7 @@ typedef struct rasta_config_info {
     rasta_config_general general;
     /**
      * Configuration for TLS / dTLS setup.
-     * Must set mode, and for mode != TLS_MODE_DISABLED, paths to certificate and keys must be set as required
+     * paths to certificate and keys must be set as required
      */
     rasta_config_tls tls;
     /**
@@ -170,7 +161,7 @@ typedef struct rasta_connection_config {
      */
     rasta_config_info *config;
     /**
-     * the sockets (IP address + port) used by the other connection endpoint 
+     * the sockets (IP address + port) used by the other connection endpoint
      */
     rasta_ip_data *transport_sockets;
     size_t transport_sockets_count;

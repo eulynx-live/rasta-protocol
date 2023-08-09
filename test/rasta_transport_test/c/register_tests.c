@@ -51,10 +51,10 @@ void cunit_register() {
     // Tests for transport_connect
     CU_add_test(pSuiteMath, "test_transport_connect_should_enable_channel_receive_event", test_transport_connect_should_enable_channel_receive_event);
 
-    // Tests for transport_close
-    CU_add_test(pSuiteMath, "test_transport_close_should_set_unconnected", test_transport_close_should_set_unconnected);
-    CU_add_test(pSuiteMath, "test_transport_close_should_invalidate_fd", test_transport_close_should_invalidate_fd);
-    CU_add_test(pSuiteMath, "test_transport_close_should_disable_channel_receive_event", test_transport_close_should_disable_channel_receive_event);
+    // Tests for transport_close_channel
+    CU_add_test(pSuiteMath, "test_transport_close_channel_should_set_unconnected", test_transport_close_channel_should_set_unconnected);
+    CU_add_test(pSuiteMath, "test_transport_close_channel_should_invalidate_fd", test_transport_close_channel_should_invalidate_fd);
+    CU_add_test(pSuiteMath, "test_transport_close_channel_should_disable_channel_receive_event", test_transport_close_channel_should_disable_channel_receive_event);
 
     // Tests for transport_redial
     CU_add_test(pSuiteMath, "test_transport_redial_should_reconnect", test_transport_redial_should_reconnect);

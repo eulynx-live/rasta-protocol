@@ -11,10 +11,11 @@ void test_transport_init_should_initialize_channel_props() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_channel channel;
+    rasta_transport_channel channel = {0};
+    rasta_config_tls tls_config = {0};
 
     // Act
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, NULL);
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
     // Assert
 
@@ -31,10 +32,11 @@ void test_transport_init_should_initialize_receive_event() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_channel channel;
+    rasta_transport_channel channel = {0};
+    rasta_config_tls tls_config = {0};
 
     // Act
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, NULL);
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
     // Assert
 
@@ -51,10 +53,11 @@ void test_transport_init_should_initialize_receive_event_data() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_channel channel;
+    rasta_transport_channel channel = {0};
+    rasta_config_tls tls_config = {0};
 
     // Act
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, NULL);
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
     // Assert
 
@@ -72,10 +75,11 @@ void test_transport_init_should_add_receive_event_to_event_system() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_channel channel;
+    rasta_transport_channel channel = {0};
+    rasta_config_tls tls_config = {0};
 
     // Act
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, NULL);
+    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
 
     // Assert
 
@@ -89,8 +93,8 @@ void test_transport_create_socket_should_initialize_socket() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_config_tls tls_config;
+    rasta_transport_socket socket = {0};
+    rasta_config_tls tls_config = {0};
 
     // Act
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -107,8 +111,8 @@ void test_transport_create_socket_should_create_fd() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_config_tls tls_config;
+    rasta_transport_socket socket = {0};
+    rasta_config_tls tls_config = {0};
 
     // Act
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -124,10 +128,14 @@ void test_transport_connect_should_set_connected() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED};
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
@@ -136,7 +144,7 @@ void test_transport_connect_should_set_connected() {
     CU_ASSERT_FALSE(channel.connected);
 
     // Act
-    CU_ASSERT_EQUAL(transport_connect(&socket, &channel, tls_config), 0);
+    CU_ASSERT_EQUAL(transport_connect(&socket, &channel), 0);
 
     // Assert
     CU_ASSERT(channel.connected);
@@ -149,16 +157,20 @@ void test_transport_connect_should_set_equal_fds() {
     h.ev_sys = &event_system;
     rasta_handle_init(&h, NULL, NULL);
 
-    rasta_transport_socket socket;
-    rasta_transport_channel channel;
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {
-        .mode = TLS_MODE_DISABLED};
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
 
     transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 42, &tls_config);
 
     // Act
-    CU_ASSERT_EQUAL(transport_connect(&socket, &channel, tls_config), 0);
+    CU_ASSERT_EQUAL(transport_connect(&socket, &channel), 0);
 
     // Assert
     CU_ASSERT_EQUAL(channel.file_descriptor, socket.file_descriptor);

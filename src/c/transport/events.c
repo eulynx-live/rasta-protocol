@@ -38,8 +38,9 @@ int channel_accept_event(void *carry_data) {
     if (channel != NULL) {
         channel->file_descriptor = fd;
         channel->receive_event.fd = fd;
-        channel->tls_mode = data->socket->tls_mode;
+        channel->tls_config = data->socket->tls_config;
         channel->connected = true;
+        channel->associated_socket = data->socket;
 #ifdef ENABLE_TLS
         channel->tls_state = RASTA_TLS_CONNECTION_READY;
         channel->ctx = data->socket->ctx;
@@ -64,13 +65,7 @@ int channel_receive_event(void *carry_data) {
     unsigned char buffer[MAX_DEFER_QUEUE_MSG_SIZE] = {0};
     struct sockaddr_in sender = {0};
 
-    // when performing DTLS accept, len = 0 doesn't signal a broken connection
-    // ifdef needed because UDP/TCP do not know about the tls_state
-#ifdef ENABLE_TLS
-    bool is_dtls_conn_ready = data->socket != NULL && data->socket->tls_mode == TLS_MODE_DTLS_1_2 && data->socket->tls_state == RASTA_TLS_CONNECTION_READY;
-#else
-    bool is_dtls_conn_ready = false;
-#endif
+    bool is_dtls_conn_ready_result = is_dtls_conn_ready(data->socket);
 
     ssize_t len = receive_callback(data, buffer, &sender);
 
@@ -106,7 +101,8 @@ int channel_receive_event(void *carry_data) {
 
     logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux receive", "Channel %d calling receive", transport_channel->id);
 
-    if (len <= 0 && !is_dtls_conn_ready) {
+    // when performing DTLS accept, len = 0 doesn't signal a broken connection
+    if (len <= 0 && !is_dtls_conn_ready_result) {
         // Connection is broken
         transport_channel->connected = false;
 

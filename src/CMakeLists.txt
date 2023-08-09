@@ -36,7 +36,6 @@ set(headers
     include/rasta/rastaredundancy.h
     include/rasta/rastautil.h
     include/rasta/rmemory.h
-    include/rasta/bsd_utils.h
     include/rasta/rastablake2.h
     include/rasta/rastasiphash24.h
     include/rasta/rastahashing.h
@@ -47,6 +46,7 @@ set(sources
     c/logging.c
     c/rastafactory.c
     c/transport/bsd_utils.c
+    c/transport/bsd_utils.h
     c/transport/diagnostics.c
     c/transport/diagnostics.h
     c/transport/events.c
@@ -90,6 +90,14 @@ endif(ENABLE_RASTA_TLS)
 foreach(RASTA_VARIANT ${RASTA_VARIANTS})
 
     set(variant_sources ${sources} c/transport/${RASTA_VARIANT}.c)
+
+    if(RASTA_VARIANT STREQUAL "tcp" OR RASTA_VARIANT STREQUAL "tls")
+        set(variant_sources ${variant_sources} c/transport/tcp_base.c)
+    endif()
+
+    if(RASTA_VARIANT STREQUAL "udp" OR RASTA_VARIANT STREQUAL "dtls")
+        set(variant_sources ${variant_sources} c/transport/udp_base.c)
+    endif()
 
     # TODO: Remove ssl_utils
     if(RASTA_VARIANT STREQUAL "dtls" OR RASTA_VARIANT STREQUAL "tls")

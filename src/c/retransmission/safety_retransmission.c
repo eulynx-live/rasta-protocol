@@ -1,13 +1,13 @@
 #include <rasta/rasta.h>
-#include <rasta/rmemory.h>
 #include <rasta/rastahandle.h>
+#include <rasta/rmemory.h>
 
-#include "safety_retransmission.h"
 #include "protocol.h"
+#include "safety_retransmission.h"
 
+#include "../retransmission/handlers.h"
 #include "../transport/events.h"
 #include "../transport/transport.h"
-#include "../retransmission/handlers.h"
 
 void sr_update_timeout_interval(long confirmed_timestamp, struct rasta_connection *con, rasta_config_sending *cfg) {
     unsigned long t_local = cur_timestamp();
@@ -64,7 +64,7 @@ void sr_add_app_messages_to_buffer(struct rasta_connection *con, struct RastaPac
         struct RastaByteArray *to_fifo = rmalloc(sizeof(struct RastaByteArray));
         allocateRastaByteArray(to_fifo, received_data.data_array[i].length);
         rmemcpy(to_fifo->bytes, received_data.data_array[i].bytes, received_data.data_array[i].length);
-        
+
         if (!fifo_push(con->fifo_receive, to_fifo)) {
             logger_log(con->logger, LOG_LEVEL_INFO, "RaSTA add to buffer", "could not insert message into receive queue because it is full");
         }
@@ -109,7 +109,7 @@ void sr_remove_confirmed_messages(struct rasta_connection *con) {
     }
 
     // sending is now possible again (space in the retransmission queue is available), so we should trigger it
-    if(fifo_full(con->fifo_send)){
+    if (fifo_full(con->fifo_send)) {
         data_send_event(&con->send_handle);
     }
 }
@@ -224,7 +224,7 @@ void sr_close_connection(struct rasta_connection *connection, rasta_disconnect_r
     if (connection->current_state == RASTA_CONNECTION_DOWN || connection->current_state == RASTA_CONNECTION_CLOSED) {
         sr_reset_connection(connection);
 
-        redundancy_mux_close_channel(connection->redundancy_channel);
+        redundancy_mux_close_channel(connection, connection->redundancy_channel);
 
         // fire connection state changed event
         fire_on_connection_state_change(sr_create_notification_result(NULL, connection));
@@ -235,7 +235,7 @@ void sr_close_connection(struct rasta_connection *connection, rasta_disconnect_r
 
         connection->current_state = RASTA_CONNECTION_CLOSED;
 
-        redundancy_mux_close_channel(connection->redundancy_channel);
+        redundancy_mux_close_channel(connection, connection->redundancy_channel);
 
         // fire connection state changed event
         fire_on_connection_state_change(sr_create_notification_result(NULL, connection));
@@ -363,7 +363,7 @@ unsigned int sr_recv_queue_item_count(struct rasta_connection *connection) {
 }
 
 void sr_listen(struct rasta_handle *h) {
-    redundancy_mux_listen_channels(h, &h->mux);
+    redundancy_mux_listen_channels(&h->mux);
 }
 
 int sr_send(struct rasta_handle *h, struct rasta_connection *con, struct RastaMessageData app_messages) {
@@ -425,7 +425,7 @@ int sr_send(struct rasta_handle *h, struct rasta_connection *con, struct RastaMe
     return 0;
 }
 
-struct rasta_connection* sr_connect(struct rasta_handle *h, unsigned long id) {
+struct rasta_connection *sr_connect(struct rasta_handle *h, unsigned long id) {
     rasta_connection *connection = NULL;
 
     for (unsigned i = 0; i < h->rasta_connections_length; i++) {
@@ -435,7 +435,7 @@ struct rasta_connection* sr_connect(struct rasta_handle *h, unsigned long id) {
         }
     }
 
-    if (connection == NULL || redundancy_mux_connect_channel(connection, &h->mux, connection->redundancy_channel) != 0) {
+    if (connection == NULL || redundancy_mux_connect_channel(&h->mux, connection->redundancy_channel) != 0) {
         return NULL;
     }
 
@@ -487,7 +487,7 @@ struct rasta_connection* sr_connect(struct rasta_handle *h, unsigned long id) {
 
     // What happened? Timeout, or user abort, or success?
     if (connection->current_state != RASTA_CONNECTION_UP) {
-        redundancy_mux_close_channel(connection->redundancy_channel);
+        redundancy_mux_close_channel(connection, connection->redundancy_channel);
         return NULL;
     }
 
@@ -652,7 +652,7 @@ void sr_closed_connection(rasta_connection *connection, unsigned long id) {
     sr_reset_connection(connection);
 
     // remove redundancy channel
-    redundancy_mux_close_channel(connection->redundancy_channel);
+    redundancy_mux_close_channel(connection, connection->redundancy_channel);
 
     // fire connection state changed event
     // TODO: Provide handle to receiver

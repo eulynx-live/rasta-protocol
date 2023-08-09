@@ -8,31 +8,12 @@ extern "C" { // only need to export C interface if
              // used by C++ source code
 #endif
 
-#include "transport.h"
 #include <netinet/in.h>
 #include <stdint.h>
-#ifdef ENABLE_TLS
-#include <wolfssl/options.h>
-#include <wolfssl/ssl.h>
-#endif
 
-#define IPV4_STR_LEN 16
+#include "transport.h"
 
-/**
- * This function will initialise an udp socket and return its file descriptor, which is used to reference it in later
- * function calls
- * @param transport_socket the udp transport_socket buffer
- * @param tls_config TLS options
- */
-void udp_init(rasta_transport_socket *transport_socket, const rasta_config_tls *tls_config);
-
-/**
- * Binds a given file descriptor to the given @p port at the network interface with IPv4 address @p ip
- * @param transport_socket transport_socket with the file descriptor which will be bound to to the @p port.
- * @param port the port the socket will listen on
- * @param ip the IPv4 address of the network interface the socket will listen on.
- */
-bool udp_bind_device(rasta_transport_socket *transport_socket, const char *ip, uint16_t port);
+void handle_tls_mode(rasta_transport_socket *transport_socket);
 
 /**
  * Receive data on the given @p file descriptor and store it in the given buffer.
