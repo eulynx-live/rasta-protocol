@@ -260,8 +260,11 @@ void redundancy_mux_close(redundancy_mux *mux) {
     rfree(mux->transport_sockets);
     for (unsigned int i = 0; i < mux->redundancy_channels_count; i++) {
         rfree(mux->redundancy_channels[i].transport_channels);
+        freeRastaByteArray(&mux->redundancy_channels[i].hashing_context.key);
+        deferqueue_destroy(&mux->redundancy_channels[i].defer_q);
     }
     rfree(mux->redundancy_channels);
+    rfree(mux->listen_ports);
 
     freeRastaByteArray(&mux->sr_hashing_context.key);
 }
