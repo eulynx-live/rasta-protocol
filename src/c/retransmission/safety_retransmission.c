@@ -344,6 +344,10 @@ void sr_retransmit_data(rasta_connection *connection) {
         freeRastaByteArray(&packets[i]);
         freeRastaByteArray(&new_p);
         freeRastaByteArray(&old_p.data);
+        freeRastaByteArray(&old_p.checksum);
+        freeRastaByteArray(&data.data);
+
+        freeRastaMessageData(&app_messages);
     }
 
     // close retransmission with heartbeat

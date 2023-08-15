@@ -46,6 +46,7 @@ void test_push() {
     CU_ASSERT_EQUAL(fifo_get_size(fifo), 3);
 
     fifo_destroy(&fifo);
+    freeRastaByteArray(&elem);
     rfree(test_str);
     rfree(struct_elem);
 }

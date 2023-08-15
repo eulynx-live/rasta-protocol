@@ -36,7 +36,7 @@ void test_transport_init_should_initialize_receive_event() {
     rasta_config_tls tls_config = {0};
 
     // Act
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
 
     // Assert
 
@@ -57,7 +57,7 @@ void test_transport_init_should_initialize_receive_event_data() {
     rasta_config_tls tls_config = {0};
 
     // Act
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
 
     // Assert
 
@@ -79,7 +79,7 @@ void test_transport_init_should_add_receive_event_to_event_system() {
     rasta_config_tls tls_config = {0};
 
     // Act
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
 
     // Assert
 
@@ -115,7 +115,7 @@ void test_transport_create_socket_should_create_fd() {
     rasta_config_tls tls_config = {0};
 
     // Act
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
 
     // Assert
     CU_ASSERT(socket.file_descriptor >= 0);
@@ -137,8 +137,8 @@ void test_transport_connect_should_set_connected() {
         .key_path = "../examples/server.key",
     };
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
 
     // Assert
     CU_ASSERT_FALSE(channel.connected);
@@ -166,8 +166,8 @@ void test_transport_connect_should_set_equal_fds() {
         .key_path = "../examples/server.key",
     };
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
 
     // Act
     CU_ASSERT_EQUAL(transport_connect(&socket, &channel), 0);

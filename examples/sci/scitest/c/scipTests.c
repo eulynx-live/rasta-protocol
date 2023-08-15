@@ -67,6 +67,8 @@ void testParseChangeLocation() {
     sci_set_message_type(telegram, SCIP_MESSAGE_TYPE_TIMEOUT);
     result = scip_parse_change_location_payload(telegram, &location);
     CU_ASSERT_EQUAL(result, SCI_PARSE_INVALID_MESSAGE_TYPE);
+
+    rfree(telegram);
 }
 
 void testParseLocationStatus() {
@@ -81,4 +83,6 @@ void testParseLocationStatus() {
     sci_set_message_type(telegram, SCIP_MESSAGE_TYPE_TIMEOUT);
     result = scip_parse_location_status_payload(telegram, &location);
     CU_ASSERT_EQUAL(result, SCI_PARSE_INVALID_MESSAGE_TYPE);
+
+    rfree(telegram);
 }

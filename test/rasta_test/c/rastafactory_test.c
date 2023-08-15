@@ -1,6 +1,7 @@
 #include "../headers/rastafactory_test.h"
 #include "CUnit/Basic.h"
 #include <rasta/rastafactory.h>
+#include <rasta/rmemory.h>
 
 void checkConnectionPacket() {
     rasta_hashing_context_t context;
@@ -35,6 +36,8 @@ void checkConnectionPacket() {
             CU_ASSERT_EQUAL(con.version[i], i);
         }
 
+        freeRastaByteArray(&r.data);
+
         r = createConnectionResponse(1, 2, 3, 4, 5, 6, 7, ver, &context);
 
         // check standart values
@@ -57,7 +60,11 @@ void checkConnectionPacket() {
         r.data.length -= 1;
         con = extractRastaConnectionData(&r);
         CU_ASSERT_EQUAL(getRastafactoryLastError(), RASTA_ERRORS_WRONG_PACKAGE_FORMAT);
+
+        freeRastaByteArray(&r.data);
     }
+
+    freeRastaByteArray(&context.key);
 }
 
 void checkNormalPacket() {
@@ -103,6 +110,8 @@ void checkNormalPacket() {
         CU_ASSERT_EQUAL(r.confirmed_timestamp, 6);
         CU_ASSERT_EQUAL(r.type, RASTA_TYPE_HB);
     }
+
+    freeRastaByteArray(&hashing_context.key);
 }
 
 void checkDisconnectionRequest() {
@@ -136,7 +145,11 @@ void checkDisconnectionRequest() {
         r.data.length -= 1;
         data = extractRastaDisconnectionData(&r);
         CU_ASSERT_EQUAL(getRastafactoryLastError(), RASTA_ERRORS_WRONG_PACKAGE_FORMAT);
+
+        freeRastaByteArray(&r.data);
     }
+
+    freeRastaByteArray(&hashing_context.key);
 }
 
 void checkMessagePacket() {
@@ -191,6 +204,7 @@ void checkMessagePacket() {
         CU_ASSERT_EQUAL(m.data_array[1].bytes[1], 4);
 
         freeRastaMessageData(&m);
+        freeRastaByteArray(&r.data);
 
         // check retransmitted message data
         r = createRetransmittedDataMessage(1, 2, 3, 4, 5, 6, data, &hashing_context);
@@ -216,9 +230,11 @@ void checkMessagePacket() {
         CU_ASSERT_EQUAL(m.data_array[1].bytes[1], 4);
 
         freeRastaMessageData(&m);
+        freeRastaByteArray(&r.data);
     }
 
     freeRastaMessageData(&data);
+    freeRastaByteArray(&hashing_context.key);
 }
 
 void testCreateRedundancyPacket() {
