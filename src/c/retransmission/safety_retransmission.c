@@ -75,6 +75,10 @@ void sr_add_app_messages_to_buffer(struct rasta_connection *con, struct RastaPac
         sr_update_timeout_interval(packet->confirmed_timestamp, con, &con->config->sending);
         sr_diagnostic_update(con, packet, &con->config->sending);
     }
+
+    freeRastaByteArray(&packet->data);
+    freeRastaByteArray(&packet->checksum);
+    freeRastaMessageData(&received_data);
 }
 
 void sr_remove_confirmed_messages(struct rasta_connection *con) {
@@ -88,6 +92,10 @@ void sr_remove_confirmed_messages(struct rasta_connection *con) {
         logger_log(con->logger, LOG_LEVEL_DEBUG, "RaSTA remove confirmed", "removing packet with sn = %lu",
                    (long unsigned int)packet.sequence_number);
 
+        freeRastaByteArray(elem);
+        freeRastaByteArray(&packet.data);
+        rfree(elem);
+
         // message is confirmed when CS_R - SN_PDU >= 0
         // equivalent to SN_PDU <= CS_R
         if (packet.sequence_number == con->cs_r) {
@@ -95,17 +103,8 @@ void sr_remove_confirmed_messages(struct rasta_connection *con) {
             // SN_PDU will be bigger than CS_R (because of FIFO property of mqueue)
             // that means we removed all confirmed messages and have to leave the loop to stop removing packets
             logger_log(con->logger, LOG_LEVEL_DEBUG, "RaSTA remove confirmed", "last confirmed packet removed");
-
-            freeRastaByteArray(elem);
-            freeRastaByteArray(&packet.data);
-            rfree(elem);
-
             break;
         }
-
-        freeRastaByteArray(elem);
-        freeRastaByteArray(&packet.data);
-        rfree(elem);
     }
 
     // sending is now possible again (space in the retransmission queue is available), so we should trigger it

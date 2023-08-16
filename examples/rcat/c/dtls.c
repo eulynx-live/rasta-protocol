@@ -30,6 +30,9 @@ void prepare_certs(const char *config_path) {
 
         printf("Generated Certificates");
     }
+
+    dictionary_free(&config.dictionary);
+    rfree(config.values.redundancy.connections.data);
 }
 
 void printHelpAndExit(void) {
@@ -82,6 +85,8 @@ int main(int argc, char *argv[]) {
     fd_event input_available_event;
     struct connect_event_data input_available_event_data;
 
+    memset(&input_available_event, 0, sizeof(fd_event));
+
     input_available_event.callback = send_input_data;
     input_available_event.carry_data = &input_available_event_data;
     input_available_event.fd = STDIN_FILENO;
@@ -104,8 +109,7 @@ int main(int argc, char *argv[]) {
             .config = &config,
             .rasta_id = ID_S,
             .transport_sockets = toServer,
-            .transport_sockets_count = sizeof(toServer) / sizeof(toServer[0])
-        };
+            .transport_sockets_count = sizeof(toServer) / sizeof(toServer[0])};
 
         rasta_lib_init_configuration(rc, &config, &logger, &connection, 1);
 
@@ -148,8 +152,7 @@ int main(int argc, char *argv[]) {
             .config = &config,
             .rasta_id = ID_R,
             .transport_sockets = toServer,
-            .transport_sockets_count = sizeof(toServer) / sizeof(toServer[0])
-        };
+            .transport_sockets_count = sizeof(toServer) / sizeof(toServer[0])};
 
         rasta_lib_init_configuration(rc, &config, &logger, &connection, 1);
 

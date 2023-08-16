@@ -90,6 +90,8 @@ int receive_packet(redundancy_mux *mux, rasta_transport_channel *transport_chann
         if (deferqueue_isfull(&channel->defer_q)) {
             // Discard incoming packet
             logger_log(channel->logger, LOG_LEVEL_INFO, "RaSTA Red receive", "discarding packet because defer queue is full");
+            freeRastaByteArray(&receivedPacket.data.data);
+            freeRastaByteArray(&receivedPacket.data.checksum);
         } else {
             // If this turned out to be a new connection or new application data, break from processing
             result |= red_f_receiveData(channel, receivedPacket, transport_channel->id);
@@ -248,8 +250,6 @@ bool redundancy_mux_bind(struct rasta_handle *h) {
 }
 
 void redundancy_mux_close(redundancy_mux *mux) {
-    // TODO: red_f_cleanup should be called when closing a rasta_connection
-
     // Close listening ports
     for (unsigned int i = 0; i < mux->port_count; ++i) {
         logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA RedMux close", "closing socket %d/%d", i + 1, mux->port_count);
@@ -259,9 +259,7 @@ void redundancy_mux_close(redundancy_mux *mux) {
     mux->port_count = 0;
     rfree(mux->transport_sockets);
     for (unsigned int i = 0; i < mux->redundancy_channels_count; i++) {
-        rfree(mux->redundancy_channels[i].transport_channels);
-        freeRastaByteArray(&mux->redundancy_channels[i].hashing_context.key);
-        deferqueue_destroy(&mux->redundancy_channels[i].defer_q);
+        red_f_cleanup(&mux->redundancy_channels[i]);
     }
     rfree(mux->redundancy_channels);
     rfree(mux->listen_ports);

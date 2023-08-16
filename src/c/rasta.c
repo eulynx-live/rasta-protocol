@@ -108,6 +108,11 @@ void rasta_disconnect(struct rasta_connection *connection) {
 void rasta_cleanup(rasta_lib_configuration_t user_configuration) {
     sr_cleanup(&user_configuration->h);
     for (unsigned i = 0; i < user_configuration->h.rasta_connections_length; i++) {
+        struct RastaByteArray *elem;
+        while ((elem = fifo_pop(user_configuration->h.rasta_connections[i].fifo_retransmission))) {
+            freeRastaByteArray(elem);
+            rfree(elem);
+        }
         fifo_destroy(&user_configuration->h.rasta_connections[i].fifo_retransmission);
         fifo_destroy(&user_configuration->h.rasta_connections[i].fifo_send);
         fifo_destroy(&user_configuration->h.rasta_connections[i].fifo_receive);

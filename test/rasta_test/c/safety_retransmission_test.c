@@ -88,6 +88,9 @@ void test_sr_retransmit_data_shouldSendFinalHeartbeat() {
 
     fifo_destroy(&connection.fifo_retransmission);
 
+    freeRastaByteArray(hb_message);
+    rfree(hb_message);
+
     rfree(mux.transport_sockets);
     freeRastaByteArray(&fake_channel.hashing_context.key);
     freeRastaByteArray(&mux.sr_hashing_context.key);
@@ -192,6 +195,11 @@ void test_sr_retransmit_data_shouldRetransmitPackage() {
 
     fifo_destroy(&connection.fifo_retransmission);
     fifo_destroy(&test_send_fifo);
+
+    freeRastaByteArray(retrdata_message);
+    freeRastaByteArray(hb_message);
+    rfree(retrdata_message);
+    rfree(hb_message);
 
     rfree(mux.transport_sockets);
     freeRastaByteArray(&data.data);

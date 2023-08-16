@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include <rasta/rastautil.h>
@@ -36,6 +37,7 @@ void freeRastaByteArray(struct RastaByteArray *data) {
 
 void allocateRastaByteArray(struct RastaByteArray *data, unsigned int length) {
     data->bytes = rmalloc(length);
+    memset(data->bytes, 0, length);
     data->length = length;
 }
 
