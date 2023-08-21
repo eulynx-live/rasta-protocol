@@ -14,7 +14,7 @@ include(ExternalProject)
 set(opaque_CFLAGS "")
 
 if(BUILD_TESTING)
-    set(opaque_CFLAGS "CFLAGS=\"-g -O0 -I ${sodium_INCLUDE_DIRS}\"")
+    set(opaque_CFLAGS "CFLAGS=\"-g -O0 -I ${sodium_INCLUDE_DIR}\"")
 endif()
 
 # directories for output library and headers
