@@ -46,6 +46,7 @@ if(ENABLE_CODE_COVERAGE)
 endif(ENABLE_CODE_COVERAGE)
 
 if(ENABLE_RASTA_OPAQUE)
+    find_package(sodium REQUIRED)
 
     find_program(GNU_MAKE_PATH
             NAMES gmake mingw32-make make

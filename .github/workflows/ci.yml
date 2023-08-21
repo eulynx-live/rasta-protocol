@@ -17,8 +17,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install vcpkg
-      run: git submodule update --init && ./vcpkg/bootstrap-vcpkg.sh --disableMetrics
+    - name: Install vcpkg and dependencies
+      run: sudo apt-get install linux-libc-dev pkgconf && git submodule update --init && ./vcpkg/bootstrap-vcpkg.sh --disableMetrics
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
