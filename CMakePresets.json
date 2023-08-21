@@ -3,6 +3,7 @@
     "configurePresets": [
         {
             "name": "vcpkg",
+            "binaryDir": "build",
             "toolchainFile": "vcpkg/scripts/buildsystems/vcpkg.cmake"
         }
     ]
