@@ -17,41 +17,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install CUnit
-      run: sudo apt-get install libcunit1 libcunit1-doc libcunit1-dev
-
-    - name: Install libopaque dependencies
-      run: sudo apt-get install libsodium-dev pkgconf
-
-    - name: Install gRPC
-      run: |
-        sudo apt-get install build-essential autoconf libtool
-        cd /tmp
-        git clone --recurse-submodules -b v1.47.0 --depth 1 --shallow-submodules https://github.com/grpc/grpc
-        cd grpc
-        mkdir -p cmake/build && cd cmake/build
-        cmake ../.. -DgRPC_INSTALL=ON
-        make -j8 && sudo make install
-        cd / && rm -rf /tmp/grpc
-
-    - name: Install WolfSSL
-      run: |
-        sudo apt-get install libtool autogen automake
-        cd /tmp
-        git clone --recurse-submodules -b v5.2.0-stable --depth 1 --shallow-submodules https://github.com/wolfssl/wolfssl
-        cd wolfssl
-        ./autogen.sh
-        ./configure --enable-dtls --enable-debug --enable-certgen --enable-tls13 CFLAGS="-DHAVE_SECRET_CALLBACK" --enable-opensslextra
-        make && sudo make install
-        cd / && rm -rf /tmp/wolfssl
-
-    - name: Set LD_LIBRARY_PATH
-      run: echo "LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH):/usr/local/lib" >> $GITHUB_ENV
+    - name: Install vcpkg
+      run: git submodule update --init && ./vcpkg/bootstrap-vcpkg.sh --disableMetrics
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_RASTA_GRPC_BRIDGE=ON -DENABLE_RASTA_TLS=ON -DENABLE_RASTA_OPAQUE=ON
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_RASTA_GRPC_BRIDGE=ON -DENABLE_RASTA_TLS=ON -DENABLE_RASTA_OPAQUE=ON --preset vcpkg
 
     - name: Build
       # Build your program with the given configuration
@@ -76,8 +48,8 @@ jobs:
       run: cd ${{github.workspace}}/build && ctest . --output-on-failure
 
     - name: Configure CMake without extensions
-      # force full rebuild
-      run: rm -r ${{github.workspace}}/build && cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_RASTA_GRPC_BRIDGE=ON -DENABLE_RASTA_TLS=ON
+      # force full rebuild, but keep installed dependencies
+      run: find ${{github.workspace}}/build | grep -v "vcpkg_installed" | xargs rm && cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DBUILD_RASTA_GRPC_BRIDGE=ON -DENABLE_RASTA_TLS=ON --preset vcpkg
 
     - name: Build without extensions
       # Build your program with the given configuration
@@ -96,4 +68,4 @@ jobs:
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_dtls.sh
 
     - name: CTest without extensions
-      run: cd ${{github.workspace}}/build && ctest .
+      run: cd ${{github.workspace}}/build && ctest . --output-on-failure
