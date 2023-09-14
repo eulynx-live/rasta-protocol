@@ -11,10 +11,10 @@ set(opaque_LIBRARY ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}opa
 
 include(ExternalProject)
 # do not overwrite CFLAGS if not debug build
-set(opaque_CFLAGS "")
+set(opaque_CFLAGS "-I ${sodium_INCLUDE_DIR} ${opaque_CFLAGS}")
 
 if(BUILD_TESTING)
-    set(opaque_CFLAGS "CFLAGS=\"-g -O0 -I ${sodium_INCLUDE_DIR}\"")
+    set(opaque_CFLAGS "CFLAGS=\"-g -O0\"")
 endif()
 
 # directories for output library and headers
