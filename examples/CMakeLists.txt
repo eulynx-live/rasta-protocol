@@ -15,6 +15,9 @@ target_include_directories(rcat_udp PRIVATE common/headers)
 set_target_properties(rcat_udp PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
 target_compile_options(rcat_udp PRIVATE ${DEFAULT_COMPILE_OPTIONS})
 target_link_libraries(rcat_udp rasta_udp)
+if(NOT BUILD_SHARED_LIBS)
+    target_link_libraries(rcat_udp -static)
+endif()
 
 add_executable(rcat_tcp
                 ${EXAMPLES_COMMON_SRC}
@@ -23,6 +26,9 @@ target_include_directories(rcat_tcp PRIVATE common/headers)
 set_target_properties(rcat_tcp PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
 target_compile_options(rcat_tcp PRIVATE ${DEFAULT_COMPILE_OPTIONS})
 target_link_libraries(rcat_tcp rasta_tcp)
+if(NOT BUILD_SHARED_LIBS)
+    target_link_libraries(rcat_tcp -static)
+endif()
 
 
 add_executable(event_system_example_local
@@ -32,6 +38,9 @@ target_include_directories(event_system_example_local PRIVATE common/headers)
 set_target_properties(event_system_example_local PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
 target_compile_options(event_system_example_local PRIVATE ${DEFAULT_COMPILE_OPTIONS})
 target_link_libraries(event_system_example_local rasta_udp)
+if(NOT BUILD_SHARED_LIBS)
+    target_link_libraries(event_system_example_local -static)
+endif()
 
 add_executable(pw2iv_sample
         examples_localhost/c/pw2iv.c)
@@ -111,6 +120,9 @@ target_include_directories(scip_example PRIVATE sci/common common/headers)
 set_target_properties(scip_example PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
 target_compile_options(scip_example PRIVATE ${DEFAULT_COMPILE_OPTIONS})
 target_link_libraries(scip_example rasta_udp)
+if(NOT BUILD_SHARED_LIBS)
+    target_link_libraries(scip_example -static)
+endif()
 
 # scils_example
 add_executable(scils_example ${SCI_COMMON} sci/scils/main.c)
@@ -118,6 +130,9 @@ target_include_directories(scils_example PRIVATE sci/common common/headers)
 set_target_properties(scils_example PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
 target_compile_options(scils_example PRIVATE ${DEFAULT_COMPILE_OPTIONS})
 target_link_libraries(scils_example rasta_udp)
+if(NOT BUILD_SHARED_LIBS)
+    target_link_libraries(scils_example -static)
+endif()
 
 add_executable(sciTest
     ${SCI_COMMON}

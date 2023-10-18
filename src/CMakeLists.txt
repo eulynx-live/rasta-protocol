@@ -105,7 +105,7 @@ foreach(RASTA_VARIANT ${RASTA_VARIANTS})
     endif()
 
     # Shared object for RaSTA protocol
-    add_library(${target}_${RASTA_VARIANT} SHARED ${variant_sources} ${headers})
+    add_library(${target}_${RASTA_VARIANT} ${variant_sources} ${headers})
 
     # Link system libraries for librasta
     target_link_libraries(${target}_${RASTA_VARIANT} pthread)
