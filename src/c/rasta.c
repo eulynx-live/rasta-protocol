@@ -37,7 +37,7 @@ void rasta_listen(rasta_lib_configuration_t user_configuration) {
     sr_listen(&user_configuration->h);
 }
 
-struct rasta_connection * rasta_accept(rasta_lib_configuration_t user_configuration) {
+struct rasta_connection *rasta_accept(rasta_lib_configuration_t user_configuration) {
     struct rasta_handle *h = &user_configuration->h;
     event_system *event_system = &user_configuration->rasta_lib_event_system;
 
@@ -56,7 +56,7 @@ struct rasta_connection * rasta_accept(rasta_lib_configuration_t user_configurat
     return NULL;
 }
 
-struct rasta_connection* rasta_connect(rasta_lib_configuration_t user_configuration, unsigned long id) {
+struct rasta_connection *rasta_connect(rasta_lib_configuration_t user_configuration, unsigned long id) {
     return sr_connect(&user_configuration->h, id);
 }
 
@@ -80,7 +80,7 @@ int rasta_recv(rasta_lib_configuration_t user_configuration, struct rasta_connec
 
     if (len < elem->length) {
         logger_log(connection->logger, LOG_LEVEL_INFO, "RaSTA receive",
-            "supplied buffer (%zd bytes) is smaller than message length (%d bytes) - received message may be incomplete!", len, elem->length);
+                   "supplied buffer (%zd bytes) is smaller than message length (%d bytes) - received message may be incomplete!", len, elem->length);
     }
 
     rmemcpy(buf, elem->bytes, received_len);
@@ -108,9 +108,16 @@ void rasta_disconnect(struct rasta_connection *connection) {
 void rasta_cleanup(rasta_lib_configuration_t user_configuration) {
     sr_cleanup(&user_configuration->h);
     for (unsigned i = 0; i < user_configuration->h.rasta_connections_length; i++) {
+        struct RastaByteArray *elem;
+        while ((elem = fifo_pop(user_configuration->h.rasta_connections[i].fifo_retransmission))) {
+            freeRastaByteArray(elem);
+            rfree(elem);
+        }
         fifo_destroy(&user_configuration->h.rasta_connections[i].fifo_retransmission);
         fifo_destroy(&user_configuration->h.rasta_connections[i].fifo_send);
+        fifo_destroy(&user_configuration->h.rasta_connections[i].fifo_receive);
     }
     rfree(user_configuration->h.rasta_connections);
-
+    rfree(user_configuration->h.config->redundancy.connections.data);
+    rfree(user_configuration->h.config->accepted_versions);
 }

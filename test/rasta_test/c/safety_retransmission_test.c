@@ -51,12 +51,17 @@ void test_sr_retransmit_data_shouldSendFinalHeartbeat() {
     rasta_redundancy_channel fake_channel;
     fake_channel.mux = &mux;
     fake_channel.associated_id = SERVER_ID;
+    fake_channel.hashing_context.algorithm = RASTA_ALGO_MD4;
     fake_channel.hashing_context.hash_length = RASTA_CHECKSUM_NONE;
+    fake_channel.seq_tx = 0;
     rasta_md4_set_key(&fake_channel.hashing_context, 0, 0, 0, 0);
 
     rasta_transport_channel transport;
     transport.send_callback = fake_send_callback;
     transport.connected = true;
+    transport.remote_port = 1234;
+    strncpy(transport.remote_ip_address, "127.0.0.1", 10);
+
     fake_channel.transport_channels = &transport;
     fake_channel.transport_channel_count = 1;
 
@@ -68,6 +73,7 @@ void test_sr_retransmit_data_shouldSendFinalHeartbeat() {
     connection.fifo_retransmission = fifo_init(0);
     connection.redundancy_channel = &fake_channel;
     connection.config = &info;
+    connection.logger = &logger;
 
     sr_retransmit_data(&connection);
 
@@ -81,6 +87,13 @@ void test_sr_retransmit_data_shouldSendFinalHeartbeat() {
     CU_ASSERT_EQUAL(RASTA_TYPE_HB, leShortToHost(hb_message->bytes + 8 + 2));
 
     fifo_destroy(&connection.fifo_retransmission);
+
+    freeRastaByteArray(hb_message);
+    rfree(hb_message);
+
+    rfree(mux.transport_sockets);
+    freeRastaByteArray(&fake_channel.hashing_context.key);
+    freeRastaByteArray(&mux.sr_hashing_context.key);
 }
 
 void test_sr_retransmit_data_shouldRetransmitPackage() {
@@ -111,12 +124,17 @@ void test_sr_retransmit_data_shouldRetransmitPackage() {
     rasta_redundancy_channel fake_channel;
     fake_channel.mux = &mux;
     fake_channel.associated_id = SERVER_ID;
+    fake_channel.hashing_context.algorithm = RASTA_ALGO_MD4;
     fake_channel.hashing_context.hash_length = RASTA_CHECKSUM_NONE;
+    fake_channel.seq_tx = 0;
     rasta_md4_set_key(&fake_channel.hashing_context, 0, 0, 0, 0);
 
     rasta_transport_channel transport;
     transport.send_callback = fake_send_callback;
     transport.connected = true;
+    transport.remote_port = 1234;
+    strncpy(transport.remote_ip_address, "127.0.0.1", 10);
+
     fake_channel.transport_channels = &transport;
     fake_channel.transport_channel_count = 1;
 
@@ -128,6 +146,7 @@ void test_sr_retransmit_data_shouldRetransmitPackage() {
     connection.fifo_retransmission = fifo_init(1);
     connection.redundancy_channel = &fake_channel;
     connection.config = &info;
+    connection.logger = &logger;
 
     struct RastaMessageData app_messages;
     struct RastaByteArray message;
@@ -137,6 +156,7 @@ void test_sr_retransmit_data_shouldRetransmitPackage() {
     app_messages.data_array = &message;
 
     rasta_hashing_context_t hashing_context;
+    hashing_context.algorithm = RASTA_ALGO_MD4;
     hashing_context.hash_length = RASTA_CHECKSUM_NONE;
     rasta_md4_set_key(&hashing_context, 0, 0, 0, 0);
     h.hashing_context = &hashing_context;
@@ -147,6 +167,7 @@ void test_sr_retransmit_data_shouldRetransmitPackage() {
     allocateRastaByteArray(to_fifo, packet.length);
     rmemcpy(to_fifo->bytes, packet.bytes, packet.length);
     fifo_push(connection.fifo_retransmission, to_fifo);
+    freeRastaByteArray(&packet);
 
     // Act
     sr_retransmit_data(&connection);
@@ -173,4 +194,16 @@ void test_sr_retransmit_data_shouldRetransmitPackage() {
     CU_ASSERT_EQUAL(RASTA_TYPE_HB, leShortToHost(hb_message->bytes + 8 + 2));
 
     fifo_destroy(&connection.fifo_retransmission);
+    fifo_destroy(&test_send_fifo);
+
+    freeRastaByteArray(retrdata_message);
+    freeRastaByteArray(hb_message);
+    rfree(retrdata_message);
+    rfree(hb_message);
+
+    rfree(mux.transport_sockets);
+    freeRastaByteArray(&data.data);
+    freeRastaByteArray(&hashing_context.key);
+    freeRastaByteArray(&fake_channel.hashing_context.key);
+    freeRastaByteArray(&mux.sr_hashing_context.key);
 }

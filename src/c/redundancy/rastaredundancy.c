@@ -5,9 +5,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <rasta/rastahandle.h>
 #include <rasta/rastautil.h>
 #include <rasta/rmemory.h>
-#include <rasta/rastahandle.h>
 
 #include "../retransmission/safety_retransmission.h"
 #include "../transport/transport.h"
@@ -91,6 +91,9 @@ int red_f_deliverDeferQueue(rasta_connection *con, rasta_redundancy_channel *cha
         // remove message from queue (effectively a pop operation with the get call)
         deferqueue_remove(&channel->defer_q, channel->seq_rx);
         logger_log(channel->logger, LOG_LEVEL_DEBUG, "RaSTA Red deliver deferq", "remove message from deferq");
+
+        freeRastaByteArray(&queuePacket.data.data);
+        freeRastaByteArray(&queuePacket.data.checksum);
 
         // increase seq_rx
         channel->seq_rx++;
@@ -239,17 +242,17 @@ void red_f_deferTmo(rasta_connection *h, rasta_redundancy_channel *channel) {
 }
 
 void red_f_cleanup(rasta_redundancy_channel *channel) {
-    // destroy the defer queue
-    // deferqueue_destroy(&channel->defer_q);
-
     // destroy the diagnostics buffer
-    // deferqueue_destroy(&channel->diagnostics_packet_buffer);
+    deferqueue_destroy(&channel->diagnostics_packet_buffer);
+
+    // destroy the defer queue
+    deferqueue_destroy(&channel->defer_q);
 
     // free the channels
-    // rfree(channel->transport_channels);
-    // channel->transport_channel_count = 0;
+    rfree(channel->transport_channels);
+    channel->transport_channel_count = 0;
 
-    // freeRastaByteArray(&channel->hashing_context.key);
+    freeRastaByteArray(&channel->hashing_context.key);
 
     logger_log(channel->logger, LOG_LEVEL_DEBUG, "RaSTA Red cleanup", "Cleanup complete");
 }

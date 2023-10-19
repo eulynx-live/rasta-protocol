@@ -56,6 +56,8 @@ void testConversion() {
 
         // check if checksum is correct
         CU_ASSERT_EQUAL(s.checksum_correct, 1);
+        freeRastaByteArray(&s.data);
+        freeRastaByteArray(&s.checksum);
 
         // manipulate data
         data.bytes[8] = 0x43;
@@ -68,10 +70,19 @@ void testConversion() {
 
         // check data failure
         r.length = 2;
-        bytesToRastaPacket(rastaModuleToBytes(&r, &context), &context, &s);
+        struct RastaByteArray r_bytes = rastaModuleToBytes(&r, &context);
+        bytesToRastaPacket(r_bytes, &context, &s);
 
         CU_ASSERT_EQUAL(getRastamoduleLastError(), RASTA_ERRORS_PACKAGE_LENGTH_INVALID);
+
+        freeRastaByteArray(&s.data);
+        freeRastaByteArray(&s.checksum);
+        freeRastaByteArray(&r.data);
+        freeRastaByteArray(&data);
+        freeRastaByteArray(&r_bytes);
     }
+
+    freeRastaByteArray(&context.key);
 }
 
 void testRedundancyConversionWithCrcChecksumCorrect() {
@@ -131,6 +142,12 @@ void testRedundancyConversionWithCrcChecksumCorrect() {
 
     // check if internal packet checksum is correct
     CU_ASSERT_EQUAL(convertedFromBytes.data.checksum_correct, 1);
+
+    freeRastaByteArray(&r.data);
+    freeRastaByteArray(&convertedFromBytes.data.data);
+    freeRastaByteArray(&convertedFromBytes.data.checksum);
+    freeRastaByteArray(&convertedToBytes);
+    freeRastaByteArray(&context.key);
 }
 
 void testRedundancyConversionWithoutChecksum() {
@@ -189,6 +206,12 @@ void testRedundancyConversionWithoutChecksum() {
 
     // check if internal packet checksum is correct
     CU_ASSERT_EQUAL(convertedFromBytes.data.checksum_correct, 1);
+
+    freeRastaByteArray(&r.data);
+    freeRastaByteArray(&convertedFromBytes.data.data);
+    freeRastaByteArray(&convertedFromBytes.data.checksum);
+    freeRastaByteArray(&convertedToBytes);
+    freeRastaByteArray(&context.key);
 }
 
 void testRedundancyConversionIncorrectChecksum() {
@@ -229,4 +252,10 @@ void testRedundancyConversionIncorrectChecksum() {
 
     // check if internal packet checksum is incorrect
     CU_ASSERT_EQUAL(convertedFromBytes.data.checksum_correct, 0);
+
+    freeRastaByteArray(&r.data);
+    freeRastaByteArray(&convertedFromBytes.data.data);
+    freeRastaByteArray(&convertedFromBytes.data.checksum);
+    freeRastaByteArray(&convertedToBytes);
+    freeRastaByteArray(&context.key);
 }

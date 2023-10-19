@@ -280,5 +280,8 @@ void tls_pin_certificate(WOLFSSL *ssl, const char *peer_tls_cert_path) {
             logger_hexdump(&sha_logger, LOG_LEVEL_DEBUG, pinned_digest_buffer, pinned_digest_buffer_size, "Pinned certificate (digest)");
             abort();
         }
+
+        wolfSSL_X509_free(pinned_cert);
+        wolfSSL_X509_free(peer_cert);
     }
 }

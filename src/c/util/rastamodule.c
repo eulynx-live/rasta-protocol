@@ -237,6 +237,7 @@ struct RastaByteArray rastaRedundancyPacketToBytes(struct RastaRedundancyPacket 
     rmemcpy(&result.bytes[8 + internal_packet_len], checksum_storage, (packet->checksum_type.width / 8));
 
     // free the temporary checksum data
+    freeRastaByteArray(&internal_packet_bytes);
     freeRastaByteArray(&temp_wo_checksum);
 
     return result;

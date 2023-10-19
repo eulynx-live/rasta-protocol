@@ -985,4 +985,6 @@ void load_configfile(rasta_config_info *c, struct logger_t *logger, const char *
     }
 
     c->initial_sequence_number = get_initial_seq_num(&config);
+
+    dictionary_free(&config.dictionary);
 }

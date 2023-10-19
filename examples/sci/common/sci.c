@@ -60,13 +60,13 @@ sci_telegram *sci_decode_telegram(struct RastaByteArray data) {
         return NULL;
     }
 
-    sci_telegram *telegram = rmalloc(sizeof(sci_telegram));
-
     // check if a valid protocol was provided
     if (!(data.bytes[0] == SCI_PROTOCOL_P || data.bytes[0] == SCI_PROTOCOL_LS)) {
         // invalid protocol
         return NULL;
     }
+
+    sci_telegram *telegram = rmalloc(sizeof(sci_telegram));
 
     // copy the basic data into the telegram
     telegram->protocol_type = data.bytes[0];

@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <rasta/rmemory.h>
+
 void check_std_config() {
     // remove old file
     remove("config.cfg");
@@ -52,6 +54,8 @@ void check_std_config() {
     // cechk general
     CU_ASSERT_EQUAL(cfg.values.general.rasta_network, 0);
     CU_ASSERT_EQUAL(cfg.values.general.rasta_id, 0);
+
+    dictionary_free(&cfg.dictionary);
 }
 
 void check_var_config() {
@@ -152,4 +156,7 @@ void check_var_config() {
     entr = config_get(&cfg, "HEX");
     CU_ASSERT_EQUAL(entr.type, DICTIONARY_NUMBER);
     CU_ASSERT_EQUAL(entr.value.number, 0xff32);
+
+    dictionary_free(&cfg.dictionary);
+    rfree(cfg.values.redundancy.connections.data);
 }

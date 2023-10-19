@@ -223,8 +223,8 @@ bool processRasta(std::string config_path,
             if (s_connection) {
                 success = true;
                 processConnection(run_thread);
+                rasta_cleanup(s_rc);
             }
-            rasta_cleanup(s_rc);
 
             // If the transport layer cannot connect, we don't have a
             // delay between connection attempts without this

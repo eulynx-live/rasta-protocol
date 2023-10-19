@@ -14,10 +14,10 @@ void test_transport_create_socket_should_initialize_receive_event() {
     rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {0};
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
 
     // Act
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
 
     // Assert
     CU_ASSERT_PTR_EQUAL(socket.receive_event.callback, channel_receive_event);
@@ -36,10 +36,10 @@ void test_transport_create_socket_should_initialize_receive_event_data() {
     rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {0};
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
 
     // Act
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
 
     // Assert
     CU_ASSERT_PTR_EQUAL(socket.receive_event_data.socket, &socket);
@@ -61,10 +61,10 @@ void test_transport_create_socket_should_add_receive_event_to_event_system() {
     rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {0};
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
 
     // Act
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
 
     // Assert
     CU_ASSERT_PTR_EQUAL(event_system.fd_events.last, &socket.receive_event);
@@ -86,8 +86,8 @@ void test_transport_listen_should_enable_socket_receive_event() {
         .key_path = "../examples/server.key",
     };
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
 
     // Assert
     CU_ASSERT_FALSE(socket.receive_event.enabled);
@@ -115,8 +115,8 @@ void test_transport_connect_should_enable_socket_receive_event() {
         .key_path = "../examples/server.key",
     };
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
 
     // Assert
     CU_ASSERT_FALSE(socket.receive_event.enabled);

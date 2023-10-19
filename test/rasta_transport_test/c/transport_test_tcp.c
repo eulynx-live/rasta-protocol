@@ -17,10 +17,10 @@ void test_transport_create_socket_should_initialize_accept_event() {
     rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {0};
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
 
     // Act
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
 
     // Assert
     CU_ASSERT_PTR_EQUAL(socket.accept_event.callback, channel_accept_event);
@@ -39,10 +39,10 @@ void test_transport_create_socket_should_initialize_accept_event_data() {
     rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {0};
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
 
     // Act
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
 
     // Assert
     CU_ASSERT_PTR_EQUAL(socket.accept_event_data.event, &socket.accept_event);
@@ -61,10 +61,10 @@ void test_transport_create_socket_should_add_accept_event_to_event_system() {
     rasta_transport_channel channel = {0};
     rasta_config_tls tls_config = {0};
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
 
     // Act
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
 
     // Assert
     CU_ASSERT_PTR_EQUAL(event_system.fd_events.last, &socket.accept_event);
@@ -86,8 +86,8 @@ void test_transport_listen_should_enable_socket_accept_event() {
         .key_path = "../examples/server.key",
     };
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
 
     // Assert
     CU_ASSERT_FALSE(socket.accept_event.enabled);
@@ -115,8 +115,8 @@ void test_transport_connect_should_enable_channel_receive_event() {
         .key_path = "../examples/server.key",
     };
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
 
     // Assert
     CU_ASSERT_FALSE(channel.receive_event.enabled);
@@ -144,8 +144,8 @@ void test_transport_close_channel_should_set_unconnected() {
         .key_path = "../examples/server.key",
     };
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
     transport_connect(&socket, &channel);
 
     // Assert
@@ -174,8 +174,8 @@ void test_transport_close_channel_should_invalidate_fd() {
         .key_path = "../examples/server.key",
     };
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
     transport_connect(&socket, &channel);
 
     // Act
@@ -201,8 +201,8 @@ void test_transport_close_channel_should_disable_channel_receive_event() {
         .key_path = "../examples/server.key",
     };
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
     transport_connect(&socket, &channel);
 
     // Act
@@ -240,8 +240,8 @@ void test_transport_redial_should_reconnect() {
     config.redundancy = red_config;
     h.mux.config = &config;
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
     transport_connect(&socket, &channel);
     transport_close_channel(&channel);
 
@@ -280,8 +280,8 @@ void test_transport_redial_should_assign_new_fds() {
     config.redundancy = red_config;
     h.mux.config = &config;
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
     transport_connect(&socket, &channel);
     transport_close_channel(&channel);
 
@@ -321,8 +321,8 @@ void test_transport_redial_should_update_event_fds() {
     config.redundancy = red_config;
     h.mux.config = &config;
 
-    transport_init(&h, &channel, 100, "127.0.0.1", 4711, &tls_config);
-    transport_create_socket(&h, &socket, 42, &tls_config);
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
     transport_connect(&socket, &channel);
     transport_close_channel(&channel);
 
