@@ -14,7 +14,7 @@ include(ExternalProject)
 set(opaque_CFLAGS "-I ${sodium_INCLUDE_DIR} ${opaque_CFLAGS}")
 
 if(BUILD_TESTING)
-    set(opaque_CFLAGS "CFLAGS=\"-g -O0\"")
+    set(opaque_CFLAGS "-g -O0 ${opaque_CFLAGS}")
 endif()
 
 # directories for output library and headers
@@ -29,7 +29,7 @@ GIT_SUBMODULES "" # update all submodules
 SOURCE_DIR        "${CMAKE_BINARY_DIR}/opaque-src"
 BUILD_IN_SOURCE TRUE
 CONFIGURE_COMMAND ""
-BUILD_COMMAND ${GNU_MAKE_PATH} -C ${CMAKE_BINARY_DIR}/opaque-src/src PREFIX=${CMAKE_BINARY_DIR} ${opaque_CFLAGS}
+BUILD_COMMAND ${GNU_MAKE_PATH} -C ${CMAKE_BINARY_DIR}/opaque-src/src PREFIX=${CMAKE_BINARY_DIR} CFLAGS="${opaque_CFLAGS}"
 INSTALL_COMMAND ${GNU_MAKE_PATH} -C ${CMAKE_BINARY_DIR}/opaque-src/src install PREFIX=${CMAKE_BINARY_DIR}
 BUILD_BYPRODUCTS ${opaque_LIBRARY}
 )
