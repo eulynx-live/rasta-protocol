@@ -54,6 +54,13 @@ if(ENABLE_RASTA_OPAQUE)
             NAMES_PER_DIR
             DOC "GNU Make" REQUIRED)
 
+    # set options for IncludeLibOpaque.cmake
+    set(opaque_LIBRARY ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}opaque${CMAKE_STATIC_LIBRARY_SUFFIX}) # resolves to something like build/lib/libopaque.a
+    set(opaque_CFLAGS "-I ${sodium_INCLUDE_DIR}")
+    if(BUILD_TESTING)
+        set(opaque_CFLAGS "${opaque_CFLAGS} -g -O0")
+    endif()
+
     configure_file(cmake/IncludeLibOpaque.cmake libopaque-timeout/CMakeLists.txt)
     execute_process(COMMAND ${CMAKE_COMMAND} -DGNU_MAKE_PATH=${GNU_MAKE_PATH} -G "${CMAKE_GENERATOR}" .
             RESULT_VARIABLE result

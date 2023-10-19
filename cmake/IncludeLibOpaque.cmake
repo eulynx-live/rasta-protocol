@@ -6,16 +6,7 @@ option(GNU_MAKE_PATH "Path to GNU make" "make")
 
 message("Using make=${GNU_MAKE_PATH}")
 
-# resolves to something like build/lib/libopaque.a
-set(opaque_LIBRARY ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}opaque${CMAKE_STATIC_LIBRARY_SUFFIX})
-
 include(ExternalProject)
-# do not overwrite CFLAGS if not debug build
-set(opaque_CFLAGS "-I ${sodium_INCLUDE_DIR} ${opaque_CFLAGS}")
-
-if(BUILD_TESTING)
-    set(opaque_CFLAGS "-g -O0 ${opaque_CFLAGS}")
-endif()
 
 # directories for output library and headers
 make_directory(${CMAKE_BINARY_DIR}/lib)
