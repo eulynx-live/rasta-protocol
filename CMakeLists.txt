@@ -56,7 +56,7 @@ if(ENABLE_RASTA_OPAQUE)
 
     # set options for IncludeLibOpaque.cmake
     set(opaque_LIBRARY ${CMAKE_INSTALL_PREFIX}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}opaque${CMAKE_STATIC_LIBRARY_SUFFIX}) # resolves to something like build/lib/libopaque.a
-    set(opaque_CFLAGS "-I ${sodium_INCLUDE_DIR}")
+    set(opaque_CFLAGS "-I${sodium_INCLUDE_DIR}")
     if(BUILD_TESTING)
         set(opaque_CFLAGS "${opaque_CFLAGS} -g -O0")
     endif()
