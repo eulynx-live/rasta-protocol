@@ -1,7 +1,6 @@
 {
     "dependencies": [
         "wolfssl",
-        "libsodium",
         "grpc",
         "cunit"
     ]

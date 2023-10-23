@@ -10,6 +10,10 @@ if(ENABLE_RASTA_TLS)
     endif(WOLFSSL_SET_TLS13_SECRET_CB_EXISTS)
 endif(ENABLE_RASTA_TLS)
 
+if(ENABLE_RASTA_OPAQUE)
+    find_package(sodium REQUIRED)
+endif()
+
 # Target name
 set(target rasta)
 
