@@ -39,6 +39,7 @@ typedef struct rasta_config_sending {
  */
 typedef struct rasta_config_receive {
     unsigned int max_recvqueue_size;
+    unsigned int max_recv_msg_size;
 } rasta_config_receive;
 
 /**

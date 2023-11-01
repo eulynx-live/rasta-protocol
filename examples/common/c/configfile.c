@@ -593,6 +593,19 @@ void config_setstd(struct RastaConfig *cfg) {
     }
 
     /*
+     * Receive recv message size
+     */
+
+    entr = config_get(cfg, "RASTA_RECV_MSG_SIZE");
+    if (entr.type != DICTIONARY_NUMBER || entr.value.number < 0) {
+        // set std
+        cfg->values.receive.max_recv_msg_size = 500;
+    } else {
+        // check valid format
+        cfg->values.receive.max_recv_msg_size = (unsigned int)entr.value.number;
+    }
+
+    /*
      * Retransmission part
      */
 

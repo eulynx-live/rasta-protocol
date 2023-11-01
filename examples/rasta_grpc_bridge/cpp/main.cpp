@@ -28,8 +28,6 @@ using namespace std::chrono_literals;
 static std::mutex s_busy;
 static std::mutex s_rasta_busy;
 
-#define BUF_SIZE 500
-
 // Client
 static std::unique_ptr<grpc::ClientContext> s_currentContext;
 static std::unique_ptr<grpc::ClientReaderWriter<sci::SciPacket, sci::SciPacket>> s_currentStream;
@@ -47,6 +45,8 @@ static int s_data_fd[2] = {-1, -1};
 
 static std::mutex s_fifo_mutex;
 static fifo_t *s_message_fifo;
+
+static unsigned int recv_msg_size = 500;
 
 void processConnection(std::function<std::thread()> run_thread) {
     s_message_fifo = fifo_init(128);
@@ -110,10 +110,10 @@ void processConnection(std::function<std::thread()> run_thread) {
 
     // Forward gRPC messages to rasta
     auto forwarderThread = run_thread();
-
-    char buf[BUF_SIZE];
+    
+    char* buf = new char[recv_msg_size];
     int recvlen;
-    while ((recvlen = rasta_recv(s_rc, s_connection, buf, BUF_SIZE)) > 0) {
+    while ((recvlen = rasta_recv(s_rc, s_connection, buf, recv_msg_size)) > 0) {
         static std::mutex s_busy_writing;
         std::lock_guard<std::mutex> guard(s_busy_writing);
 
@@ -132,6 +132,8 @@ void processConnection(std::function<std::thread()> run_thread) {
             logger_log(s_rc->h.logger, LOG_LEVEL_ERROR, (char *)"RaSTA retrieve", (char *)"discarding packet.");
         }
     }
+
+    delete[] buf;
 
     {
         std::lock_guard<std::mutex> guard(s_busy);
@@ -174,6 +176,7 @@ bool processRasta(std::string config_path,
 
     rasta_config_info config;
     load_configfile(&config, &logger, config_path.c_str());
+    recv_msg_size = config.receive.max_recv_msg_size;
 
     unsigned nchannels = config.redundancy.connections.count < 2 ? config.redundancy.connections.count : 2;
 
