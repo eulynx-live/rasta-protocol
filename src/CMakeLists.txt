@@ -105,7 +105,7 @@ foreach(RASTA_VARIANT ${RASTA_VARIANTS})
     endif()
 
     # Shared object for RaSTA protocol
-    add_library(${target}_${RASTA_VARIANT} SHARED ${variant_sources} ${headers})
+    add_library(${target}_${RASTA_VARIANT} ${variant_sources} ${headers})
 
     # Link system libraries for librasta
     target_link_libraries(${target}_${RASTA_VARIANT} pthread)
@@ -195,10 +195,3 @@ if(ENABLE_RASTA_TLS)
     target_link_libraries(${target}_dtls wolfssl)
     target_link_libraries(${target}_tls wolfssl)
 endif(ENABLE_RASTA_TLS)
-
-if(ENABLE_SLEEP_ON_CONNECT)
-    target_compile_definitions(${target}_tcp PUBLIC SLEEP_ON_CONNECT)
-    if(ENABLE_RASTA_TLS)
-    target_compile_definitions(${target}_tls PUBLIC SLEEP_ON_CONNECT)
-    endif(ENABLE_RASTA_TLS)
-endif(ENABLE_SLEEP_ON_CONNECT)

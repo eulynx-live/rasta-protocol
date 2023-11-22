@@ -127,3 +127,31 @@ void test_transport_connect_should_enable_socket_receive_event() {
     // Assert
     CU_ASSERT(socket.receive_event.enabled);
 }
+
+void test_transport_bind_should_bind_socket_fd() {
+    // Arrange
+    event_system event_system = {0};
+    struct rasta_handle h;
+    h.ev_sys = &event_system;
+    rasta_handle_init(&h, NULL, NULL);
+
+    rasta_transport_socket socket = {0};
+    rasta_transport_channel channel = {0};
+    rasta_config_tls tls_config = {
+        .tls_hostname = "localhost",
+        .ca_cert_path = "../examples/root-ca.pem",
+        .cert_path = "../examples/server.pem",
+        .key_path = "../examples/server.key",
+    };
+
+    transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
+    transport_create_socket(&h, &socket, 0, &tls_config);
+    
+    // Act
+    transport_bind(&socket, "127.0.0.1", 8888);
+
+    extern int mock_bind_call_count;
+
+    // Assert
+    CU_ASSERT_EQUAL(mock_bind_call_count, 1);
+}
