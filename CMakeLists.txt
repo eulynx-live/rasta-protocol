@@ -16,6 +16,7 @@ option(ENABLE_RASTA_OPAQUE "Enable Password-Authenticated Session Key Exchange b
 option(ENABLE_CODE_COVERAGE "Provide command to generate code coverage report" OFF)
 option(ENABLE_STATIC_ANALYSIS "Run cppcheck along with the compiler" OFF)
 option(ENABLE_SLEEP_ON_CONNECT "Sleep for 5 seconds after connecting a transport channel" ON)
+option(USE_VCPKG "Make changes needed to use dependencies from Vcpkg" OFF)
 
 if(ENABLE_STATIC_ANALYSIS)
     set(CMAKE_C_CPPCHECK "cppcheck" "--enable=performance,information")

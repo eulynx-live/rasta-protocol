@@ -4,7 +4,10 @@
         {
             "name": "vcpkg",
             "binaryDir": "build",
-            "toolchainFile": "vcpkg/scripts/buildsystems/vcpkg.cmake"
+            "toolchainFile": "vcpkg/scripts/buildsystems/vcpkg.cmake",
+            "cacheVariables": {
+                "USE_VCPKG": "ON"
+            }
         }
     ]
 }

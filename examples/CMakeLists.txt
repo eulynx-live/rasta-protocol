@@ -1,7 +1,13 @@
-include(FindPkgConfig)
-if(PKG_CONFIG_FOUND)
+if(USE_VCPKG)
+  find_package(unofficial-cunit CONFIG REQUIRED)
+  set(CUNIT_PACKAGE unofficial::cunit::cunit)
+else()
+  include(FindPkgConfig)
+  if(PKG_CONFIG_FOUND)
     pkg_check_modules(CUnit IMPORTED_TARGET cunit)
-endif(PKG_CONFIG_FOUND)
+    set(CUNIT_PACKAGE PkgConfig::CUnit)
+  endif(PKG_CONFIG_FOUND)
+endif(USE_VCPKG)
 
 set(EXAMPLES_COMMON_SRC
     common/c/configfile.c
@@ -130,6 +136,6 @@ add_executable(sciTest
     sci/scitest/c/scipTests.c
     sci/scitest/c/sciTests.c)
 target_include_directories(sciTest PRIVATE sci/common sci/scitest/headers common/headers)
-target_link_libraries(sciTest rasta_udp PkgConfig::CUnit)
+target_link_libraries(sciTest rasta_udp ${CUNIT_PACKAGE})
 target_compile_definitions(sciTest PRIVATE WITH_CMAKE)
 add_test(NAME test_sciTest COMMAND sciTest)
