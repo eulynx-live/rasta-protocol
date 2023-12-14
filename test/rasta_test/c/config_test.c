@@ -40,6 +40,7 @@ void check_std_config() {
 
     // check receive
     CU_ASSERT_EQUAL(cfg.values.receive.max_recvqueue_size, 20);
+    CU_ASSERT_EQUAL(cfg.values.receive.max_recv_msg_size, 500);
 
     // check retransmission
     CU_ASSERT_EQUAL(cfg.values.retransmission.max_retransmission_queue_size, 100);
@@ -74,6 +75,7 @@ void check_var_config() {
     fprintf(f, "RASTA_DIAG_WINDOW = 6000\n");
 
     fprintf(f, "RASTA_RECVQUEUE_SIZE = 42\n");
+    fprintf(f, "RASTA_RECV_MSG_SIZE = 1337\n");
 
     fprintf(f, "RASTA_RETRANSMISSION_QUEUE_SIZE = 50\n");
 
@@ -111,6 +113,7 @@ void check_var_config() {
 
     // check receive
     CU_ASSERT_EQUAL(cfg.values.receive.max_recvqueue_size, 42);
+    CU_ASSERT_EQUAL(cfg.values.receive.max_recv_msg_size, 1337);
 
     // check retransmission
     CU_ASSERT_EQUAL(cfg.values.retransmission.max_retransmission_queue_size, 50);
