@@ -662,21 +662,21 @@ void config_setstd(struct RastaConfig *cfg) {
     cfg->values.tls.ca_cert_path = NULL;
     if (entr.type == DICTIONARY_STRING) {
         cfg->values.tls.ca_cert_path = calloc(MAX_DICTIONARY_STRING_LENGTH_BYTES, 1);
-        strncpy(cfg->values.tls.ca_cert_path, entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES);
+        strncpy(cfg->values.tls.ca_cert_path, entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES - 1);
     }
 
     entr = config_get(cfg, "RASTA_CERT_PATH");
     cfg->values.tls.cert_path = NULL;
     if (entr.type == DICTIONARY_STRING) {
         cfg->values.tls.cert_path = calloc(MAX_DICTIONARY_STRING_LENGTH_BYTES, 1);
-        strncpy(cfg->values.tls.cert_path, entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES);
+        strncpy(cfg->values.tls.cert_path, entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES - 1);
     }
 
     entr = config_get(cfg, "RASTA_KEY_PATH");
     cfg->values.tls.key_path = NULL;
     if (entr.type == DICTIONARY_STRING) {
         cfg->values.tls.key_path = calloc(MAX_DICTIONARY_STRING_LENGTH_BYTES, 1);
-        strncpy(cfg->values.tls.key_path, entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES);
+        strncpy(cfg->values.tls.key_path, entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES - 1);
     }
 
 #ifdef ENABLE_TLS
@@ -689,7 +689,7 @@ void config_setstd(struct RastaConfig *cfg) {
     cfg->values.tls.peer_tls_cert_path = NULL;
     if (entr.type == DICTIONARY_STRING) {
         cfg->values.tls.peer_tls_cert_path = calloc(MAX_DICTIONARY_STRING_LENGTH_BYTES, 1);
-        strncpy(cfg->values.tls.peer_tls_cert_path, entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES);
+        strncpy(cfg->values.tls.peer_tls_cert_path, entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES - 1);
     }
 #endif
 
