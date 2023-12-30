@@ -213,20 +213,19 @@ typedef struct rasta_config_general {
 /**
  * Non-standard extension
  */
-// TODO: PATH_MAX is Linux-specific, replace if possible
 typedef struct rasta_config_tls {
     /**
      * Path to CA certificate to use, required for server and client operation
      */
-    char ca_cert_path[PATH_MAX];
+    char *ca_cert_path;
     /**
      * Path to server certificate to use, required for server and client operation
      */
-    char cert_path[PATH_MAX];
+    char *cert_path;
     /**
      * Path to server private key to use, required for server operation
      */
-    char key_path[PATH_MAX];
+    char *key_path;
     /**
      * Domain / common name to validate TLS certificates against (as client)
      */
@@ -234,7 +233,7 @@ typedef struct rasta_config_tls {
     /**
      * path to peer certificate for certificate pinning. Optional.
      */
-    char peer_tls_cert_path[PATH_MAX];
+    char *peer_tls_cert_path;
 } rasta_config_tls;
 
 /**

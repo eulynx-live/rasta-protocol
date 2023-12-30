@@ -64,7 +64,7 @@ int parser_next(struct LineParser *p) {
  * increases the parser position until
  * @param p
  */
-void parser_skipBlanc(struct LineParser *p) {
+void parser_skipBlank(struct LineParser *p) {
     while (p->current == ' ' || p->current == '\t') {
         if (!parser_next(p)) {
             logger_log(&p->cfg->logger, LOG_LEVEL_ERROR, p->cfg->filename, "Error in line %d: Reached unexpected end of line", p->line);
@@ -79,7 +79,7 @@ void parser_skipBlanc(struct LineParser *p) {
  * @param identifier pointer to the output
  */
 void parser_parseIdentifier(struct LineParser *p, char *identifier) {
-    parser_skipBlanc(p);
+    parser_skipBlank(p);
     int i = 0;
     while (isdigit(p->current) || isalpha(p->current) || (p->current == '_')) {
         if (i >= MAX_DICTIONARY_STRING_LENGTH_BYTES - 1) {
@@ -213,7 +213,7 @@ int parser_parseArray(struct LineParser *p, struct DictionaryArray *array) {
 
     unsigned int i = 0;
     while (p->current != '}') {
-        parser_skipBlanc(p);
+        parser_skipBlank(p);
         // skip number arrays
         if (p->current == '0' || p->current == '1' || p->current == '2' || p->current == '3' || p->current == '4' || p->current == '5' || p->current == '6' || p->current == '7' || p->current == '8' || p->current == '9') {
             return 1;
@@ -235,7 +235,7 @@ int parser_parseArray(struct LineParser *p, struct DictionaryArray *array) {
         i++;
 
         if (p->current == '"') parser_next(p);
-        parser_skipBlanc(p);
+        parser_skipBlank(p);
         if (p->current == ';' || p->current == ',') {
             parser_next(p);
             continue;
@@ -260,7 +260,7 @@ int parser_parseArray(struct LineParser *p, struct DictionaryArray *array) {
  */
 void parser_parseValue(struct LineParser *p, const char key[MAX_DICTIONARY_STRING_LENGTH_BYTES]) {
     // skip empty start
-    parser_skipBlanc(p);
+    parser_skipBlank(p);
 
     if (p->current == '-' || isdigit(p->current)) {
         // parse number
@@ -659,21 +659,27 @@ void config_setstd(struct RastaConfig *cfg) {
     // TLS settings
 
     entr = config_get(cfg, "RASTA_CA_PATH");
+    cfg->values.tls.ca_cert_path = NULL;
     if (entr.type == DICTIONARY_STRING) {
-        cfg->values.tls.ca_cert_path[PATH_MAX - 1] = 0;
-        memcpy(cfg->values.tls.ca_cert_path, entr.value.string.c, PATH_MAX);
+        char *ca_path = malloc(strnlen(entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES) + 1);
+        strncpy(ca_path, entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES);
+        cfg->values.tls.ca_cert_path = ca_path;
     }
 
     entr = config_get(cfg, "RASTA_CERT_PATH");
+    cfg->values.tls.cert_path = NULL;
     if (entr.type == DICTIONARY_STRING) {
-        cfg->values.tls.cert_path[PATH_MAX - 1] = 0;
-        memcpy(cfg->values.tls.cert_path, entr.value.string.c, PATH_MAX);
+        char *cert_path = malloc(strnlen(entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES) + 1);
+        strncpy(cert_path, entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES);
+        cfg->values.tls.cert_path = cert_path;
     }
 
     entr = config_get(cfg, "RASTA_KEY_PATH");
+    cfg->values.tls.key_path = NULL;
     if (entr.type == DICTIONARY_STRING) {
-        cfg->values.tls.key_path[PATH_MAX - 1] = 0;
-        memcpy(cfg->values.tls.key_path, entr.value.string.c, PATH_MAX);
+        char *key_path = malloc(strnlen(entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES) + 1);
+        strncpy(key_path, entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES);
+        cfg->values.tls.key_path = key_path;
     }
 
 #ifdef ENABLE_TLS
@@ -683,8 +689,11 @@ void config_setstd(struct RastaConfig *cfg) {
         memcpy(cfg->values.tls.tls_hostname, entr.value.string.c, MAX_DOMAIN_LENGTH);
     }
     entr = config_get(cfg, "RASTA_TLS_PEER_CERT_PATH");
+    cfg->values.tls.peer_tls_cert_path = NULL;
     if (entr.type == DICTIONARY_STRING) {
-        memcpy(cfg->values.tls.peer_tls_cert_path, entr.value.string.c, PATH_MAX);
+        char *peer_tls_cert_path = malloc(strnlen(entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES) + 1);
+        strncpy(peer_tls_cert_path, entr.value.string.c, MAX_DICTIONARY_STRING_LENGTH_BYTES);
+        cfg->values.tls.peer_tls_cert_path = peer_tls_cert_path;
     }
 #endif
 
@@ -775,7 +784,7 @@ int config_load(struct RastaConfig *config, const char *filename) {
         parser_init(&p, buf, n, config);
 
         // skip empty start
-        parser_skipBlanc(&p);
+        parser_skipBlank(&p);
 
         // ignore comments
         if (p.current == ';') {
@@ -800,7 +809,7 @@ int config_load(struct RastaConfig *config, const char *filename) {
         parser_parseIdentifier(&p, key);
 
         // skip empty start
-        parser_skipBlanc(&p);
+        parser_skipBlank(&p);
 
         if (p.current != '=') {
             logger_log(&p.cfg->logger, LOG_LEVEL_ERROR, p.cfg->filename, "Error in line %d: Expected '=' but found '%c'", p.line, p.current);
@@ -810,7 +819,7 @@ int config_load(struct RastaConfig *config, const char *filename) {
         parser_next(&p);
 
         // skip empty start
-        parser_skipBlanc(&p);
+        parser_skipBlank(&p);
 
         parser_parseValue(&p, key);
 
@@ -832,6 +841,10 @@ struct DictionaryEntry config_get(struct RastaConfig *cfg, const char *key) {
 void config_free(struct RastaConfig *cfg) {
     dictionary_free(&cfg->dictionary);
     if (cfg->values.redundancy.connections.count > 0) free(cfg->values.redundancy.connections.data);
+    if (cfg->values.tls.ca_cert_path != NULL) free(cfg->values.tls.ca_cert_path);
+    if (cfg->values.tls.cert_path != NULL) free(cfg->values.tls.cert_path);
+    if (cfg->values.tls.key_path != NULL) free(cfg->values.tls.key_path);
+    if (cfg->values.tls.peer_tls_cert_path != NULL) free(cfg->values.tls.peer_tls_cert_path);
 }
 
 unsigned long mix(unsigned long a, unsigned long b, unsigned long c) {
