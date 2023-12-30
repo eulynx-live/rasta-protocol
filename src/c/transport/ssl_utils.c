@@ -130,7 +130,7 @@ void wolfssl_start_client(WOLFSSL_CTX **ctx, const rasta_config_tls *tls_config,
         abort();
     }
 
-    if (!tls_config->ca_cert_path != NULL) {
+    if (tls_config->ca_cert_path == NULL) {
         fprintf(stderr, "CA certificate path missing!\n");
         abort();
     }
