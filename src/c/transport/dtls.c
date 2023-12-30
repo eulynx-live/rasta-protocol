@@ -115,7 +115,7 @@ static size_t wolfssl_receive_dtls(rasta_transport_socket *transport_socket, uns
 
 static bool is_dtls_server(const rasta_config_tls *tls_config) {
     // client has CA cert but no server certs
-    return tls_config->cert_path[0] && tls_config->key_path[0];
+    return tls_config->cert_path != NULL && tls_config->key_path != NULL;
 }
 
 void handle_tls_mode(rasta_transport_socket *transport_socket) {
