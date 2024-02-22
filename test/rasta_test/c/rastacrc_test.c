@@ -1,6 +1,6 @@
+#include "../../../src/c/util/rastacrc.h"
+#include "../../../src/c/util/rastautil.h"
 #include <CUnit/Basic.h>
-#include <rasta/rastacrc.h>
-
 #define TEST_VAL "123456789"
 
 #define OPT_B_EXPECTED 0x0E7C650A

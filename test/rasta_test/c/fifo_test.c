@@ -1,8 +1,8 @@
 #include "fifo_test.h"
+#include "../../src/c/util/fifo.h"
+#include "../../src/c/util/rastautil.h"
+#include "../../src/c/util/rmemory.h"
 #include <CUnit/Basic.h>
-#include <rasta/fifo.h>
-#include <rasta/rastautil.h>
-#include <rasta/rmemory.h>
 
 void test_push() {
     fifo_t *fifo = fifo_init(3);

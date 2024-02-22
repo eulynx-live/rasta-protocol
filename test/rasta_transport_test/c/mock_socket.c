@@ -7,7 +7,7 @@ int connect(int fd, const struct sockaddr *addr, unsigned int len) {
 int mock_bind_call_count;
 
 int bind(int fd, const struct sockaddr *addr, unsigned int len) {
-    mock_bind_call_count ++;
+    mock_bind_call_count++;
     return 0;
 }
 

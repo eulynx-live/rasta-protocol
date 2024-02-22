@@ -1,12 +1,11 @@
-#include <sys/mman.h>
 #include <errno.h>
+#include <sys/mman.h>
 
-#include <rasta/logging.h>
-#include <rasta/rastahandle.h>
-
+#include "../logging.h"
+#include "../rastahandle.h"
 
 #ifdef ENABLE_OPAQUE
-#include <rasta/key_exchange.h>
+#include "key_exchange.h"
 static inline Opaque_Ids rasta_ids_to_opaque_ids(const uint32_t *my_id,
                                                  const uint32_t *remote_id) { // make sure IDs are represented the same way regardless of endianness
     const Opaque_Ids ids = {.idS = (uint8_t *)my_id, .idS_len = sizeof(uint32_t), .idU = (uint8_t *)remote_id, .idU_len = sizeof(uint32_t)};

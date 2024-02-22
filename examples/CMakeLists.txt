@@ -55,14 +55,14 @@ target_compile_options(pw2iv_sample PRIVATE ${DEFAULT_COMPILE_OPTIONS})
 if(ENABLE_RASTA_TLS)
         add_executable(rcat_dtls
                 ${EXAMPLES_COMMON_SRC}
-                rcat/c/dtls.c rcat/c/wolfssl_certificate_helper.c rcat/c/wolfssl_certificate_helper.h)
+                rcat/c/rcat_dtls.c rcat/c/wolfssl_certificate_helper.c rcat/c/wolfssl_certificate_helper.h)
         target_include_directories(rcat_dtls PRIVATE common/headers)
         set_target_properties(rcat_dtls PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
         target_compile_options(rcat_dtls PRIVATE ${DEFAULT_COMPILE_OPTIONS})
         target_link_libraries(rcat_dtls rasta_dtls wolfssl)
         add_executable(rcat_tls
                 ${EXAMPLES_COMMON_SRC}
-                rcat/c/tls.c rcat/c/wolfssl_certificate_helper.c rcat/c/wolfssl_certificate_helper.h)
+                rcat/c/rcat_tls.c rcat/c/wolfssl_certificate_helper.c rcat/c/wolfssl_certificate_helper.h)
         target_include_directories(rcat_tls PRIVATE common/headers)
         set_target_properties(rcat_tls PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
         target_compile_options(rcat_tls PRIVATE ${DEFAULT_COMPILE_OPTIONS})
@@ -70,7 +70,7 @@ if(ENABLE_RASTA_TLS)
 endif()
 
 if(ENABLE_RASTA_OPAQUE)
-        add_executable(rcat_kex ${EXAMPLES_COMMON_SRC} rcat/c/kex.c)
+        add_executable(rcat_kex ${EXAMPLES_COMMON_SRC} rcat/c/rcat_kex.c)
         target_include_directories(rcat_kex PRIVATE common/headers)
         set_target_properties(rcat_kex PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
         target_compile_options(rcat_kex PRIVATE ${DEFAULT_COMPILE_OPTIONS})
@@ -101,56 +101,3 @@ endif(BUILD_LOCAL_EXAMPLES)
 if(BUILD_RASTA_GRPC_BRIDGE)
 add_subdirectory(rasta_grpc_bridge)
 endif(BUILD_RASTA_GRPC_BRIDGE)
-
-set(SCI_COMMON
-    ${EXAMPLES_COMMON_SRC}
-    sci/common/hashmap.h
-    sci/common/hashmap.c
-    sci/common/sci_telegram_factory.c
-    sci/common/sci_telegram_factory.h
-    sci/common/sci.c
-    sci/common/sci.h
-    sci/common/scils_telegram_factory.c
-    sci/common/scils_telegram_factory.h
-    sci/common/scils.c
-    sci/common/scils.h
-    sci/common/scip_telegram_factory.c
-    sci/common/scip_telegram_factory.h
-    sci/common/scip.c
-    sci/common/scip.h
-)
-
-# scip_example
-add_executable(scip_example ${SCI_COMMON} sci/scip/main.c)
-target_include_directories(scip_example PRIVATE sci/common common/headers)
-set_target_properties(scip_example PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
-target_compile_options(scip_example PRIVATE ${DEFAULT_COMPILE_OPTIONS})
-target_link_libraries(scip_example rasta_udp)
-if(NOT BUILD_SHARED_LIBS)
-    target_link_libraries(scip_example -static)
-endif()
-
-# scils_example
-add_executable(scils_example ${SCI_COMMON} sci/scils/main.c)
-target_include_directories(scils_example PRIVATE sci/common common/headers)
-set_target_properties(scils_example PROPERTIES ${DEFAULT_PROJECT_OPTIONS})
-target_compile_options(scils_example PRIVATE ${DEFAULT_COMPILE_OPTIONS})
-target_link_libraries(scils_example rasta_udp)
-if(NOT BUILD_SHARED_LIBS)
-    target_link_libraries(scils_example -static)
-endif()
-
-add_executable(sciTest
-    ${SCI_COMMON}
-    sci/scitest/headers/registerTests.h
-    sci/scitest/headers/scilsTests.h
-    sci/scitest/headers/scipTests.h
-    sci/scitest/headers/sciTests.h
-    sci/scitest/c/registerTests.c
-    sci/scitest/c/scilsTests.c
-    sci/scitest/c/scipTests.c
-    sci/scitest/c/sciTests.c)
-target_include_directories(sciTest PRIVATE sci/common sci/scitest/headers common/headers)
-target_link_libraries(sciTest rasta_udp ${CUNIT_PACKAGE})
-target_compile_definitions(sciTest PRIVATE WITH_CMAKE)
-add_test(NAME test_sciTest COMMAND sciTest)

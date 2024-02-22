@@ -1,8 +1,10 @@
 #include "handlers.h"
-#include "protocol.h"
-#include "safety_retransmission.h"
 
 #include "../experimental/handlers.h"
+#include "../rasta_connection.h"
+#include "../redundancy/rasta_redundancy_channel.h"
+#include "protocol.h"
+#include "safety_retransmission.h"
 
 int handle_received_packet(struct rasta_connection *connection, struct RastaPacket *receivedPacket) {
     switch (receivedPacket->type) {
@@ -53,7 +55,7 @@ int handle_discreq(struct rasta_connection *connection, struct RastaPacket *rece
     sr_reset_connection(connection);
 
     // remove redundancy channel
-    redundancy_mux_close_channel(connection, connection->redundancy_channel);
+    redundancy_channel_close(connection, connection->redundancy_channel);
 
     // fire connection state changed event
     fire_on_connection_state_change(sr_create_notification_result(NULL, connection));

@@ -1,9 +1,14 @@
-#include <rasta/event_system.h>
+#include "event_system.h"
 
+#include <assert.h>
+#include <stdio.h>
 #include <sys/select.h>
 #include <time.h>
 
 #include <rasta/rasta.h>
+
+#include "../rastahandle.h"
+#include "rastautil.h"
 
 uint64_t get_nanotime() {
     struct timespec t;
@@ -64,13 +69,13 @@ int event_system_sleep(uint64_t time_to_wait, struct fd_event_linked_list_s *fd_
     }
     for (fd_event *current = fd_events->first; current; current = current->next) {
         if (current->enabled && FD_ISSET(current->fd, &on_readable)) {
-            if (current->callback(current->carry_data)) return -1;
+            if (current->callback(current->carry_data, current->fd)) return -1;
         }
         if (current->enabled && FD_ISSET(current->fd, &on_writable)) {
-            if (current->callback(current->carry_data)) return -1;
+            if (current->callback(current->carry_data, current->fd)) return -1;
         }
         if (current->enabled && FD_ISSET(current->fd, &on_exceptional)) {
-            if (current->callback(current->carry_data)) return -1;
+            if (current->callback(current->carry_data, current->fd)) return -1;
         }
     }
     return result;
@@ -151,7 +156,7 @@ void event_system_start(event_system *ev_sys) {
             }
         }
         // fire event and exit in case it returns something else than 0
-        if (next_event->callback(next_event->carry_data)) {
+        if (next_event->callback(next_event->carry_data, -1)) {
             break;
         }
         // update timed_event::last_call
@@ -263,6 +268,10 @@ void add_fd_event(event_system *ev_sys, fd_event *event, int options) {
     event->options = options;
 }
 
+void rasta_add_fd_event(rasta *rasta, fd_event *event, int options) {
+    add_fd_event(&rasta->rasta_lib_event_system, event, options);
+}
+
 /**
  * Removes a fd event from its event system.
  * (not thread safe)
@@ -280,4 +289,8 @@ void remove_fd_event(event_system *ev_sys, fd_event *event) {
     }
     if (event->prev) event->prev->next = event->next;
     if (event->next) event->next->prev = event->prev;
+}
+
+void rasta_remove_fd_event(rasta *rasta, fd_event *event) {
+    remove_fd_event(&rasta->rasta_lib_event_system, event);
 }

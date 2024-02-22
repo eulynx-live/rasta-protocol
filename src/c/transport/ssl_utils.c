@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <wolfssl/error-ssl.h>
 
+#include "../logging.h"
+
 // #define DEBUG_WOLFSSL
 void wolfssl_initialize_if_necessary() {
     static bool wolfssl_initialized = false;
@@ -39,7 +41,7 @@ void wolfssl_start_server(rasta_transport_socket *transport_socket, const rasta_
         abort();
     }
 
-    if (!tls_config->ca_cert_path[0] || !tls_config->cert_path[0] || !tls_config->key_path[0]) {
+    if (tls_config->ca_cert_path == NULL || tls_config->cert_path == NULL || tls_config->key_path == NULL) {
         fprintf(stderr, "CA certificate path, server certificate path or server private key path missing!\n");
         abort();
     }
@@ -128,7 +130,7 @@ void wolfssl_start_client(WOLFSSL_CTX **ctx, const rasta_config_tls *tls_config,
         abort();
     }
 
-    if (!tls_config->ca_cert_path[0]) {
+    if (tls_config->ca_cert_path == NULL) {
         fprintf(stderr, "CA certificate path missing!\n");
         abort();
     }
@@ -141,7 +143,7 @@ void wolfssl_start_client(WOLFSSL_CTX **ctx, const rasta_config_tls *tls_config,
         abort();
     }
 
-    if (tls_config->cert_path[0] && tls_config->key_path[0]) {
+    if (tls_config->cert_path != NULL && tls_config->key_path != NULL) {
         /* Load client certificates */
         if (wolfSSL_CTX_use_certificate_file(*ctx, tls_config->cert_path, SSL_FILETYPE_PEM) !=
             SSL_SUCCESS) {
@@ -261,7 +263,7 @@ void generate_certificate_digest(WOLFSSL_X509 *peer_cert,
 }
 
 void tls_pin_certificate(WOLFSSL *ssl, const char *peer_tls_cert_path) {
-    if (peer_tls_cert_path[0]) {
+    if (peer_tls_cert_path != NULL) {
         // public key pinning: check TLS public key of peer
         unsigned char peer_digest_buffer[SHA256_BUFFER_LENGTH_BYTES], pinned_digest_buffer[SHA256_BUFFER_LENGTH_BYTES];
         unsigned int peer_digest_buffer_size, pinned_digest_buffer_size;
@@ -274,7 +276,8 @@ void tls_pin_certificate(WOLFSSL *ssl, const char *peer_tls_cert_path) {
             abort();
         }
         if (memcmp(peer_digest_buffer, pinned_digest_buffer, pinned_digest_buffer_size) != 0) {
-            struct logger_t sha_logger = logger_init(LOG_LEVEL_DEBUG, LOGGER_TYPE_CONSOLE);
+            struct logger_t sha_logger;
+            logger_init(&sha_logger, LOG_LEVEL_DEBUG, LOGGER_TYPE_CONSOLE);
             fprintf(stderr, "Certificate Pinning error - peer certificate hash does not match!\n");
             logger_hexdump(&sha_logger, LOG_LEVEL_DEBUG, peer_digest_buffer, peer_digest_buffer_size, "Peer certificate (digest)");
             logger_hexdump(&sha_logger, LOG_LEVEL_DEBUG, pinned_digest_buffer, pinned_digest_buffer_size, "Pinned certificate (digest)");

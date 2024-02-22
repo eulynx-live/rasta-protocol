@@ -6,8 +6,7 @@
 #include <string.h> //memset
 #include <unistd.h>
 
-#include <rasta/rmemory.h>
-
+#include "../util/rmemory.h"
 #include "bsd_utils.h"
 #include "tcp.h"
 #include "transport.h"

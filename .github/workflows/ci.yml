@@ -16,19 +16,30 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    
+
+    - name: 'Clang Format'
+      uses: DoozyX/clang-format-lint-action@v0.16.2
+      with:
+        source: '.'
+        extensions: 'h,cpp,c'
+        clangFormatVersion: 16
+        inplace: True
+
+    - name: 'Ensure no changes'
+      run: git diff --exit-code
+
     - name: Update package database
       run: sudo apt-get update
-      
-    - name: Install valgrind
-      run: sudo apt-get install valgrind
 
     - name: Install libopaque dependencies
       run: sudo apt-get install libsodium-dev pkgconf
-      
+
+    - name: Install valgrind
+      run: sudo apt-get install valgrind
+
     - name: Install vcpkg and dependencies
       run: git submodule update --init && ./vcpkg/bootstrap-vcpkg.sh --disableMetrics
-      
+
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
@@ -40,15 +51,19 @@ jobs:
 
     - name: Rcat UDP Test
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_udp.sh
-      
+      timeout-minutes: 1
+
     - name: Rcat TCP Test
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_tcp.sh
+      timeout-minutes: 1
 
     - name: Rcat TLS Test
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_tls.sh
+      timeout-minutes: 1
 
     - name: Rcat DTLS Test
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_dtls.sh
+      timeout-minutes: 1
 
     - name: Rcat KEX / Opaque Test
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_kex.sh
@@ -69,15 +84,19 @@ jobs:
 
     - name: Rcat UDP Test without extensions
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_udp.sh
-      
+      timeout-minutes: 1
+
     - name: Rcat TCP Test without extensions
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_tcp.sh
+      timeout-minutes: 1
 
     - name: Rcat TLS Test without extensions
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_tls.sh
+      timeout-minutes: 1
 
     - name: Rcat DTLS Test without extensions
       run: cd ${{github.workspace}} && ./examples/example_scripts/example_dtls.sh
+      timeout-minutes: 1
 
     - name: CTest without extensions
       run: cd ${{github.workspace}}/build && ctest . --output-on-failure

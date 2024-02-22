@@ -1,4 +1,4 @@
-#include <rasta/logging.h>
+#include "logging.h"
 
 #include <ctype.h>
 #include <inttypes.h>
@@ -11,7 +11,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <rasta/rmemory.h>
+#include "util/rmemory.h"
 
 /**
  * logs a string to the console
@@ -108,17 +108,10 @@ char *get_log_message_string(log_level max_log_level, log_level level, char *loc
     return msg_string;
 }
 
-struct logger_t logger_init(log_level max_log_level, logger_type type) {
-    struct logger_t logger;
-
-    logger.type = type;
-    logger.max_log_level = max_log_level;
-    logger.log_file = NULL;
-
-    // init the buffer FIFO
-    // logger.buffer = fifo_init(LOGGER_BUFFER_SIZE);
-
-    return logger;
+void logger_init(struct logger_t *logger, log_level max_log_level, logger_type type) {
+    logger->type = type;
+    logger->max_log_level = max_log_level;
+    logger->log_file = NULL;
 }
 
 void logger_set_log_file(struct logger_t *logger, char *path) {

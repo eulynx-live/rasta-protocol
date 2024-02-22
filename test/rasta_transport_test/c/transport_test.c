@@ -1,4 +1,5 @@
 #include "transport_test.h"
+#include "../../../src/c/rastahandle.h"
 #include "../../src/c/transport/transport.h"
 #include "mock_socket.h"
 #include <CUnit/Basic.h>

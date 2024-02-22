@@ -1,7 +1,6 @@
 #include "../headers/rastadeferqueue_test.h"
+#include "../../../src/c/util/rastadeferqueue.h"
 #include <CUnit/Basic.h>
-#include <rasta/rastadeferqueue.h>
-#include <rasta/rmemory.h>
 
 void test_deferqueue_init() {
     struct defer_queue queue_to_test = deferqueue_init(3);

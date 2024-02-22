@@ -1,4 +1,5 @@
 #include "transport_test_udp.h"
+#include "../../../src/c/rastahandle.h"
 #include "../../src/c/transport/transport.h"
 #include "mock_socket.h"
 #include <CUnit/Basic.h>
@@ -146,7 +147,7 @@ void test_transport_bind_should_bind_socket_fd() {
 
     transport_init(&h, &channel, 0, "127.0.0.1", 4711, &tls_config);
     transport_create_socket(&h, &socket, 0, &tls_config);
-    
+
     // Act
     transport_bind(&socket, "127.0.0.1", 8888);
 

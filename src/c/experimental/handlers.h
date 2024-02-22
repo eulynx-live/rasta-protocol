@@ -1,7 +1,8 @@
 #pragma once
 
-#include <rasta/rastahandle.h>
-#include <rasta/rastamodule.h>
+#include "../util/rastamodule.h"
+
+struct rasta_connection;
 
 /**
  * send a Key Exchange Request to the specified host

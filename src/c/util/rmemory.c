@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <rasta/rmemory.h>
+#include "rmemory.h"
 
 void *rmalloc(unsigned int size) {
     return malloc(size);

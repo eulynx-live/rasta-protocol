@@ -24,6 +24,7 @@ add_executable(rasta_test
     rasta_test/headers/register_tests.h
     rasta_test/headers/siphash24_test.h
     rasta_test/headers/opaque_test.h
+    rasta_test/headers/redundancy_channel_test.h
     rasta_test/headers/safety_retransmission_test.h
     rasta_test/c/blake2_test.c
     rasta_test/c/config_test.c
@@ -37,6 +38,7 @@ add_executable(rasta_test
     rasta_test/c/register_tests.c
     rasta_test/c/siphash24_test.c
     rasta_test/c/opaque_test.c
+    rasta_test/c/redundancy_channel_test.c
     rasta_test/c/safety_retransmission_test.c
 )
 target_include_directories(rasta_test PRIVATE rasta_test/headers ../examples/common/headers)

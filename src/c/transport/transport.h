@@ -1,8 +1,11 @@
 #pragma once
 
 #include <arpa/inet.h>
-#include <rasta/rasta_red_multiplexer.h>
+#include <stdbool.h>
 
+#include <rasta/config.h>
+
+#include "../util/rastautil.h"
 #include "diagnostics.h"
 #include "events.h"
 
@@ -107,4 +110,4 @@ void transport_close_socket(rasta_transport_socket *socket);
 bool is_dtls_conn_ready(rasta_transport_socket *socket);
 
 // Protected methods
-void find_channel_by_ip_address(struct rasta_handle *h, struct sockaddr_in sender, int *red_channel_idx, int *transport_channel_idx);
+rasta_transport_channel *find_channel_by_ip_address(struct rasta_handle *h, struct sockaddr_in sender);

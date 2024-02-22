@@ -6,9 +6,8 @@
 #include "configfile.h"
 #include <CUnit/Basic.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-
-#include <rasta/rmemory.h>
 
 void check_std_config() {
     // remove old file
@@ -40,6 +39,7 @@ void check_std_config() {
 
     // check receive
     CU_ASSERT_EQUAL(cfg.values.receive.max_recvqueue_size, 20);
+    CU_ASSERT_EQUAL(cfg.values.receive.max_recv_msg_size, 500);
 
     // check retransmission
     CU_ASSERT_EQUAL(cfg.values.retransmission.max_retransmission_queue_size, 100);
@@ -74,6 +74,7 @@ void check_var_config() {
     fprintf(f, "RASTA_DIAG_WINDOW = 6000\n");
 
     fprintf(f, "RASTA_RECVQUEUE_SIZE = 42\n");
+    fprintf(f, "RASTA_RECV_MSG_SIZE = 1337\n");
 
     fprintf(f, "RASTA_RETRANSMISSION_QUEUE_SIZE = 50\n");
 
@@ -111,6 +112,7 @@ void check_var_config() {
 
     // check receive
     CU_ASSERT_EQUAL(cfg.values.receive.max_recvqueue_size, 42);
+    CU_ASSERT_EQUAL(cfg.values.receive.max_recv_msg_size, 1337);
 
     // check retransmission
     CU_ASSERT_EQUAL(cfg.values.retransmission.max_retransmission_queue_size, 50);
@@ -158,5 +160,5 @@ void check_var_config() {
     CU_ASSERT_EQUAL(entr.value.number, 0xff32);
 
     dictionary_free(&cfg.dictionary);
-    rfree(cfg.values.redundancy.connections.data);
+    free(cfg.values.redundancy.connections.data);
 }

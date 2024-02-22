@@ -2,10 +2,11 @@
 
 #include <stdlib.h>
 
-#include <rasta/rasta_init.h>
+#include <rasta/rasta.h>
 
-#include "../retransmission/safety_retransmission.h"
+#include "../rasta_connection.h"
 #include "../retransmission/protocol.h"
+#include "../retransmission/safety_retransmission.h"
 
 /**
  * processes a received Key Exchange Request packet

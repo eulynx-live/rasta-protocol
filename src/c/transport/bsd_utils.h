@@ -1,5 +1,5 @@
-#include <stdbool.h>
 #include <arpa/inet.h>
+#include <stdbool.h>
 
 #define IPV4_STR_LEN 16
 

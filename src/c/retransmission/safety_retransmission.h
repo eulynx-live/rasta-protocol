@@ -1,14 +1,15 @@
 #pragma once
 
-#include <rasta/event_system.h>
 #include <rasta/config.h>
-#include <rasta/rastahandle.h>
-#include <rasta/logging.h>
+
+#include "../logging.h"
+#include "../rastahandle.h"
+#include "../util/event_system.h"
 #include "messages.h"
 
 /**
  * Copy received messages from a RaSTA packet into the receive buffer.
-*/
+ */
 void sr_add_app_messages_to_buffer(struct rasta_connection *con, struct RastaPacket *packet);
 
 /**
@@ -19,34 +20,34 @@ void sr_remove_confirmed_messages(struct rasta_connection *con);
 
 /**
  * Reset connection attributes of @p connection.
-*/
+ */
 void sr_reset_connection(struct rasta_connection *connection);
 
 /**
- * Initialize a @p connection with @p role (client or server) 
-*/
+ * Initialize a @p connection with @p role (client or server)
+ */
 void sr_init_connection(struct rasta_connection *connection, rasta_role role);
 
 /**
  * Send a disconnection request on @p connection with reason @p reason
-*/
+ */
 void sr_close_connection(struct rasta_connection *connection, rasta_disconnect_reason reason, unsigned short details);
 
 /**
  * Handle a transport channel closed because of connection failures
-*/
+ */
 void sr_closed_connection(rasta_connection *connection, unsigned long id);
 
 /**
  * Retransmit all messages in the retransmission queue
-*/
+ */
 void sr_retransmit_data(struct rasta_connection *connection);
 
 /**
  * Listen on all sockets specified by the given RaSTA handle.
  * This should not be called from outside the library - use rasta_listen() instead!
  * @param h the RaSTA handle containing the socket information
-*/
+ */
 void sr_listen(struct rasta_handle *h);
 
 /**
@@ -61,7 +62,7 @@ int sr_send(struct rasta_handle *h, struct rasta_connection *con, struct RastaMe
  * Handle a received packet on the safety/retransmission level and check validity
  * @param con the connection on which the packet was received
  * @param receivedPacket the packet that was received
-*/
+ */
 int sr_receive(rasta_connection *con, struct RastaPacket *receivedPacket);
 
 /**
@@ -70,15 +71,14 @@ int sr_receive(rasta_connection *con, struct RastaPacket *receivedPacket);
  * @param h the handle of the local RaSTA instance
  * @param id the ID of the remote RaSTA instance to connect to
  */
-struct rasta_connection* sr_connect(struct rasta_handle *h, unsigned long id);
+struct rasta_connection *sr_connect(struct rasta_handle *h);
 
 /**
  * Disconnect a connection on request by the user.
  * This should not be called from outside the library - use rasta_disconnect() instead!
  * @param con the connection that should be disconnected
-*/
+ */
 void sr_disconnect(struct rasta_connection *con);
-
 
 /**
  * Cleanup a connection after a disconnect and free assigned ressources.
@@ -132,7 +132,7 @@ int sr_message_authentic(struct rasta_connection *con, struct RastaPacket *packe
 
 /**
  * checks if the received packet is valid
-*/
+ */
 int sr_check_packet(struct rasta_connection *con, struct logger_t *logger, rasta_config_sending *cfg, struct RastaPacket *receivedPacket, char *location);
 
 // Diagnostics

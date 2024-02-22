@@ -1,4 +1,6 @@
 
+#include "udp.h"
+
 #include <arpa/inet.h>
 #include <errno.h>
 #include <stdbool.h>
@@ -7,11 +9,10 @@
 #include <string.h> //memset
 #include <unistd.h>
 
-#include <rasta/rmemory.h>
-
+#include "../rastahandle.h"
+#include "../util/rmemory.h"
 #include "bsd_utils.h"
 #include "ssl_utils.h"
-#include "udp.h"
 
 static void get_client_addr_from_socket(const rasta_transport_socket *transport_socket, struct sockaddr_in *client_addr, socklen_t *addr_len) {
     ssize_t received_bytes;
@@ -60,14 +61,8 @@ static size_t wolfssl_receive_dtls(rasta_transport_socket *transport_socket, uns
 
     get_client_addr_from_socket(transport_socket, sender, &sender_size);
 
-    int red_channel_idx, transport_channel_idx;
-    rasta_transport_channel *channel = NULL;
-
     // find the transport channel corresponding to this socket
-    find_channel_by_ip_address(data->h, *sender, &red_channel_idx, &transport_channel_idx);
-    if (red_channel_idx != -1 && transport_channel_idx != -1) {
-        channel = &data->h->mux.redundancy_channels[red_channel_idx].transport_channels[transport_channel_idx];
-    }
+    rasta_transport_channel *channel = find_channel_by_ip_address(data->h, *sender);
 
     // If this is a client and the channel was connected using udp_send, we may not have
     // told the socket about it. In this case, propagate the connection information to the
@@ -114,7 +109,7 @@ static size_t wolfssl_receive_dtls(rasta_transport_socket *transport_socket, uns
 
 static bool is_dtls_server(const rasta_config_tls *tls_config) {
     // client has CA cert but no server certs
-    return tls_config->cert_path[0] && tls_config->key_path[0];
+    return tls_config->cert_path != NULL && tls_config->key_path != NULL;
 }
 
 void handle_tls_mode(rasta_transport_socket *transport_socket) {

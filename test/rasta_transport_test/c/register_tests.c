@@ -73,7 +73,7 @@ void cunit_register() {
 
     // Tests for transport_connect
     CU_add_test(pSuiteMath, "test_transport_connect_should_enable_socket_receive_event", test_transport_connect_should_enable_socket_receive_event);
-    
+
     // Tests for transport_bind
     CU_add_test(pSuiteMath, "test_transport_bind_should_bind_socket_fd", test_transport_bind_should_bind_socket_fd);
 #endif

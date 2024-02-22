@@ -1,3 +1,5 @@
+#include <rasta/rasta.h>
+
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -5,15 +7,15 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <rasta/event_system.h>
 #include <rasta/rasta.h>
-#include <rasta/rasta_init.h>
-#include <rasta/rastahandle.h>
-#include <rasta/rmemory.h>
 
 #include "experimental/handlers.h"
+#include "rasta_connection.h"
+#include "rastahandle.h"
 #include "retransmission/handlers.h"
 #include "retransmission/safety_retransmission.h"
+#include "util/event_system.h"
+#include "util/rmemory.h"
 
 void log_main_loop_state(struct rasta_handle *h, event_system *ev_sys, const char *message) {
     int fd_event_count = 0, fd_event_active_count = 0, timed_event_count = 0, timed_event_active_count = 0;
@@ -29,38 +31,106 @@ void log_main_loop_state(struct rasta_handle *h, event_system *ev_sys, const cha
                message, fd_event_active_count, fd_event_count, timed_event_active_count, timed_event_count);
 }
 
-bool rasta_bind(rasta_lib_configuration_t user_configuration) {
+bool rasta_bind(rasta *user_configuration) {
     return redundancy_mux_bind(&user_configuration->h);
 }
 
-void rasta_listen(rasta_lib_configuration_t user_configuration) {
+void rasta_listen(rasta *user_configuration) {
     sr_listen(&user_configuration->h);
 }
 
-struct rasta_connection *rasta_accept(rasta_lib_configuration_t user_configuration) {
+rasta_connection *rasta_accept(rasta *user_configuration) {
     struct rasta_handle *h = &user_configuration->h;
     event_system *event_system = &user_configuration->rasta_lib_event_system;
+
+    // Re-initialize the mux
+    redundancy_mux_init(&h->mux);
 
     // accept events were already prepared by rasta_listen
     // event system will break when we have received the first heartbeat of a new connection
     log_main_loop_state(h, event_system, "event-system started");
     event_system_start(event_system);
 
-    for (unsigned i = 0; i < h->rasta_connections_length; i++) {
-        if (h->rasta_connections[i].is_new) {
-            h->rasta_connections[i].is_new = false;
-            return &h->rasta_connections[i];
-        }
+    if (h->rasta_connection->is_new) {
+        h->rasta_connection->is_new = false;
+        return h->rasta_connection;
     }
 
     return NULL;
 }
 
-struct rasta_connection *rasta_connect(rasta_lib_configuration_t user_configuration, unsigned long id) {
-    return sr_connect(&user_configuration->h, id);
+int terminator_callback(void *carry, int fd) {
+    rasta *r = carry;
+
+    logger_log(&r->logger, LOG_LEVEL_DEBUG, "RaSTA Cancel", "Executing cancel handler...");
+
+    // Invalidate the event (read from the pipe)
+    uint64_t u;
+    ssize_t ignored = read(fd, &u, sizeof(u));
+    (void)ignored;
+
+    // Close the pipe
+    close(fd);
+
+    // Exit the event loop
+    return 1;
 }
 
-int rasta_recv(rasta_lib_configuration_t user_configuration, struct rasta_connection *connection, void *buf, size_t len) {
+typedef struct rasta_cancellation {
+    int fd[2];
+} rasta_cancellation;
+
+rasta_cancellation *rasta_prepare_cancellation(rasta *r) {
+    logger_log(&r->logger, LOG_LEVEL_DEBUG, "RaSTA Cancel", "Allocating cancellation...");
+    rasta_cancellation *result = rmalloc(sizeof(rasta_cancellation));
+
+    // Cancel event
+    if (pipe(result->fd) < 0) {
+        perror("Failed to create pipe");
+        rfree(result);
+        return NULL;
+    }
+
+    return result;
+}
+
+rasta_connection *rasta_accept_with_cancel(rasta *r, rasta_cancellation *cancellation) {
+    logger_log(&r->logger, LOG_LEVEL_DEBUG, "RaSTA Accept", "Registering cancel event...");
+
+    fd_event terminator_event;
+    memset(&terminator_event, 0, sizeof(fd_event));
+    terminator_event.callback = terminator_callback;
+    terminator_event.carry_data = r;
+    terminator_event.fd = cancellation->fd[0];
+    enable_fd_event(&terminator_event);
+    rasta_add_fd_event(r, &terminator_event, EV_READABLE);
+
+    rasta_connection *result = rasta_accept(r);
+
+    logger_log(&r->logger, LOG_LEVEL_DEBUG, "RaSTA Accept", "Unregistering cancel event...");
+
+    rasta_remove_fd_event(r, &terminator_event);
+    close(cancellation->fd[1]);
+
+    logger_log(&r->logger, LOG_LEVEL_DEBUG, "RaSTA Cancel", "Freeing cancellation...");
+    rfree(cancellation);
+
+    return result;
+}
+
+void rasta_cancel_operation(rasta *r, rasta_cancellation *cancel) {
+    logger_log(&r->logger, LOG_LEVEL_DEBUG, "RaSTA Cancel", "Canceling operation...");
+
+    uint64_t terminate = 1;
+    uint64_t ignore = write(cancel->fd[1], &terminate, sizeof(uint64_t));
+    (void)ignore;
+}
+
+rasta_connection *rasta_connect(rasta *user_configuration) {
+    return sr_connect(&user_configuration->h);
+}
+
+int rasta_recv(rasta *user_configuration, rasta_connection *connection, void *buf, size_t len) {
     struct rasta_handle *h = &user_configuration->h;
     event_system *event_system = &user_configuration->rasta_lib_event_system;
 
@@ -90,7 +160,7 @@ int rasta_recv(rasta_lib_configuration_t user_configuration, struct rasta_connec
     return received_len;
 }
 
-int rasta_send(rasta_lib_configuration_t user_configuration, struct rasta_connection *connection, void *buf, size_t len) {
+int rasta_send(rasta *user_configuration, rasta_connection *connection, void *buf, size_t len) {
     struct RastaMessageData messageData1;
     allocateRastaMessageData(&messageData1, 1);
     messageData1.data_array[0].bytes = buf;
@@ -101,23 +171,22 @@ int rasta_send(rasta_lib_configuration_t user_configuration, struct rasta_connec
     return return_val;
 }
 
-void rasta_disconnect(struct rasta_connection *connection) {
+void rasta_disconnect(rasta_connection *connection) {
     sr_disconnect(connection);
 }
 
-void rasta_cleanup(rasta_lib_configuration_t user_configuration) {
+void rasta_cleanup(rasta *user_configuration) {
     sr_cleanup(&user_configuration->h);
-    for (unsigned i = 0; i < user_configuration->h.rasta_connections_length; i++) {
-        struct RastaByteArray *elem;
-        while ((elem = fifo_pop(user_configuration->h.rasta_connections[i].fifo_retransmission))) {
-            freeRastaByteArray(elem);
-            rfree(elem);
-        }
-        fifo_destroy(&user_configuration->h.rasta_connections[i].fifo_retransmission);
-        fifo_destroy(&user_configuration->h.rasta_connections[i].fifo_send);
-        fifo_destroy(&user_configuration->h.rasta_connections[i].fifo_receive);
+
+    struct RastaByteArray *elem;
+    while ((elem = fifo_pop(user_configuration->h.rasta_connection->fifo_retransmission))) {
+        freeRastaByteArray(elem);
+        rfree(elem);
     }
-    rfree(user_configuration->h.rasta_connections);
-    rfree(user_configuration->h.config->redundancy.connections.data);
-    rfree(user_configuration->h.config->accepted_versions);
+    fifo_destroy(&user_configuration->h.rasta_connection->fifo_retransmission);
+    fifo_destroy(&user_configuration->h.rasta_connection->fifo_send);
+    fifo_destroy(&user_configuration->h.rasta_connection->fifo_receive);
+
+    rfree(user_configuration->h.rasta_connection);
+    rfree(user_configuration);
 }

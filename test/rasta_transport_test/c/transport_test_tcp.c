@@ -4,6 +4,7 @@
 #include <CUnit/Basic.h>
 #include <stdlib.h>
 
+#include "../../../src/c/rastahandle.h"
 #include "../../src/c/transport/transport.h"
 
 void test_transport_create_socket_should_initialize_accept_event() {

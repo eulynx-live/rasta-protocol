@@ -1,5 +1,6 @@
 #include "diagnostics.h"
 
+#include "../redundancy/rasta_red_multiplexer.h"
 #include "transport.h"
 
 /**
@@ -82,7 +83,7 @@ void red_call_on_diagnostic(redundancy_mux *mux, int n_diagnose,
     logger_log(mux->logger, LOG_LEVEL_DEBUG, "RaSTA Redundancy call onDiagnostics", "called onDiagnostics");
 }
 
-void run_channel_diagnostics(rasta_redundancy_channel* current, unsigned int transport_channel_index) {
+void run_channel_diagnostics(rasta_redundancy_channel *current, unsigned int transport_channel_index) {
     int n_diagnose = current->mux->config->redundancy.n_diagnose;
 
     unsigned long channel_diag_start_time = current->transport_channels[transport_channel_index].diagnostics_data.start_time;
@@ -92,7 +93,7 @@ void run_channel_diagnostics(rasta_redundancy_channel* current, unsigned int tra
 
         // amount of missed packets
         int missed_count = current->diagnostics_packet_buffer.count -
-                            current->transport_channels[transport_channel_index].diagnostics_data.received_packets;
+                           current->transport_channels[transport_channel_index].diagnostics_data.received_packets;
 
         // increase n_missed
         current->transport_channels[transport_channel_index].diagnostics_data.n_missed += missed_count;
@@ -100,11 +101,11 @@ void run_channel_diagnostics(rasta_redundancy_channel* current, unsigned int tra
         // window finished, fire event
         // fire diagnostic notification
         red_call_on_diagnostic(current->mux,
-                                current->mux->config->redundancy.n_diagnose,
-                                current->transport_channels[transport_channel_index].diagnostics_data.n_missed,
-                                current->transport_channels[transport_channel_index].diagnostics_data.t_drift,
-                                current->transport_channels[transport_channel_index].diagnostics_data.t_drift2,
-                                current->associated_id);
+                               current->mux->config->redundancy.n_diagnose,
+                               current->transport_channels[transport_channel_index].diagnostics_data.n_missed,
+                               current->transport_channels[transport_channel_index].diagnostics_data.t_drift,
+                               current->transport_channels[transport_channel_index].diagnostics_data.t_drift2,
+                               current->associated_id);
 
         // reset values
         current->transport_channels[transport_channel_index].diagnostics_data.n_missed = 0;

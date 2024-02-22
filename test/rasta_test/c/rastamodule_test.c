@@ -3,8 +3,7 @@
 //
 
 #include "../headers/rastamodule_test.h"
-#include <rasta/rastamodule.h>
-
+#include "../../../src/c/util/rastamodule.h"
 #include "CUnit/Basic.h"
 
 void testConversion() {

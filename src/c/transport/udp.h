@@ -3,11 +3,6 @@
  */
 #pragma once
 
-#ifdef __cplusplus
-extern "C" { // only need to export C interface if
-             // used by C++ source code
-#endif
-
 #include <netinet/in.h>
 #include <stdint.h>
 
@@ -52,7 +47,3 @@ void udp_send_sockaddr(rasta_transport_channel *transport_channel, unsigned char
  * @param transport_socket the rasta_transport_socket which identifies the socket
  */
 void udp_close(rasta_transport_socket *transport_socket);
-
-#ifdef __cplusplus
-}
-#endif

@@ -1,12 +1,10 @@
 #include "../headers/safety_retransmission_test.h"
 #include <CUnit/Basic.h>
-#include <rasta/rastahandle.h>
-#include <rasta/rastaredundancy.h>
-#include <rasta/rastautil.h>
-#include <rasta/rmemory.h>
 
+#include "../../../src/c/rasta_connection.h"
 #include "../../../src/c/retransmission/safety_retransmission.h"
 #include "../../../src/c/transport/transport.h"
+#include "../../../src/c/util/rmemory.h"
 
 #define SERVER_ID 0xA
 
@@ -27,24 +25,25 @@ void fake_send_callback(struct RastaByteArray data_to_send, rasta_transport_chan
 void test_sr_retransmit_data_shouldSendFinalHeartbeat() {
     fifo_destroy(&test_send_fifo);
 
+    struct rasta_handle rasta_h = {0};
+
     rasta_receive_handle h;
-    struct logger_t logger = logger_init(LOG_LEVEL_INFO, LOGGER_TYPE_CONSOLE);
+    struct logger_t logger;
+    logger_init(&logger, LOG_LEVEL_INFO, LOGGER_TYPE_CONSOLE);
     h.logger = &logger;
 
-    rasta_config_info info;
-    rasta_config_redundancy configInfoRedundancy;
-    configInfoRedundancy.t_seq = 100;
-    configInfoRedundancy.n_diagnose = 10;
-    configInfoRedundancy.crc_type = crc_init_opt_a();
-    configInfoRedundancy.n_deferqueue_size = 2;
-    info.redundancy = configInfoRedundancy;
+    rasta_config_info info = {0};
+    info.redundancy.t_seq = 100;
+    info.redundancy.n_diagnose = 10;
+    info.redundancy.crc_type = crc_init_opt_a();
+    info.redundancy.n_deferqueue_size = 2;
 
     rasta_config_retransmission configRetransmission;
     configRetransmission.max_retransmission_queue_size = 100;
     info.retransmission = configRetransmission;
 
-    uint16_t listenPorts[1] = {1234};
-    redundancy_mux mux = redundancy_mux_init(&logger, listenPorts, 1, &info);
+    redundancy_mux mux;
+    redundancy_mux_alloc(&rasta_h, &mux, &logger, &info);
     mux.sr_hashing_context.hash_length = RASTA_CHECKSUM_NONE;
     rasta_md4_set_key(&mux.sr_hashing_context, 0, 0, 0, 0);
 
@@ -65,8 +64,7 @@ void test_sr_retransmit_data_shouldSendFinalHeartbeat() {
     fake_channel.transport_channels = &transport;
     fake_channel.transport_channel_count = 1;
 
-    mux.redundancy_channels = &fake_channel;
-    mux.redundancy_channels_count = 1;
+    mux.redundancy_channel = &fake_channel;
 
     rasta_connection connection;
     connection.remote_id = SERVER_ID;
@@ -91,7 +89,6 @@ void test_sr_retransmit_data_shouldSendFinalHeartbeat() {
     freeRastaByteArray(hb_message);
     rfree(hb_message);
 
-    rfree(mux.transport_sockets);
     freeRastaByteArray(&fake_channel.hashing_context.key);
     freeRastaByteArray(&mux.sr_hashing_context.key);
 }
@@ -100,24 +97,26 @@ void test_sr_retransmit_data_shouldRetransmitPackage() {
     fifo_destroy(&test_send_fifo);
 
     // Arrange
+
+    struct rasta_handle rasta_h = {0};
+
     rasta_receive_handle h;
-    struct logger_t logger = logger_init(LOG_LEVEL_INFO, LOGGER_TYPE_CONSOLE);
+    struct logger_t logger;
+    logger_init(&logger, LOG_LEVEL_INFO, LOGGER_TYPE_CONSOLE);
     h.logger = &logger;
 
-    rasta_config_info info;
-    rasta_config_redundancy configInfoRedundancy;
-    configInfoRedundancy.t_seq = 100;
-    configInfoRedundancy.n_diagnose = 10;
-    configInfoRedundancy.crc_type = crc_init_opt_a();
-    configInfoRedundancy.n_deferqueue_size = 2;
-    info.redundancy = configInfoRedundancy;
+    rasta_config_info info = {0};
+    info.redundancy.t_seq = 100;
+    info.redundancy.n_diagnose = 10;
+    info.redundancy.crc_type = crc_init_opt_a();
+    info.redundancy.n_deferqueue_size = 2;
 
     rasta_config_retransmission configRetransmission;
     configRetransmission.max_retransmission_queue_size = 100;
     info.retransmission = configRetransmission;
 
-    uint16_t listenPorts[1] = {1234};
-    redundancy_mux mux = redundancy_mux_init(&logger, listenPorts, 1, &info);
+    redundancy_mux mux;
+    redundancy_mux_alloc(&rasta_h, &mux, &logger, &info);
     mux.sr_hashing_context.hash_length = RASTA_CHECKSUM_NONE;
     rasta_md4_set_key(&mux.sr_hashing_context, 0, 0, 0, 0);
 
@@ -138,8 +137,7 @@ void test_sr_retransmit_data_shouldRetransmitPackage() {
     fake_channel.transport_channels = &transport;
     fake_channel.transport_channel_count = 1;
 
-    mux.redundancy_channels = &fake_channel;
-    mux.redundancy_channels_count = 1;
+    mux.redundancy_channel = &fake_channel;
 
     struct rasta_connection connection;
     connection.remote_id = SERVER_ID;
@@ -201,7 +199,6 @@ void test_sr_retransmit_data_shouldRetransmitPackage() {
     rfree(retrdata_message);
     rfree(hb_message);
 
-    rfree(mux.transport_sockets);
     freeRastaByteArray(&data.data);
     freeRastaByteArray(&hashing_context.key);
     freeRastaByteArray(&fake_channel.hashing_context.key);

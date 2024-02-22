@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include <rasta/key_exchange.h>
+#include "../../../src/c/experimental/key_exchange.h"
 #include <string.h>
 
 #define MAX_PASSWORD_LENGTH 128
@@ -25,7 +25,8 @@ int main(int argc, char *argv[]) {
     struct key_exchange_state kex_state;
     int64_t my_id = -1, remote_id = -1;
 
-    struct logger_t logger = logger_init(LOG_LEVEL_ERROR, LOGGER_TYPE_CONSOLE);
+    struct logger_t logger;
+    logger_init(&logger, LOG_LEVEL_ERROR, LOGGER_TYPE_CONSOLE);
 
     int ret, opt;
 

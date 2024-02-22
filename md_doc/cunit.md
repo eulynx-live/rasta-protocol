@@ -31,11 +31,9 @@ void my_unit_test(){
 Congratulations, your just created your unit test, but in order to run it automatically on build we need to register it.
 
 ### Registering the tests
-By registering a unit test it will be added to the list of tests that are executed when the project is built using gradle.
-Registering a unit test is pretty simple, just open the file `src/rastaTest/c/registerTests.c` and you'll see a lot of other unit tests that are already registered here. In order to register your own test you need to include your header file and call `CU_add_test` in the `gradle_cunit_register` function. `CU_add_test` takes 3 arguments.
-The first one is the suite to be used, `pSuiteMath` should be fine for almost all applications, but you could easily implement your own suite, see the CUnit documentation for details.
-The second parameter is the name of your test, we are using the name of the test function as the test name, but you can name it whatever you want.
-The last parameter is a function that is associated with the test. Here you have to pass your previosly created test function.
+By registering a unit test it will be added to the list of tests that are executed.
+Registering a unit test is pretty simple, just open the file `src/rastaTest/c/registerTests.c` and you'll see a lot of other unit tests that are already registered here.
+
 
 ```
 #include "registerTests.h"
@@ -44,7 +42,7 @@ The last parameter is a function that is associated with the test. Here you have
 #include "mytest.h"
 // ... a lot of other test headers and suite init
 
-void gradle_cunit_register() {
+void cunit_register() {
     // ... initialization of suite and other tests
     CU_add_test(pSuiteMath, "my_unit_test", my_unit_test);
 }

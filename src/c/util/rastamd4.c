@@ -1,10 +1,8 @@
-#include <rasta/rastamd4.h>
+#include "rastamd4.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <rasta/rastamd4.h>
 
 /*
  * The basic MD4 functions.

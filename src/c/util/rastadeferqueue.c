@@ -1,7 +1,8 @@
+#include "rastadeferqueue.h"
+
 #include <stdlib.h>
 
-#include <rasta/rastadeferqueue.h>
-#include <rasta/rmemory.h>
+#include "rmemory.h"
 
 /**
  * finds the index of a given element inside the given queue.

@@ -1,9 +1,10 @@
+#include "rastautil.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-#include <rasta/rastautil.h>
-#include <rasta/rmemory.h>
+#include "rmemory.h"
 
 #define rasta_htole32(X) (X)
 #define rasta_le32toh(X) (X)

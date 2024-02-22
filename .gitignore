@@ -29,3 +29,5 @@ doc/
 Makefile
 */bin/*
 *.tcl
+
+.DS_Store

@@ -1,10 +1,12 @@
+#include "protocol.h"
+
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 #include <rasta/config.h>
-#include <rasta/rastautil.h>
 
-#include "protocol.h"
+#include "../util/rastautil.h"
 
 // TODO: This contains mostly utility functions, like rastautil.c. Merge these two files?
 

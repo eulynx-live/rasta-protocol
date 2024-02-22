@@ -1,9 +1,9 @@
 //
 // Created by erica on 04/07/2022.
 //
+#include "../../src/c/experimental/key_exchange.h"
+#include "../../src/c/logging.h"
 #include <CUnit/Basic.h>
-#include <rasta/key_exchange.h>
-#include <rasta/logging.h>
 
 #ifdef ENABLE_OPAQUE
 #include <opaque.h>
@@ -12,7 +12,8 @@ void opaque_wrapper_test() {
     const char *psk = "MySecretPW";
     struct key_exchange_state kex_state;
     const uint32_t server_id = 42, client_id = 21, isn = 0xdeadbeef;
-    struct logger_t logger = logger_init(LOG_LEVEL_DEBUG, LOGGER_TYPE_CONSOLE);
+    struct logger_t logger;
+    logger_init(&logger, LOG_LEVEL_DEBUG, LOGGER_TYPE_CONSOLE);
     uint8_t server_session_key[OPAQUE_SHARED_SECRETBYTES];
     uint8_t server_user_auth[crypto_auth_hmacsha512_BYTES];
     uint8_t client_user_auth[crypto_auth_hmacsha512_BYTES];

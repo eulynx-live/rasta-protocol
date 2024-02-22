@@ -20,31 +20,16 @@ set(target rasta)
 # RaSTA headers
 set(headers
     include/rasta/config.h
-    include/rasta/event_system.h
-    include/rasta/fifo.h
-    include/rasta/logging.h
     include/rasta/rasta.h
-    include/rasta/rasta_red_multiplexer.h
-    include/rasta/rasta_connection.h
-    include/rasta/rastacrc.h
-    include/rasta/rastadeferqueue.h
-    include/rasta/rastafactory.h
-    include/rasta/rastahandle.h
-    include/rasta/rasta_init.h
-    include/rasta/rastamd4.h
-    include/rasta/rastamodule.h
-    include/rasta/rastaredundancy.h
-    include/rasta/rastautil.h
-    include/rasta/rmemory.h
-    include/rasta/rastablake2.h
-    include/rasta/rastasiphash24.h
-    include/rasta/rastahashing.h
-    include/rasta/key_exchange.h
+    include/rasta/notification.h
+    include/rasta/events.h
 )
 
 set(sources
     c/logging.c
+    c/logging.h
     c/rastafactory.c
+    c/rastafactory.h
     c/transport/bsd_utils.c
     c/transport/bsd_utils.h
     c/transport/diagnostics.c
@@ -53,32 +38,50 @@ set(sources
     c/transport/events.h
     c/transport/transport.c
     c/retransmission/handlers.c
+    c/retransmission/handlers.h
+    c/retransmission/safety_retransmission.c
     c/retransmission/safety_retransmission.h
     c/retransmission/messages.c
     c/retransmission/messages.h
-    c/retransmission/safety_retransmission.c
     c/retransmission/protocol.c
-    c/retransmission/handlers.h
     c/retransmission/protocol.h
     c/redundancy/rasta_red_multiplexer.c
+    c/redundancy/rasta_red_multiplexer.h
     c/redundancy/rastaredundancy.c
+    c/redundancy/rastaredundancy.h
+    c/redundancy/rasta_redundancy_channel.c
+    c/redundancy/rasta_redundancy_channel.h
     c/experimental/handlers.c
-    c/experimental/key_exchange.c
     c/experimental/handlers.h
+    c/experimental/key_exchange.c
+    c/experimental/key_exchange.h
     c/util/rastamodule.c
+    c/util/rastamodule.h
     c/util/rastacrc.c
+    c/util/rastacrc.h
     c/util/rastautil.c
+    c/util/rastautil.h
     c/util/rastahashing.c
+    c/util/rastahashing.h
     c/util/rastamd4.c
+    c/util/rastamd4.h
     c/util/event_system.c
+    c/util/event_system.h
     c/util/rmemory.c
+    c/util/rmemory.h
     c/util/fifo.c
+    c/util/fifo.h
     c/util/rastablake2.c
+    c/util/rastablake2.h
     c/util/rastasiphash24.c
+    c/util/rastasiphash24.h
     c/util/rastadeferqueue.c
+    c/util/rastadeferqueue.h
     c/rasta_init.c
     c/rasta.c
     c/rastahandle.c
+    c/rastahandle.h
+    c/rasta_connection.h
 )
 
 if(ENABLE_RASTA_TLS)

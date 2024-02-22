@@ -1,8 +1,6 @@
 #include "../headers/siphash24_test.h"
+#include "../../../src/c/util/rastasiphash24.h"
 #include <CUnit/Basic.h>
-#include <rasta/rastasiphash24.h>
-#include <rasta/rmemory.h>
-
 size_t lengths[4] = {8, 16, 4, 8};
 
 void testSipHash24() {

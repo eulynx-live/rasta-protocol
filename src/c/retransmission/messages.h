@@ -1,7 +1,6 @@
 #pragma once
 
-#include <rasta/rasta_red_multiplexer.h>
-#include <rasta/rastahandle.h>
+struct rasta_connection;
 
 /**
  * Reasons for DiscReq as specified in 5.4.6

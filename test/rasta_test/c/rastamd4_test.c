@@ -7,9 +7,9 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "../../../src/c/util/rastamd4.h"
+#include "../../../src/c/util/rmemory.h"
 #include "../headers/rastamd4_test.h"
-#include <rasta/rastamd4.h>
-#include <rasta/rmemory.h>
 
 void testMD4function() {
 

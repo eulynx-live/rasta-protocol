@@ -1,7 +1,8 @@
-#include <rasta/rastahashing.h>
+#include "rastahashing.h"
 
-#include <rasta/rmemory.h>
 #include <stdlib.h>
+
+#include "rmemory.h"
 
 void rasta_md4_set_key(rasta_hashing_context_t *context, MD4_u32plus a, MD4_u32plus b, MD4_u32plus c, MD4_u32plus d) {
     // MD4 IV has length 4*4 bytes

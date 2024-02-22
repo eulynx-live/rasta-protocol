@@ -1,4 +1,7 @@
 #include "messages.h"
+
+#include "../rasta_connection.h"
+#include "../rastahandle.h"
 #include "protocol.h"
 
 /**

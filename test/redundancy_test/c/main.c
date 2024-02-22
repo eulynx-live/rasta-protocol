@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
         info.redundancy.connections = cons;
 
         printf("Initializing client 1...\n");
-        mux = redundancy_mux_init_(logger, info);
+        mux = redundancy_mux_init(&mux, logger, info);
         redundancy_mux_add_channel(&mux, SERVER_ID, serverConnection);
 
         printf("Init Client 1 done\n");

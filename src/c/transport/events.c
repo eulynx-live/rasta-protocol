@@ -1,21 +1,25 @@
+#include "events.h"
+
 #include <inttypes.h>
 #include <stdlib.h>
 
-#include <rasta/logging.h>
 #include <rasta/rasta.h>
-#include <rasta/rastahandle.h>
-#include <rasta/rastaredundancy.h>
-#include <rasta/rmemory.h>
 
 #include "../experimental/handlers.h"
+#include "../logging.h"
+#include "../rasta_connection.h"
+#include "../rastahandle.h"
+#include "../redundancy/rastaredundancy.h"
 #include "../retransmission/messages.h"
 #include "../retransmission/protocol.h"
 #include "../retransmission/safety_retransmission.h"
+#include "../util/rmemory.h"
 #include "diagnostics.h"
-#include "events.h"
 #include "transport.h"
 
-int channel_accept_event(void *carry_data) {
+int channel_accept_event(void *carry_data, int _fd) {
+    UNUSED(_fd);
+
     struct accept_event_data *data = carry_data;
 
     logger_log(data->h->mux.logger, LOG_LEVEL_DEBUG, "RaSTA RedMux accept", "Socket ready to accept");
@@ -26,14 +30,8 @@ int channel_accept_event(void *carry_data) {
     char str[INET_ADDRSTRLEN];
     inet_ntop(AF_INET, &addr.sin_addr, str, INET_ADDRSTRLEN);
 
-    int red_channel_idx, transport_channel_idx;
-    rasta_transport_channel *channel = NULL;
-
     // Find the suitable transport channel in the mux
-    find_channel_by_ip_address(data->h, addr, &red_channel_idx, &transport_channel_idx);
-    if (red_channel_idx != -1 && transport_channel_idx != -1) {
-        channel = &data->h->mux.redundancy_channels[red_channel_idx].transport_channels[transport_channel_idx];
-    }
+    rasta_transport_channel *channel = find_channel_by_ip_address(data->h, addr);
 
     if (channel != NULL) {
         channel->file_descriptor = fd;
@@ -58,7 +56,9 @@ int channel_accept_event(void *carry_data) {
     return 0;
 }
 
-int channel_receive_event(void *carry_data) {
+int channel_receive_event(void *carry_data, int fd) {
+    UNUSED(fd);
+
     struct receive_event_data *data = carry_data;
     rasta_connection *connection = data->connection;
 
@@ -76,14 +76,9 @@ int channel_receive_event(void *carry_data) {
 
     if (transport_channel == NULL) {
         // We will only enter this branch for UDP and DTLS
-        int red_channel_idx, transport_channel_idx;
 
         // Find the suitable transport channel in the mux
-        find_channel_by_ip_address(data->h, sender, &red_channel_idx, &transport_channel_idx);
-        if (red_channel_idx != -1 && transport_channel_idx != -1) {
-            transport_channel = &data->h->mux.redundancy_channels[red_channel_idx].transport_channels[transport_channel_idx];
-            connection = &data->h->rasta_connections[red_channel_idx];
-        }
+        transport_channel = find_channel_by_ip_address(data->h, sender);
 
         if (transport_channel == NULL) {
             // Ignore and continue
@@ -91,6 +86,7 @@ int channel_receive_event(void *carry_data) {
             return 0;
         }
 
+        connection = data->h->rasta_connection;
         transport_channel->file_descriptor = data->socket->file_descriptor;
 
         // We can regard UDP channels as 'always connected' (no re-dial possible)
@@ -110,6 +106,7 @@ int channel_receive_event(void *carry_data) {
         if (data->socket != NULL) {
             disable_fd_event(&data->socket->receive_event);
         }
+
         if (data->channel != NULL) {
             disable_fd_event(&data->channel->receive_event);
         }
@@ -117,6 +114,7 @@ int channel_receive_event(void *carry_data) {
         if (connection != NULL) {
             return handle_closed_transport(connection, connection->redundancy_channel);
         }
+
         // Ignore and continue
         return 0;
     }
@@ -131,7 +129,9 @@ int channel_receive_event(void *carry_data) {
     return 0;
 }
 
-int event_connection_expired(void *carry_data) {
+int event_connection_expired(void *carry_data, int fd) {
+    UNUSED(fd);
+
     struct timed_event_data *data = carry_data;
     struct rasta_heartbeat_handle *h = (struct rasta_heartbeat_handle *)data->handle;
     logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA HEARTBEAT", "T_i timer expired");
@@ -165,7 +165,9 @@ int event_connection_expired(void *carry_data) {
     return 1;
 }
 
-int heartbeat_send_event(void *carry_data) {
+int heartbeat_send_event(void *carry_data, int fd) {
+    UNUSED(fd);
+
     struct timed_event_data *data = carry_data;
     struct rasta_heartbeat_handle *h = (struct rasta_heartbeat_handle *)data->handle;
 
@@ -187,7 +189,9 @@ int heartbeat_send_event(void *carry_data) {
     return 0;
 }
 
-int data_send_event(void *carry_data) {
+int data_send_event(void *carry_data, int fd) {
+    UNUSED(fd);
+
     rasta_sending_handle *h = carry_data;
 
     logger_log(h->logger, LOG_LEVEL_DEBUG, "RaSTA send handler", "send data");
@@ -272,7 +276,9 @@ int data_send_event(void *carry_data) {
     return 0;
 }
 
-int send_timed_key_exchange(void *arg) {
+int send_timed_key_exchange(void *arg, int fd) {
+    UNUSED(fd);
+
 #ifdef ENABLE_OPAQUE
     struct timed_event_data *event_data = (struct timed_event_data *)arg;
     // rasta_receive_handle *handle = (rasta_receive_handle *)event_data->handle;

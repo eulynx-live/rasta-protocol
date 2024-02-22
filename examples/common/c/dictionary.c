@@ -1,8 +1,8 @@
 #include <ctype.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "dictionary.h"
-#include <rasta/rmemory.h>
 
 /**
  * makes the string uppercase
@@ -21,7 +21,7 @@ void uppercase(char *string) {
  * @param size
  */
 void dictionary_change_size(struct Dictionary *dict, unsigned int size) {
-    dict->data = rrealloc(dict->data, size * sizeof(struct DictionaryEntry));
+    dict->data = realloc(dict->data, size * sizeof(struct DictionaryEntry));
     dict->actual_size = size;
 }
 
@@ -52,20 +52,20 @@ int dictionary_add(struct Dictionary *dict, struct DictionaryEntry entry) {
 
 struct DictionaryArray allocate_DictionaryArray(unsigned int size) {
     struct DictionaryArray result;
-    result.data = rmalloc(sizeof(struct DictionaryString) * size);
+    result.data = malloc(sizeof(struct DictionaryString) * size);
     result.count = size;
     return result;
 }
 
 void reallocate_DictionaryArray(struct DictionaryArray *array, unsigned int new_size) {
-    array->data = rrealloc(array->data, sizeof(struct DictionaryString) * new_size);
+    array->data = realloc(array->data, sizeof(struct DictionaryString) * new_size);
     array->count = new_size;
 }
 
 void free_DictionaryArray(struct DictionaryArray *array) {
     if (array->count == 0) return;
     array->count = 0;
-    rfree(array->data);
+    free(array->data);
 }
 
 struct Dictionary dictionary_create(unsigned int initial_size) {
@@ -73,7 +73,7 @@ struct Dictionary dictionary_create(unsigned int initial_size) {
     struct Dictionary result;
     result.size = 0;
     result.actual_size = initial_size;
-    result.data = rmalloc(sizeof(struct DictionaryEntry) * initial_size);
+    result.data = malloc(sizeof(struct DictionaryEntry) * initial_size);
 
     return result;
 }
@@ -87,7 +87,7 @@ void dictionary_free(struct Dictionary *dict) {
     if (dict->actual_size != 0) {
         dict->actual_size = 0;
         dict->size = 0;
-        rfree(dict->data);
+        free(dict->data);
     }
 }
 

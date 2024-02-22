@@ -1,4 +1,4 @@
-#include <rasta/event_system.h>
+#include "../../../src/c/util/event_system.h"
 #include <stdio.h>
 #include <unistd.h>
 
@@ -14,21 +14,24 @@ uint64_t test_get_nanotime() {
     return t.tv_sec * 1000000000 + t.tv_nsec;
 }
 
-int send_heartbeat_event(void *carry_data) {
+int send_heartbeat_event(void *carry_data, int fd) {
     (void)carry_data;
+    (void)fd;
     uint64_t n_time = test_get_nanotime();
     printf("time since last call: %8lu us - expected:%8lu us\n", (unsigned long)((n_time - last_time) / 1000), (unsigned long)(heartbeat_interval / 1000));
     last_time = n_time;
     return 0;
 }
 
-int disconnect_event(void *carry_data) {
+int disconnect_event(void *carry_data, int fd) {
     (void)carry_data;
+    (void)fd;
     printf("disconnecting due to inactivity\n");
     return 1;
 }
 
-int event_read(void *carry_data) {
+int event_read(void *carry_data, int fd) {
+    (void)fd;
     char buffer[128];
     ssize_t len = read(STDIN_FILENO, buffer, 127);
     if (buffer[0] != '\n') {

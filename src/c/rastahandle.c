@@ -1,13 +1,13 @@
-#include <rasta/rastahandle.h>
+#include "rastahandle.h"
 
-#include <rasta/rmemory.h>
 #include <stdlib.h>
 
-struct rasta_notification_result sr_create_notification_result(struct rasta_handle *handle, struct rasta_connection *connection) {
-    struct rasta_notification_result r;
-    UNUSED(handle);
+#include "util/rmemory.h"
 
-    r.connection = *connection;
+struct rasta_notification_result sr_create_notification_result(struct rasta_handle *handle, struct rasta_connection *connection) {
+    struct rasta_notification_result r = {NULL};
+    UNUSED(handle);
+    UNUSED(connection);
 
     return r;
 }
@@ -78,7 +78,8 @@ void on_discrequest_change_call(struct rasta_disconnect_notification_result *con
  * @param connection the connection that is used
  */
 void fire_on_discrequest_state_change(struct rasta_notification_result result, struct RastaDisconnectionData data) {
-    UNUSED(result); UNUSED(data);
+    UNUSED(result);
+    UNUSED(data);
 
     // if (result.handle->notifications.on_disconnection_request_received == NULL) {
     //     // notification not set, do nothing
@@ -178,4 +179,3 @@ void rasta_handle_init(struct rasta_handle *h, rasta_config_info *config, struct
     h->notifications.on_disconnection_request_received = NULL;
     h->notifications.on_redundancy_diagnostic_notification = NULL;
 }
-

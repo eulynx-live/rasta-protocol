@@ -8,7 +8,7 @@ This tutorial is written for Linux. If you are using another operating system, t
 
 The following dependencies are required for building the RaSTA library and binaries:
 
-* CUnit (package `libcunit1` or similar)
+* CUnit (package `libcunit1-dev` or similar)
 * if `ENABLE_RASTA_OPAQUE` is enabled: libsodium (packages `libsodium-dev` and `pkgconf` or similar)
 * if `ENABLE_RASTA_TLS` is enabled: [WolfSSL](https://www.wolfssl.com/) (package `wolfssl` or similar).
 * if `BUILD_RASTA_GRPC_BRIDGE` is enabled: gRPC (package `grpc` or similar)
@@ -47,9 +47,7 @@ Note that on ARM systems, our default MD4 implementation does not work correctly
 The RaSTA C library comes with some simple examples to show the use of the library.
 The following examples are included:
 
-- **mux_stresstest:** a simple forwarding example using only the redundancy layer. A client sends a message to a server which forwards the received message to another client.
 - **rcat:** an example for communication between a client and a server (provided in versions for all supported transport protocols), which allows sending text submitted on the commandline between client and server. Use commandline argument `r` to start in server (receiver) mode and `s` to start in client (sender) mode. Note that these examples should be run from a folder containing the config files `rasta_server_local{_tls,_dtls}.cfg` and `rasta_client_local{_tls,_dtls}.cfg`.
-- **scils_example** and **scip_example**: examples for the communication with points and light signals using SCI-P and SCI-LS. These examples just send one simple SCI telegram to change the point position / signal aspect and wait for the corresponding status message.
 - **rasta_grpc_bridge**: an extremely useful program, which sends messages submitted via gRPC on a RaSTA connection and sends received RaSTA messages back to you, also via gRPC. This allows you to fully focus on your application specific protocol without needing to know RaSTA.
 - **examples_localhost** and **logging_example**: These examples show you (as a RaSTA library developer) how logging, events and MD4 work. They are also meant to test these specific modules.
 

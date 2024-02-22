@@ -1,0 +1,58 @@
+version: 2.1
+jobs:
+  build:
+    resource_class: arm.medium
+    docker:
+      - image: cimg/base:2023.12
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Build and Push application Docker image
+          command: |
+            TAG=main-arm64
+
+            SHA=$(git rev-parse HEAD)
+            SHORTSHA="${SHA:0:7}"
+            SHA_TAG=sha-$SHORTSHA-arm64
+
+            echo $GHCR_PASSWORD | docker login ghcr.io -u $GHCR_USERNAME --password-stdin
+
+            docker buildx build --platform linux/arm64 \
+              --target udp \
+              -t ghcr.io/eulynx-live/librasta/rasta_grpc_bridge_udp:$TAG \
+              -t ghcr.io/eulynx-live/librasta/rasta_grpc_bridge_udp:$SHA_TAG \
+              -f docker/rasta_grpc_bridge/Dockerfile .
+
+            docker buildx build --platform linux/arm64 \
+              --target tcp \
+              -t ghcr.io/eulynx-live/librasta/rasta_grpc_bridge_tcp:$TAG \
+              -t ghcr.io/eulynx-live/librasta/rasta_grpc_bridge_tcp:$SHA_TAG \
+              -f docker/rasta_grpc_bridge/Dockerfile .
+
+            docker buildx build --platform linux/arm64 \
+              --target dtls \
+              -t ghcr.io/eulynx-live/librasta/rasta_grpc_bridge_dtls:$TAG \
+              -t ghcr.io/eulynx-live/librasta/rasta_grpc_bridge_dtls:$SHA_TAG \
+              -f docker/rasta_grpc_bridge/Dockerfile .
+
+            docker buildx build --platform linux/arm64 \
+              --target tls \
+              -t ghcr.io/eulynx-live/librasta/rasta_grpc_bridge_tls:$TAG \
+              -t ghcr.io/eulynx-live/librasta/rasta_grpc_bridge_tls:$SHA_TAG \
+              -f docker/rasta_grpc_bridge/Dockerfile .
+
+
+            docker push --all-tags ghcr.io/eulynx-live/librasta/rasta_grpc_bridge_udp
+            docker push --all-tags ghcr.io/eulynx-live/librasta/rasta_grpc_bridge_tcp
+            docker push --all-tags ghcr.io/eulynx-live/librasta/rasta_grpc_bridge_dtls
+            docker push --all-tags ghcr.io/eulynx-live/librasta/rasta_grpc_bridge_tls
+workflows:
+  build:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - main
