@@ -267,7 +267,7 @@ void test_sr_handle_conreq_shouldInitializeSequenceNumberFromConfig() {
     rasta_md4_set_key(&hashing_context, 0, 0, 0, 0);
     h.hashing_context = &hashing_context;
 
-    char* version = "0303";
+    char *version = "0303";
     struct RastaPacket data = createConnectionRequest(SERVER_ID, CLIENT_ID, 0, 0, 0, version, &hashing_context);
     data.checksum_correct = true;
 
