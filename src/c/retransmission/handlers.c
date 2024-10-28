@@ -383,7 +383,7 @@ void handle_conreq(struct rasta_connection *connection, struct RastaPacket *rece
         sr_init_connection(connection, RASTA_ROLE_SERVER);
 
         // initialize seq num
-        connection->sn_t = connection->sn_i = receivedPacket->sequence_number;
+        connection->sn_t = connection->sn_i = connection->config->initial_sequence_number;
 
         logger_log(connection->logger, LOG_LEVEL_DEBUG, "RaSTA HANDLE: ConnectionRequest", "Using %lu as initial sequence number",
                    (long unsigned int)connection->sn_t);

@@ -84,6 +84,7 @@ void cunit_register() {
     // Tests for Safety and Retransmission layer
     CU_add_test(pSuiteRasta, "test_sr_retransmit_data_shouldSendFinalHeartbeat", test_sr_retransmit_data_shouldSendFinalHeartbeat);
     CU_add_test(pSuiteRasta, "test_sr_retransmit_data_shouldRetransmitPackage", test_sr_retransmit_data_shouldRetransmitPackage);
+    CU_add_test(pSuiteRasta, "test_sr_handle_conreq_shouldInitializeSequenceNumberFromConfig", test_sr_handle_conreq_shouldInitializeSequenceNumberFromConfig);
 
     CU_add_test(pSuiteRasta, "test_redundancy_channel", test_redundancy_channel);
 
