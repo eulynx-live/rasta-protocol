@@ -298,7 +298,7 @@ class RastaService final : public sci::Rasta::Service {
 
 int main(int argc, char *argv[]) {
     if (argc < 9) {
-        std::cout << "Usage: " << argv[0] << " <config_file> <listen_address> <target_host_ch0> <target_port_ch0> <target_host_ch1> <target_port_ch1> <local_rasta_id> <local_remote_id> <?grpc_target_address>" << std::endl;
+        std::cout << "Usage: " << argv[0] << " <config_file> <listen_address> <target_host_ch0> <target_port_ch0> <target_host_ch1> <target_port_ch1> <rasta_local_id> <rasta_target_id> <?grpc_target_address>" << std::endl;
         return 1;
     }
 
